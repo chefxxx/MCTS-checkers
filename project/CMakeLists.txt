@@ -24,7 +24,7 @@ message("Supported CUDA architectures: " "${CMAKE_CUDA_ARCHITECTURES}")
 
 target_include_directories(${CUDA_LIB} PUBLIC
         "${CMAKE_CURRENT_SOURCE_DIR}/include/cpu"
-        "${CMAKE_CURRENT_SOURCE_DIR}/include/cuda"
+        "${CMAKE_CURRENT_SOURCE_DIR}/include/general"
         "${CMAKE_CURRENT_SOURCE_DIR}/include/cuda_utils"
         "${CMAKE_CURRENT_SOURCE_DIR}/include/utils"
          ${CUDAToolkit_INCLUDE_DIRS}

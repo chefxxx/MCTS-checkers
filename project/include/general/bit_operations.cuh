@@ -7,6 +7,14 @@
 
 #include <bit>
 
+// --- Make this compile with .cpp files ---
+#ifndef __CUDACC__
+    #define __device__
+    #define __host__
+    #define __forceinline__ inline
+#endif
+// -----------------------------------------
+
 constexpr size_t MIN_LSB = 1ull;
 
 // this func is used for setting bits

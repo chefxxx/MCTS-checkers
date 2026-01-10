@@ -9,7 +9,7 @@
 #include <iostream>
 #include <string>
 
-#include "bit_operations.h"
+#include "bit_operations.cuh"
 
 enum class StartingColour
 {
@@ -19,7 +19,7 @@ enum class StartingColour
 
 struct Board
 {
-    explicit Board(const StartingColour t_perspective) : m_whiteBoard(0ull), m_blackBoard(0ull), m_perspective(t_perspective)
+    __host__ explicit Board(const StartingColour t_perspective) : m_whiteBoard(0ull), m_blackBoard(0ull), m_perspective(t_perspective)
     {
         initBoard();
     }
