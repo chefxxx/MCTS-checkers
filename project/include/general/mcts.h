@@ -7,4 +7,14 @@
 
 // class to manage mcts tree on the cpu
 
+struct MctsNode
+{
+
+};
+
+struct MctsTree
+{
+
+};
+
 #endif // MCTS_CHECKERS_MCTS_H

@@ -9,9 +9,9 @@
 #include <iostream>
 #include <string>
 
-#include "bit_operations.cuh"
+#include "bit_operations.h"
 
-enum class StartingColour
+enum class Colour
 {
     black = 0,
     white = 1,
@@ -19,11 +19,11 @@ enum class StartingColour
 
 struct Board
 {
-    __host__ explicit Board(const StartingColour t_perspective) : m_whiteBoard(0ull), m_blackBoard(0ull), m_perspective(t_perspective)
+    explicit Board(const Colour t_perspective) : m_whiteBoard(0ull), m_blackBoard(0ull), m_perspective(t_perspective)
     {
         initBoard();
     }
-    __host__ void printBoard() const
+    void printBoard() const
     {
         const std::string middleRow = " +---+---+---+---+---+---+---+---+\n";
 
@@ -50,6 +50,12 @@ struct Board
         std::cout << middleRow;
         std::cout << columnsNamesRow;
     }
+
+    // TODO: dummy function
+    [[nodiscard]] bool isGameOver() const
+    {
+        return popCount(m_whiteBoard) == popCount(m_blackBoard);
+    }
 private:
     void initBoard()
     {
@@ -69,7 +75,7 @@ private:
         opponent |= firstRowMask  << 48;
         opponent |= secondRowMask << 56;
 
-        if (m_perspective == StartingColour::black) {
+        if (m_perspective == Colour::black) {
             columnsNamesRow = "    h   g   f   e   d   c   b   a \n";
             rowsNames = {'1', '2', '3', '4', '5', '6', '7', '8'};
             m_blackBoard = us;
@@ -88,7 +94,7 @@ private:
     size_t m_blackBoard;
 
     // perspective and printing utils
-    StartingColour m_perspective;
+    Colour m_perspective;
     std::array<char, 8> rowsNames{};
     std::string columnsNamesRow;
 };

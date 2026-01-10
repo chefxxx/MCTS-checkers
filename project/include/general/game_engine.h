@@ -7,8 +7,8 @@
 
 #include "board_infra.cuh"
 
-StartingColour drawStartingColour();
-void gameLoop(StartingColour t_player);
-void genMoves_cpu();
+Colour drawStartingColour();
+void playPlayer(Board& t_currentBoard, Colour t_myColour);
+void playAI_cpu();
 
 #endif // MCTS_CHECKERS_GAME_ENGINE_H
