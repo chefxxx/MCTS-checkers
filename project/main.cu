@@ -7,6 +7,7 @@ int main(int argc, const char ** argv) {
     std::cout << "Press any key to draw a colour and start the game...\n";
     std::cin.get();
     const auto playerColour = drawStartingColour();
+    std::cout << "You are " << playerColour << "!\n";
 
     const Colour aiColour = playerColour == Colour::black ? Colour::white : Colour::black;
     auto current_turn = Colour::white;

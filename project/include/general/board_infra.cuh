@@ -17,6 +17,12 @@ enum class Colour
     white = 1,
 };
 
+inline std::ostream& operator<<(std::ostream& os, const Colour& t_colour)
+{
+    const std::string colStr = t_colour == Colour::black ? "black" : "white";
+    return os << colStr;
+}
+
 struct Board
 {
     explicit Board(const Colour t_perspective) : m_whiteBoard(0ull), m_blackBoard(0ull), m_perspective(t_perspective)
@@ -29,24 +35,32 @@ struct Board
 
         // Remember that rocks may overlap each other, this func just prints
         std::cout << columnsNamesRow;
-        int row = 0;
-        for (int i = 56; i >= 0; i -= 8) {
+        for (int visualRow = 0; visualRow < 8; ++visualRow) {
             std::cout << middleRow;
-            std::cout << rowsNames[row];
-            for (int j = i; j < i + 8; ++j) {
-                if (checkBitAtIdx(m_whiteBoard, j)) {
+            std::cout << rowsNames[visualRow];
+            for (int visualCol = 0; visualCol < 8; ++visualCol) {
+                int actualRow, actualCol;
+                if (m_perspective == Colour::black) {
+                    actualRow = visualRow;
+                    actualCol = 7 - visualCol;
+                }
+                else {
+                    actualRow = 7 - visualRow;
+                    actualCol = visualCol;
+                }
+                if (const int bitIdx = actualRow * 8 + actualCol; checkBitAtIdx(m_whiteBoard, bitIdx)) {
                     std::cout << "| w ";
                 }
-                else if (checkBitAtIdx(m_blackBoard, j)) {
+                else if (checkBitAtIdx(m_blackBoard, bitIdx)) {
                     std::cout << "| b ";
                 }
                 else {
                     std::cout << "|   ";
                 }
             }
-            std::cout << '|' << rowsNames[row] << '\n';
-            ++row;
+            std::cout << '|' << rowsNames[visualRow] << '\n';
         }
+
         std::cout << middleRow;
         std::cout << columnsNamesRow;
     }
@@ -62,34 +76,26 @@ private:
         constexpr size_t firstRowMask  = 85;
         constexpr size_t secondRowMask = 170;
 
-        size_t us = 0ull;
-        size_t opponent = 0ull;
-
         // initialize us player rocks
-        us |= firstRowMask;
-        us |= secondRowMask << 8;
-        us |= firstRowMask  << 16;
+        m_whiteBoard |= firstRowMask;
+        m_whiteBoard |= secondRowMask << 8;
+        m_whiteBoard |= firstRowMask  << 16;
 
         // initialize opponent player rocks
-        opponent |= secondRowMask << 40;
-        opponent |= firstRowMask  << 48;
-        opponent |= secondRowMask << 56;
+        m_blackBoard |= secondRowMask << 40;
+        m_blackBoard |= firstRowMask  << 48;
+        m_blackBoard |= secondRowMask << 56;
 
+        // perspective only affects printing
         if (m_perspective == Colour::black) {
             columnsNamesRow = "    h   g   f   e   d   c   b   a \n";
             rowsNames = {'1', '2', '3', '4', '5', '6', '7', '8'};
-            m_blackBoard = us;
-            m_whiteBoard = opponent;
         }
         else {
             columnsNamesRow = "    a   b   c   d   e   f   g   h \n";
             rowsNames = {'8', '7', '6', '5', '4', '3', '2', '1'};
-            m_blackBoard = opponent;
-            m_whiteBoard = us;
         }
     }
-    // all moves will be performed from player perspective, so
-    // always the player perspective start on the 0..32 positions
     size_t m_whiteBoard;
     size_t m_blackBoard;
 
