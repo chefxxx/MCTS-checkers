@@ -49,23 +49,23 @@ inline void helper(const std::string_view t_str)
               << "] ";
 }
 
-inline void print_recursive (const std::string_view str) {
-    std::cout << str << '\n';
+inline void print_recursive (const std::string_view t_str) {
+    std::cout << t_str << '\n';
 }
 
 template <typename First, typename... Rest>
-void print_recursive(std::string_view str, First&& t_first, Rest&&... t_rest)
+void print_recursive(std::string_view t_str, First&& t_first, Rest&&... t_rest)
 {
-    const size_t pos = str.find("{}");
+    const size_t pos = t_str.find("{}");
     if (pos == std::string_view::npos) {
-        print_recursive(str);
+        print_recursive(t_str);
         return;
     }
 
-    std::cout << str.substr(0, pos);
+    std::cout << t_str.substr(0, pos);
     std::cout << std::forward<First>(t_first);
 
-    print_recursive(str.substr(pos + 2), std::forward<Rest>(t_rest)...);
+    print_recursive(t_str.substr(pos + 2), std::forward<Rest>(t_rest)...);
 }
 
 }
