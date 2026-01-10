@@ -1,6 +1,7 @@
-#include "logger_util.h"
+#include "board_infra.cuh"
 
 int main(int argc, const char ** argv) {
-    logger::info("Hello {} world", 1);
+    const Board board{StartingColour::white};
+    board.printBoard();
     return 0;
 }
