@@ -3,7 +3,9 @@
 //
 
 #include <random>
+
 #include "game_engine.h"
+#include "logger.h"
 
 Colour drawStartingColour() {
     std::random_device rd;
@@ -12,9 +14,29 @@ Colour drawStartingColour() {
     return distrib(gen) == 0 ? Colour::black : Colour::white;
 }
 
-void playPlayer(Board& t_currentBoard, Colour t_myColour)
+// void playPlayer(Board& t_currentBoard, Colour t_myColour)
+// {
+//     std::cout << "Please enter your move...\n";
+//     std::string move;
+//     std::getline(std::cin, move);
+// }
+
+std::optional<Move> parseMove(const std::string &t_move)
 {
-    if (t_myColour == Colour::black)
-        std::cout << "Player moves...\n";
-    t_currentBoard.printBoard();
+    if (t_move.size() < 5) {
+        logger::warn("Not valid move format, try again!");
+        return std::nullopt;
+    }
+    Move move;
+    move.kind = t_move[2] == '-' ? MoveKind::normal : MoveKind::take;
+    for (size_t i = 0; i < t_move.size(); i += 3) {
+        if (std::isalpha(t_move[i])) {
+            // we have found character
+            if (i + 1 < t_move.size() && std::isdigit(t_move[i + 1])) {
+                std::string curr = t_move.substr(i, 2);
+                move.addPosition(curr);
+            }
+        }
+    }
+    return move;
 }
