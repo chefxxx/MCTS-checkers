@@ -17,10 +17,10 @@ std::vector<Move> generateAllPossibleMoves(const Board &t_board, const Colour t_
     // just form one perspective
 
     // remember to correctly initialize all variables!
-    const size_t pawns = t_board.m_pawns[t_color];
+    const size_t pawns = t_board.pawns[t_color];
     // TODO: const size_t kings = t_board.m_kings[t_color];
     const size_t pieces = pawns;
-    const size_t opponent_pawns = t_board.m_pawns[1 - t_color];
+    const size_t opponent_pawns = t_board.pawns[1 - t_color];
     // TODO: const size_t opponent_kings = t_board.m_kings[1 - t_color];
     const size_t opponent_pieces = opponent_pawns;
     const size_t empty = ~(pieces | opponent_pieces);
@@ -34,7 +34,7 @@ std::vector<Move> generateAllPossibleMoves(const Board &t_board, const Colour t_
     else {
         // if there is no attack possibility we can think of sliding moves
         const size_t pawns_movers = getPawnsMovesMask(pawns, empty, t_color);
-        const auto pawns_slide_moves = createAllPawnMoves(result, pawns_movers, empty, t_color);
+        createAllPawnsMoves(result, pawns_movers, empty, t_color);
     }
     return result;
 }
@@ -61,7 +61,7 @@ size_t getPawnsMovesMask(const size_t t_moversPawnsMask, const size_t t_emptyFil
     return move_upRight | move_upLeft | move_downRight | move_downLeft;
 }
 
-void createAllPawnMoves(std::vector<Move> &t_allMoves,
+void createAllPawnsMoves(std::vector<Move> &t_allMoves,
                         const size_t       t_moversMask,
                         const size_t       t_emptyFiles,
                         const Colour       t_moversColour)
@@ -69,11 +69,11 @@ void createAllPawnMoves(std::vector<Move> &t_allMoves,
     size_t maskCopy = t_moversMask;
     while (maskCopy) {
         const int mover_idx = popLsb(maskCopy);
-        createOnePawnsMove(t_allMoves, mover_idx, t_emptyFiles, t_moversColour);
+        createOnePawnMoves(t_allMoves, mover_idx, t_emptyFiles, t_moversColour);
     }
 }
 
-void createOnePawnsMove(std::vector<Move> &t_allMoves,
+void createOnePawnMoves(std::vector<Move> &t_allMoves,
                         const int          t_idx,
                         const size_t       t_emptyFiles,
                         const Colour       t_moversColour)
@@ -83,7 +83,7 @@ void createOnePawnsMove(std::vector<Move> &t_allMoves,
         // ReSharper disable once CppTooWideScope
         const size_t move_mask = canMove[t_moversColour][dir] * globalTables.NeighbourTable[t_idx][dir] & t_emptyFiles;
         if (move_mask) {
-            const auto move = Move(1ull << t_idx, move_mask);
+            const auto move = Move(1ULL << t_idx, move_mask);
             t_allMoves.push_back(move);
         }
     }

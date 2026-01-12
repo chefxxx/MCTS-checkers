@@ -58,10 +58,10 @@ struct Board
                     actualRow = 7 - visualRow;
                     actualCol = visualCol;
                 }
-                if (const int bitIdx = actualRow * 8 + actualCol; checkBitAtIdx(m_pawns[white], bitIdx)) {
+                if (const int bitIdx = actualRow * 8 + actualCol; checkBitAtIdx(pawns[white], bitIdx)) {
                     std::cout << "| w ";
                 }
-                else if (checkBitAtIdx(m_pawns[black], bitIdx)) {
+                else if (checkBitAtIdx(pawns[black], bitIdx)) {
                     std::cout << "| b ";
                 }
                 else {
@@ -76,12 +76,12 @@ struct Board
     }
 
     // TODO: dummy function
-    [[nodiscard]] bool isGameOver() const { return popCount(m_pawns[white]) == popCount(m_pawns[black]); }
+    [[nodiscard]] bool isGameOver() const { return popCount(pawns[white]) == popCount(pawns[black]); }
     // this is the state of the board
     // 0 represents black pieces
     // 1 represents white pieces
-    std::array<size_t, 2> m_pawns;
-    std::array<size_t, 2> m_kings;
+    std::array<size_t, 2> pawns;
+    std::array<size_t, 2> kings;
 
 private:
     void initBoard()
@@ -89,18 +89,18 @@ private:
         constexpr size_t firstRowMask  = 85;
         constexpr size_t secondRowMask = 170;
 
-        m_pawns[white] = 0ull;
-        m_pawns[black] = 0ull;
+        pawns[white] = 0ull;
+        pawns[black] = 0ull;
 
         // initialize white player rocks
-        m_pawns[white] |= firstRowMask;
-        m_pawns[white] |= secondRowMask << 8;
-        m_pawns[white] |= firstRowMask << 16;
+        pawns[white] |= firstRowMask;
+        pawns[white] |= secondRowMask << 8;
+        pawns[white] |= firstRowMask << 16;
 
         // initialize black player rocks
-        m_pawns[black] |= secondRowMask << 40;
-        m_pawns[black] |= firstRowMask << 48;
-        m_pawns[black] |= secondRowMask << 56;
+        pawns[black] |= secondRowMask << 40;
+        pawns[black] |= firstRowMask << 48;
+        pawns[black] |= secondRowMask << 56;
 
         // perspective only affects printing
         if (m_perspective == black) {

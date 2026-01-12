@@ -48,7 +48,7 @@ constexpr int MAX_MOVE_SEQUENCE = 8;
 
 enum class MoveKind { null = -1, normal = 0, attack = 1 };
 
-struct move
+struct PlayerMove
 {
     void addPosition(const std::string &t_pos)
     {
@@ -68,9 +68,11 @@ struct move
 
 struct Move
 {
-    explicit Move(const size_t t_from, const size_t t_to) : from_mask(t_from), to_mask(t_to) {}
+    explicit Move(const size_t t_from, const size_t t_to) : from_mask(t_from), to_mask(t_to), captures_mask(0ull) {}
+    explicit Move(const size_t t_from, const size_t t_to, const size_t t_captures) : from_mask(t_from), to_mask(t_to), captures_mask(t_captures) {}
     size_t from_mask;
     size_t to_mask;
+    size_t captures_mask;
 };
 
 #endif // MCTS_CHECKERS_MOVE_H

@@ -29,7 +29,7 @@ size_t            getPawnsAttackMask(size_t t_attackerPawns, size_t t_opponentPi
 size_t            getPawnsMovesMask(size_t t_moversPawnsMask, size_t t_emptyFiles, Colour t_moversColour);
 std::vector<Move> createAllPawnsAttacks(size_t t_onMove, size_t t_opponent, Colour t_onMoveColour);
 Move              createOnePawnsAttack(size_t t_onMove, size_t t_opponent, int t_idx, Colour t_onMoveColour);
-void createAllPawnMoves(std::vector<Move> &t_allMoves, size_t t_moversMask, size_t t_emptyFiles, Colour t_moversColour);
-void createOnePawnsMove(std::vector<Move> &t_allMoves, int t_idx, size_t t_emptyFiles, Colour t_moversColour);
+void createAllPawnsMoves(std::vector<Move> &t_allMoves, size_t t_moversMask, size_t t_emptyFiles, Colour t_moversColour);
+void createOnePawnMoves(std::vector<Move> &t_allMoves, int t_idx, size_t t_emptyFiles, Colour t_moversColour);
 
 #endif // MCTS_CHECKERS_CPU_MOVEGEN_H

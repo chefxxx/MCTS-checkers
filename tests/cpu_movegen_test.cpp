@@ -129,3 +129,42 @@ TEST(CPU_movegenTest, getPawnsMovesMask_fullyBlocked)
     const auto test_case = getPawnsMovesMask(black_mask, empty_mask, black);
     ASSERT_EQ(test_case, result_mask);
 }
+
+// white: 27
+// empty: all squares except 27
+// expected: moves from 27 to 34 and 27 to 36
+TEST(CPU_movegenTest, createOnePawnsMove_whiteCenter)
+{
+    constexpr int start_idx = 27;
+    constexpr uint64_t white_mask = (1ULL << start_idx);
+    constexpr uint64_t empty_mask = ~white_mask;
+
+    std::vector<Move> moves;
+    createOnePawnMoves(moves, start_idx, empty_mask, white);
+
+    ASSERT_EQ(moves.size(), 2);
+    // Move to 34 (Up-Left: 27+7) and 36 (Up-Right: 27+9)
+    EXPECT_TRUE(moves[0].to_mask == 1ULL << 34);
+    EXPECT_TRUE(moves[1].to_mask == 1ULL << 36);
+}
+
+// white: 18, 20
+// expected: 4 total moves (2 from each piece)
+TEST(CPU_movegenTest, createAllPawnMoves_multiplePieces)
+{
+    constexpr uint64_t white_mask = (1ULL << 18) | (1ULL << 20);
+    constexpr uint64_t empty_mask = ~white_mask;
+
+    // We assume getPawnsMovesMask correctly identifies both 18 and 20 as movers
+    constexpr uint64_t movers_mask = white_mask;
+
+    std::vector<Move> all_moves;
+    createAllPawnsMoves(all_moves, movers_mask, empty_mask, white);
+
+    // Each piece has 2 diagonal forward moves
+    EXPECT_EQ(all_moves.size(), 4);
+    EXPECT_TRUE(all_moves[0].to_mask == 1ULL << 25 && all_moves[0].from_mask == 1ULL << 18);
+    EXPECT_TRUE(all_moves[1].to_mask == 1ULL << 27 && all_moves[1].from_mask == 1ULL << 18);
+    EXPECT_TRUE(all_moves[2].to_mask == 1ULL << 27 && all_moves[2].from_mask == 1ULL << 20);
+    EXPECT_TRUE(all_moves[3].to_mask == 1ULL << 29 && all_moves[3].from_mask == 1ULL << 20);
+}
