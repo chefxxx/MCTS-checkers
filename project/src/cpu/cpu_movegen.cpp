@@ -9,6 +9,34 @@
 // how to keep track of it???
 // bitmask with other pieces and then check
 
+std::vector<Move> generateAllPossibleMoves(const Board &t_board, const Colour t_color)
+{
+    std::vector<Move> result;
+    // t_colour represents a player that is currently
+    // on the move, I do not want to think of this func
+    // just form one perspective
+
+    const size_t onMove_pawns = t_board.m_pawns[t_color];
+    const size_t opponent_pawns = t_board.m_pawns[1 - t_color];
+
+    // ReSharper disable once CppTooWideScope
+    size_t attackers = getPawnsAttackMask(onMove_pawns, opponent_pawns);
+    if (attackers) {
+        // if there is a move that is a jump/attack we have to do this move
+        while (attackers) {
+            const int attacker_idx = popLsb(attackers);
+        }
+    }
+    else {
+        // if there is no attack possibility we can think of sliding moves
+        size_t movers = getPawnsMovesMask(t_color, onMove_pawns, opponent_pawns);
+        while (movers) {
+            const int mover_idx = popLsb(movers);
+        }
+    }
+    return result;
+}
+
 size_t getPawnsAttackMask(const size_t t_attacker, const size_t t_opponent)
 {
     const size_t empty             = ~(t_attacker | t_opponent);
@@ -34,5 +62,7 @@ size_t getPawnsMovesMask(const Colour t_onMoveColour, const size_t t_onMove, con
     return move_upRight | move_upLeft | move_downRight | move_downLeft;
 }
 
+void checkMultiAttacks()
+{
 
-// std::vector<Move> getNormalMoves(const Board &board, Colour t_color) {}
+}

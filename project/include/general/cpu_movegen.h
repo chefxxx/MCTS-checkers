@@ -27,5 +27,6 @@ constexpr int canMove[2][4] = {
 std::vector<Move> generateAllPossibleMoves(const Board &t_board, Colour t_color);
 size_t            getPawnsAttackMask(size_t t_attacker, size_t t_opponent);
 size_t            getPawnsMovesMask(Colour t_onMoveColour, size_t t_onMove, size_t t_opponent);
+void              checkMultiAttacks();
 
 #endif // MCTS_CHECKERS_CPU_MOVEGEN_H
