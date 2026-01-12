@@ -10,7 +10,7 @@
 // black: 19, 43, 23
 // white on the move
 // result: 10, 34
-TEST(CPU_movegenTest, return_upRightAttacks)
+TEST(CPU_movegenTest, getPawnsAttackMask_returns_upRightAttacks)
 {
     constexpr auto white_mask  = (1ULL << 10) | (1ULL << 14) | (1ULL << 34);
     constexpr auto black_mask  = (1ULL << 19) | (1ULL << 23) | (1ULL << 43);
@@ -23,7 +23,7 @@ TEST(CPU_movegenTest, return_upRightAttacks)
 // black: 25
 // landing: 32 (empty)
 // result: 18 (the jumper)
-TEST(CPU_movegenTest, returns_upLeftAttacks)
+TEST(CPU_movegenTest, getPawnsAttackMask_returns_upLeftAttacks)
 {
     constexpr uint64_t white_mask  = (1ULL << 18);
     constexpr uint64_t black_mask  = (1ULL << 25);
@@ -37,7 +37,7 @@ TEST(CPU_movegenTest, returns_upLeftAttacks)
 // white: 35
 // landing: 28 (empty)
 // result: 42 (the jumper)
-TEST(CPU_movegenTest, returns_downRightAttacks)
+TEST(CPU_movegenTest, getPawnsAttackMask_returns_downRightAttacks)
 {
     constexpr uint64_t black_mask  = (1ULL << 42);
     constexpr uint64_t white_mask  = (1ULL << 35);
@@ -51,7 +51,7 @@ TEST(CPU_movegenTest, returns_downRightAttacks)
 // white: 16 (File A)
 // black: 25
 // result: 0 (cannot jump left from File A)
-TEST(CPU_movegenTest, does_not_wrap_fileA)
+TEST(CPU_movegenTest, getPawnsAttackMask_does_not_wrap_fileA)
 {
     constexpr uint64_t white_mask  = (1ULL << 16);
     constexpr uint64_t black_mask  = (1ULL << 25);
@@ -65,7 +65,7 @@ TEST(CPU_movegenTest, does_not_wrap_fileA)
 // black: 19, 21
 // landing: 28 (empty)
 // result: 10, 14
-TEST(CPU_movegenTest, returns_multiple_attackers)
+TEST(CPU_movegenTest, getPawnsAttackMask_returns_multiple_attackers)
 {
     constexpr uint64_t white_mask  = (1ULL << 10) | (1ULL << 14);
     constexpr uint64_t black_mask  = (1ULL << 19) | (1ULL << 21);
@@ -73,4 +73,56 @@ TEST(CPU_movegenTest, returns_multiple_attackers)
 
     const auto test_case = getPawnsAttackMask(white_mask, black_mask);
     EXPECT_EQ(result_mask, test_case);
+}
+
+// white: 19, 26, 28
+// pawn 19 is blocked by 26 and 28,
+// so the only pawns to mover are 26 and 28
+TEST(CPU_movegenTest, getPawnsMovesMask_withBlockedWhitePawn)
+{
+    constexpr uint64_t white_mask  = (1ull << 19) | (1ull << 26) | (1ull << 28);
+    constexpr uint64_t black_mask  = 0ull;
+    constexpr uint64_t result_mask = (1ull << 26) | (1ull << 28);
+    const auto test_case = getPawnsMovesMask(white, white_mask, black_mask);
+    ASSERT_EQ(test_case, result_mask);
+}
+
+// black: 35
+// white: 0
+// Result: 35 should be able to move Down-Left (26) or Down-Right (28).
+TEST(CPU_movegenTest, getPawnsMovesMask_blackMovesDown)
+{
+    constexpr uint64_t black_mask  = (1ull << 35);
+    constexpr uint64_t white_mask  = 0ull;
+    constexpr uint64_t result_mask = (1ull << 35);
+
+    const auto test_case = getPawnsMovesMask(black, black_mask, white_mask);
+    ASSERT_EQ(test_case, result_mask);
+}
+
+// white: 15, 22
+// Result: 15 cannot move, but 22 can
+// The NOT_FILE_H mask should prevent 15 from moving to 24
+TEST(CPU_movegenTest, getPawnsMovesMask_preventWrapFileH)
+{
+    constexpr uint64_t white_mask  = (1ull << 15) | (1ull << 22);
+    constexpr uint64_t black_mask  = 0ull;
+    constexpr uint64_t result_mask = (1ull << 22);
+
+    // We check if it correctly identifies 15 as a not mover
+    // without allowing it to "teleport" across the board.
+    const auto test_case = getPawnsMovesMask(white, white_mask, black_mask);
+    ASSERT_EQ(test_case, result_mask);
+}
+
+// black: 44, 35, 37
+// Result: 35, 37
+TEST(CPU_movegenTest, getPawnsMovesMask_fullyBlocked)
+{
+    constexpr uint64_t black_mask  = (1ull << 44) | (1ull << 35) | (1ull << 37);
+    constexpr uint64_t white_mask  = 0ull;
+    constexpr uint64_t result_mask = (1ull << 35) | (1ull << 37);
+
+    const auto test_case = getPawnsMovesMask(black, black_mask, white_mask);
+    ASSERT_EQ(test_case, result_mask);
 }

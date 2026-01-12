@@ -10,8 +10,22 @@
 #include "board_infra.cuh"
 #include "move.h"
 
+// enum Colour {
+//     black = 0,
+//     white = 1,
+// };
+
+// An array to perform branchless
+// sliding move generation.
+//
+// ------------------------------
+constexpr int canMove[2][4] = {
+    {0, 0, 1, 1}, // this represents black
+    {1, 1, 0 ,0}  // this represents white
+};
+
 std::vector<Move> generateAllPossibleMoves(const Board &t_board, Colour t_color);
 size_t            getPawnsAttackMask(size_t t_attacker, size_t t_opponent);
-std::vector<Move> getPawnsMovesMask(const Board &t_board, Colour t_color);
+size_t            getPawnsMovesMask(Colour t_onMoveColour, size_t t_onMove, size_t t_opponent);
 
 #endif // MCTS_CHECKERS_CPU_MOVEGEN_H
