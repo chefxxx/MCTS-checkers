@@ -34,7 +34,7 @@ std::vector<Move> generateAllPossibleMoves(const Board &t_board, const Colour t_
     else {
         // if there is no attack possibility we can think of sliding moves
         const size_t pawns_movers = getPawnsMovesMask(pawns, empty, t_color);
-        const auto pawns_slide_moves = createAllPawnMoves(pawns_movers, empty, t_color);
+        const auto pawns_slide_moves = createAllPawnMoves(result, pawns_movers, empty, t_color);
     }
     return result;
 }
@@ -61,28 +61,30 @@ size_t getPawnsMovesMask(const size_t t_moversPawnsMask, const size_t t_emptyFil
     return move_upRight | move_upLeft | move_downRight | move_downLeft;
 }
 
-std::vector<Move> createAllPawnMoves(const size_t t_moversMask, const size_t t_emptyFiles, const Colour t_moversColour)
+void createAllPawnMoves(std::vector<Move> &t_allMoves,
+                        const size_t       t_moversMask,
+                        const size_t       t_emptyFiles,
+                        const Colour       t_moversColour)
 {
-    std::vector<Move> result;
     size_t maskCopy = t_moversMask;
     while (maskCopy) {
         const int mover_idx = popLsb(maskCopy);
-        const auto moves = createOnePawnsMove(mover_idx, t_emptyFiles, t_moversColour);
+        createOnePawnsMove(t_allMoves, mover_idx, t_emptyFiles, t_moversColour);
     }
-    return result;
 }
 
-std::vector<Move> createOnePawnsMove(const int t_idx, const size_t t_emptyFiles, const Colour t_moversColour)
+void createOnePawnsMove(std::vector<Move> &t_allMoves,
+                        const int          t_idx,
+                        const size_t       t_emptyFiles,
+                        const Colour       t_moversColour)
 {
-    std::vector<Move> result;
     // check directions of moves and create them
     for (const int dir : {UP_LEFT, UP_RIGHT, DOWN_LEFT, DOWN_RIGHT}) {
         // ReSharper disable once CppTooWideScope
         const size_t move_mask = canMove[t_moversColour][dir] * globalTables.NeighbourTable[t_idx][dir] & t_emptyFiles;
         if (move_mask) {
             const auto move = Move(1ull << t_idx, move_mask);
-            result.push_back(move);
+            t_allMoves.push_back(move);
         }
     }
-    return result;
 }
