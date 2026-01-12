@@ -10,9 +10,8 @@
 #include "board_infra.cuh"
 #include "move.h"
 
-
-
-std::vector<Move> generateAllPossibleMoves(const Board &board);
-size_t getNormalMoves(size_t t_boardState, Colour t_color);
+std::vector<Move> generateAllPossibleMoves(const Board &t_board, Colour t_color);
+size_t            getPawnsAttackMask(size_t t_attacker, size_t t_opponent);
+std::vector<Move> getPawnsMovesMask(const Board &t_board, Colour t_color);
 
 #endif // MCTS_CHECKERS_CPU_MOVEGEN_H

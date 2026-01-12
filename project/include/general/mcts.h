@@ -9,12 +9,10 @@
 
 struct MctsNode
 {
-
 };
 
 struct MctsTree
 {
-
 };
 
 #endif // MCTS_CHECKERS_MCTS_H

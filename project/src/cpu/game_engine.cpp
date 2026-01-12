@@ -2,14 +2,16 @@
 // Created by chefxx on 10.01.2026.
 //
 
+#include "game_engine.h"
+
 #include <random>
 
-#include "game_engine.h"
 #include "logger.h"
 
-Colour drawStartingColour() {
-    std::random_device rd;
-    std::mt19937 gen(rd());
+Colour drawStartingColour()
+{
+    std::random_device            rd;
+    std::mt19937                  gen(rd());
     std::uniform_int_distribution distrib(0, 1);
     return distrib(gen) == 0 ? Colour::black : Colour::white;
 }
@@ -21,13 +23,13 @@ Colour drawStartingColour() {
 //     std::getline(std::cin, move);
 // }
 
-std::optional<Move> parseMove(const std::string &t_move)
+std::optional<move> parseMove(const std::string &t_move)
 {
     if (t_move.size() < 5) {
         logger::warn("Not valid move format, try again!");
         return std::nullopt;
     }
-    Move move;
+    move move;
     move.kind = t_move[2] == '-' ? MoveKind::normal : MoveKind::take;
     for (size_t i = 0; i < t_move.size(); i += 3) {
         if (std::isalpha(t_move[i])) {

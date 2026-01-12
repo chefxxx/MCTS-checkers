@@ -3,6 +3,7 @@
 //
 
 #include <gtest/gtest.h>
+
 #include "game_engine.h"
 
 TEST(MoveParse, simpleParse)
@@ -27,4 +28,3 @@ TEST(MoveParse, simpleParse)
     ASSERT_EQ(mv2.positions[2], 6);
     ASSERT_EQ(mv2.kind, MoveKind::take);
 }
-

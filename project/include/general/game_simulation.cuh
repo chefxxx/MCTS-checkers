@@ -6,5 +6,4 @@
 #define MCTS_CHECKERS_GAME_SIMULATION_H
 
 
-
 #endif

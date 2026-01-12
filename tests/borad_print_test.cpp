@@ -3,6 +3,7 @@
 //
 
 #include <gtest/gtest.h>
+
 #include "board_infra.cuh"
 
 TEST(BoardPrint, SimplePrint)

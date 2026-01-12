@@ -7,6 +7,6 @@
 
 #include "board_infra.cuh"
 
-void playAI_gpu(Board& t_currentBoard, Colour t_myColour);
+void playAI_gpu(Board &t_currentBoard, Colour t_myColour);
 
 #endif

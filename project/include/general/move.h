@@ -32,17 +32,11 @@
 //  +---+---+---+---+---+---+---+---+
 //     a   b   c   d   e   f   g   h
 
-inline int Col(const char t_col)
-{
-    return t_col - 97;
-}
+inline int Col(const char t_col) { return t_col - 97; }
 
-inline int Row(const char t_col)
-{
-    return t_col - 49;
-}
+inline int Row(const char t_col) { return t_col - 49; }
 
-inline uint8_t strToPos(const std::string& t_pos)
+inline uint8_t strToPos(const std::string &t_pos)
 {
     // a1
     const auto col = Col(t_pos[0]);
@@ -50,18 +44,13 @@ inline uint8_t strToPos(const std::string& t_pos)
     return row * 8 + col;
 }
 
-constexpr int MAX_MOVE_SEQUENCE = 12;
+constexpr int MAX_MOVE_SEQUENCE = 8;
 
-enum class MoveKind
-{
-    null = -1,
-    normal = 0,
-    take = 1
-};
+enum class MoveKind { null = -1, normal = 0, take = 1 };
 
-struct Move
+struct move
 {
-    void addPosition(const std::string& t_pos)
+    void addPosition(const std::string &t_pos)
     {
         const auto idx = strToPos(t_pos);
         if (count < MAX_MOVE_SEQUENCE) {
@@ -73,8 +62,12 @@ struct Move
         }
     }
     std::array<uint8_t, MAX_MOVE_SEQUENCE> positions{};
-    uint8_t count = 0;
-    MoveKind kind = MoveKind::null;
+    uint8_t                                count = 0;
+    MoveKind                               kind  = MoveKind::null;
+};
+
+struct Move
+{
 };
 
 #endif // MCTS_CHECKERS_MOVE_H
