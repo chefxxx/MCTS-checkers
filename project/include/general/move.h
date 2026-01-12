@@ -68,8 +68,9 @@ struct move
 
 struct Move
 {
-    Move();
-    size_t move_mask;
+    explicit Move(const size_t t_from, const size_t t_to) : from_mask(t_from), to_mask(t_to) {}
+    size_t from_mask;
+    size_t to_mask;
 };
 
 #endif // MCTS_CHECKERS_MOVE_H

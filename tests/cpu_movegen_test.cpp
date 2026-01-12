@@ -15,7 +15,8 @@ TEST(CPU_movegenTest, getPawnsAttackMask_returns_upRightAttacks)
     constexpr auto white_mask  = (1ULL << 10) | (1ULL << 14) | (1ULL << 34);
     constexpr auto black_mask  = (1ULL << 19) | (1ULL << 23) | (1ULL << 43);
     constexpr auto result_mask = (1ULL << 10) | (1ULL << 34);
-    const auto     test_case   = getPawnsAttackMask(white_mask, black_mask);
+    constexpr auto empty_mask = ~(white_mask | black_mask);
+    const auto     test_case   = getPawnsAttackMask(white_mask, black_mask, empty_mask);
     EXPECT_EQ(result_mask, test_case);
 }
 
@@ -28,8 +29,8 @@ TEST(CPU_movegenTest, getPawnsAttackMask_returns_upLeftAttacks)
     constexpr uint64_t white_mask  = (1ULL << 18);
     constexpr uint64_t black_mask  = (1ULL << 25);
     constexpr uint64_t result_mask = (1ULL << 18);
-
-    const auto test_case = getPawnsAttackMask(white_mask, black_mask);
+    constexpr auto empty_mask = ~(white_mask | black_mask);
+    const auto test_case = getPawnsAttackMask(white_mask, black_mask, empty_mask);
     EXPECT_EQ(result_mask, test_case);
 }
 
@@ -42,9 +43,9 @@ TEST(CPU_movegenTest, getPawnsAttackMask_returns_downRightAttacks)
     constexpr uint64_t black_mask  = (1ULL << 42);
     constexpr uint64_t white_mask  = (1ULL << 35);
     constexpr uint64_t result_mask = (1ULL << 42);
-
+    constexpr auto empty_mask = ~(white_mask | black_mask);
     // We pass black_mask as t_mask because black is the "attacker" here
-    const auto test_case = getPawnsAttackMask(black_mask, white_mask);
+    const auto test_case = getPawnsAttackMask(black_mask, white_mask, empty_mask);
     EXPECT_EQ(result_mask, test_case);
 }
 
@@ -56,8 +57,8 @@ TEST(CPU_movegenTest, getPawnsAttackMask_does_not_wrap_fileA)
     constexpr uint64_t white_mask  = (1ULL << 16);
     constexpr uint64_t black_mask  = (1ULL << 25);
     constexpr uint64_t result_mask = 0ULL;
-
-    const auto test_case = getPawnsAttackMask(black_mask, white_mask);
+    constexpr auto empty_mask = ~(white_mask | black_mask);
+    const auto test_case = getPawnsAttackMask(black_mask, white_mask, empty_mask);
     EXPECT_EQ(result_mask, test_case);
 }
 
@@ -70,8 +71,8 @@ TEST(CPU_movegenTest, getPawnsAttackMask_returns_multiple_attackers)
     constexpr uint64_t white_mask  = (1ULL << 10) | (1ULL << 14);
     constexpr uint64_t black_mask  = (1ULL << 19) | (1ULL << 21);
     constexpr uint64_t result_mask = (1ULL << 10) | (1ULL << 14);
-
-    const auto test_case = getPawnsAttackMask(white_mask, black_mask);
+    constexpr auto empty_mask = ~(white_mask | black_mask);
+    const auto test_case = getPawnsAttackMask(white_mask, black_mask, empty_mask);
     EXPECT_EQ(result_mask, test_case);
 }
 
@@ -83,7 +84,8 @@ TEST(CPU_movegenTest, getPawnsMovesMask_withBlockedWhitePawn)
     constexpr uint64_t white_mask  = (1ull << 19) | (1ull << 26) | (1ull << 28);
     constexpr uint64_t black_mask  = 0ull;
     constexpr uint64_t result_mask = (1ull << 26) | (1ull << 28);
-    const auto test_case = getPawnsMovesMask(white, white_mask, black_mask);
+    constexpr auto empty_mask = ~(white_mask | black_mask);
+    const auto test_case = getPawnsMovesMask(white_mask, empty_mask, white);
     ASSERT_EQ(test_case, result_mask);
 }
 
@@ -95,8 +97,8 @@ TEST(CPU_movegenTest, getPawnsMovesMask_blackMovesDown)
     constexpr uint64_t black_mask  = (1ull << 35);
     constexpr uint64_t white_mask  = 0ull;
     constexpr uint64_t result_mask = (1ull << 35);
-
-    const auto test_case = getPawnsMovesMask(black, black_mask, white_mask);
+    constexpr auto empty_mask = ~(white_mask | black_mask);
+    const auto test_case = getPawnsMovesMask(black_mask, empty_mask, black);
     ASSERT_EQ(test_case, result_mask);
 }
 
@@ -108,10 +110,11 @@ TEST(CPU_movegenTest, getPawnsMovesMask_preventWrapFileH)
     constexpr uint64_t white_mask  = (1ull << 15) | (1ull << 22);
     constexpr uint64_t black_mask  = 0ull;
     constexpr uint64_t result_mask = (1ull << 22);
+    constexpr auto empty_mask = ~(white_mask | black_mask);
 
     // We check if it correctly identifies 15 as a not mover
     // without allowing it to "teleport" across the board.
-    const auto test_case = getPawnsMovesMask(white, white_mask, black_mask);
+    const auto test_case = getPawnsMovesMask(white_mask, empty_mask, white);
     ASSERT_EQ(test_case, result_mask);
 }
 
@@ -122,7 +125,7 @@ TEST(CPU_movegenTest, getPawnsMovesMask_fullyBlocked)
     constexpr uint64_t black_mask  = (1ull << 44) | (1ull << 35) | (1ull << 37);
     constexpr uint64_t white_mask  = 0ull;
     constexpr uint64_t result_mask = (1ull << 35) | (1ull << 37);
-
-    const auto test_case = getPawnsMovesMask(black, black_mask, white_mask);
+    constexpr auto empty_mask = ~(white_mask | black_mask);
+    const auto test_case = getPawnsMovesMask(black_mask, empty_mask, black);
     ASSERT_EQ(test_case, result_mask);
 }
