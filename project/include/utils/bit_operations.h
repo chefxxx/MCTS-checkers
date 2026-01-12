@@ -15,7 +15,7 @@
 #endif
 // -----------------------------------------
 
-constexpr size_t MIN_LSB = 1ull;
+constexpr size_t MIN_LSB = 1ULL;
 
 // this func is used for setting bits
 __device__ __host__ __forceinline__ void setBitAtIdx(size_t &a, const size_t idx) { a |= MIN_LSB << idx; }
@@ -24,6 +24,12 @@ __device__ __host__ __forceinline__ void setBitAtIdx(size_t &a, const size_t idx
 __device__ __host__ __forceinline__ bool checkBitAtIdx(const size_t a, const size_t idx)
 {
     return a & (MIN_LSB << idx);
+}
+
+// this func toggles the bit at the given index (0 -> 1 or 1 -> 0)
+__device__ __host__ __forceinline__ void flipBitAtIdx(size_t &a, const size_t idx)
+{
+    a ^= (MIN_LSB << idx);
 }
 
 // this func sets to 0 bit of given idx

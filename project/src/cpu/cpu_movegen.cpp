@@ -4,11 +4,6 @@
 
 #include "cpu_movegen.h"
 
-// generate all possible jumps first
-// if a jump is possible from given position only jump can be made
-// how to keep track of it???
-// bitmask with other pieces and then check
-
 std::vector<Move> generateAllPossibleMoves(const Board &t_board, const Colour t_color)
 {
     std::vector<Move> result;
@@ -25,11 +20,9 @@ std::vector<Move> generateAllPossibleMoves(const Board &t_board, const Colour t_
     const size_t opponent_pieces = opponent_pawns;
     const size_t empty = ~(pieces | opponent_pieces);
 
-    // ReSharper disable once CppTooWideScope
-    const size_t pawns_attackers = getPawnsAttackMask(pawns, opponent_pieces, empty);
-    if (pawns_attackers) {
+    if (const size_t pawns_attackers = getPawnsAttackMask(pawns, opponent_pieces, empty)) {
         // if there is a move that is a jump/attack we have to do this move
-
+        createAllPawnsAttacks(result, pawns_attackers, opponent_pieces, empty, TODO);
     }
     else {
         // if there is no attack possibility we can think of sliding moves
@@ -54,11 +47,50 @@ size_t getPawnsMovesMask(const size_t t_moversPawnsMask, const size_t t_emptyFil
     // so for white pawns only "up" slides are permitted, meaning
     // that for black only "down" slides are permitted.
 
-    const size_t move_upRight   = canMove[t_moversColour][0] * ((t_moversPawnsMask & NOT_FILE_H) << 9 & t_emptyFiles) >> 9;
-    const size_t move_upLeft    = canMove[t_moversColour][1] * ((t_moversPawnsMask & NOT_FILE_A) << 7 & t_emptyFiles) >> 7;
-    const size_t move_downRight = canMove[t_moversColour][2] * ((t_moversPawnsMask & NOT_FILE_H) >> 7 & t_emptyFiles) << 7;
-    const size_t move_downLeft  = canMove[t_moversColour][3] * ((t_moversPawnsMask & NOT_FILE_A) >> 9 & t_emptyFiles) << 9;
+    const size_t move_upRight   = canMove[t_moversColour][UP_RIGHT] * ((t_moversPawnsMask & NOT_FILE_H) << 9 & t_emptyFiles) >> 9;
+    const size_t move_upLeft    = canMove[t_moversColour][UP_LEFT] * ((t_moversPawnsMask & NOT_FILE_A) << 7 & t_emptyFiles) >> 7;
+    const size_t move_downRight = canMove[t_moversColour][DOWN_RIGHT] * ((t_moversPawnsMask & NOT_FILE_H) >> 7 & t_emptyFiles) << 7;
+    const size_t move_downLeft  = canMove[t_moversColour][DOWN_LEFT] * ((t_moversPawnsMask & NOT_FILE_A) >> 9 & t_emptyFiles) << 9;
     return move_upRight | move_upLeft | move_downRight | move_downLeft;
+}
+
+void createAllPawnsAttacks(std::vector<Move> &t_allMoves,
+                           const size_t       t_attackersMask,
+                           const size_t       t_opponentPieces,
+                           const size_t       t_emptyFiles,
+                           const Colour       t_attackersColour)
+{
+    size_t maskCopy = t_attackersMask;
+    while (maskCopy) {
+        const int attacker_idx = popLsb(maskCopy);
+        recursiveCreatePawnsAttacks(t_allMoves, attacker_idx, t_opponentPieces, t_emptyFiles, TODO, TODO);
+    }
+}
+
+void recursiveCreatePawnsAttacks(std::vector<Move> &t_allMoves,
+                                 const int          t_idx,
+                                 const size_t       t_opponentPieces,
+                                 const size_t       t_emptyFiles,
+                                 const size_t       t_currentVictimsMask,
+                                 const Colour       t_attackerColour)
+{
+    for (const int dir : {UP_LEFT, UP_RIGHT, DOWN_LEFT, DOWN_RIGHT}) {
+        // if in dir we have opponent piece
+        const size_t attack_mask =
+            canMove[t_attackerColour][dir] * t_opponentPieces & globalTables.NeighbourTable[t_idx][dir];
+        // if in dir we have a free file to jump into
+        const size_t jump_mask =
+            canMove[t_attackerColour][dir] * globalTables.NeighbourTable[t_idx][dir] & t_emptyFiles;
+        if (jump_mask && attack_mask) {
+            // TODO: update masks
+            const size_t new_empty = t_emptyFiles;
+            const size_t new_opponents = t_opponentPieces;
+            const size_t new_attacks = t_currentVictimsMask | attack_mask;
+            recursiveCreatePawnsAttacks(t_allMoves, t_idx + idxUpdate[dir], new_opponents, new_empty, new_attacks, t_attackerColour);
+        }
+    }
+    // TODO: add new move to vector
+
 }
 
 void createAllPawnsMoves(std::vector<Move> &t_allMoves,

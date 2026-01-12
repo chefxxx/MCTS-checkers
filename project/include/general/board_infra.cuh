@@ -16,10 +16,13 @@ constexpr size_t   NOT_FILE_H = 0x7F7F7F7F7F7F7F7FULL;
 constexpr uint64_t NOT_FILE_B = 0xFDFDFDFDFDFDFDFDULL;
 constexpr uint64_t NOT_FILE_G = 0xBFBFBFBFBFBFBFBFULL;
 
-constexpr uint8_t UP_RIGHT   = 0;
-constexpr uint8_t UP_LEFT    = 1;
-constexpr uint8_t DOWN_RIGHT = 2;
-constexpr uint8_t DOWN_LEFT  = 3;
+enum Direction
+{
+    UP_RIGHT = 0,
+    UP_LEFT    = 1,
+    DOWN_RIGHT = 2,
+    DOWN_LEFT  = 3
+};
 
 enum Colour {
     black = 0,
