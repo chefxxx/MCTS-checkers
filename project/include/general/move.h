@@ -46,7 +46,7 @@ inline uint8_t strToPos(const std::string &t_pos)
 
 constexpr int MAX_MOVE_SEQUENCE = 8;
 
-enum class MoveKind { null = -1, normal = 0, take = 1 };
+enum class MoveKind { null = -1, normal = 0, attack = 1 };
 
 struct move
 {
@@ -68,6 +68,8 @@ struct move
 
 struct Move
 {
+    Move();
+    size_t move_mask;
 };
 
 #endif // MCTS_CHECKERS_MOVE_H

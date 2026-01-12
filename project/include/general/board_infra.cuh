@@ -38,7 +38,6 @@ struct Board
         : m_perspective(t_perspective)
     {
         initBoard();
-        initLUTs();
     }
     void printBoard() const
     {
@@ -84,13 +83,6 @@ struct Board
     std::array<size_t, 2> m_pawns;
     std::array<size_t, 2> m_kings;
 
-    // lookup tables
-    size_t JumpTable[64][4];
-    size_t NeighbourTable[64][4];
-
-    // TODO: initialization of king table
-    // const size_t KingTable[64][4];
-
 private:
     void initBoard()
     {
@@ -121,7 +113,19 @@ private:
         }
     }
 
-    void initLUTs()
+    // perspective and printing utils
+    Colour              m_perspective;
+    std::array<char, 8> rowsNames{};
+    std::string         columnsNamesRow;
+};
+
+struct LookupTables
+{
+    constexpr LookupTables()
+    {
+        initLUTs();
+    }
+    constexpr void initLUTs()
     {
         for (int i = 0; i < 64; ++i) {
             const size_t index            = MIN_LSB << i;
@@ -137,10 +141,14 @@ private:
         }
     }
 
-    // perspective and printing utils
-    Colour              m_perspective;
-    std::array<char, 8> rowsNames{};
-    std::string         columnsNamesRow;
+    // lookup tables
+    size_t JumpTable[64][4];
+    size_t NeighbourTable[64][4];
+
+    // TODO: initialization of king table
+    // const size_t KingTable[64][4];
 };
+
+constexpr LookupTables globalTables;
 
 #endif

@@ -20,11 +20,11 @@ TEST(MoveParse, simpleParse)
     const auto mv1 = parseMove(takeMove).value();
     ASSERT_EQ(mv1.positions[0], 18);
     ASSERT_EQ(mv1.positions[1], 36);
-    ASSERT_EQ(mv1.kind, MoveKind::take);
+    ASSERT_EQ(mv1.kind, MoveKind::attack);
 
     const auto mv2 = parseMove(doubleTakeMove).value();
     ASSERT_EQ(mv2.positions[0], 2);
     ASSERT_EQ(mv2.positions[1], 20);
     ASSERT_EQ(mv2.positions[2], 6);
-    ASSERT_EQ(mv2.kind, MoveKind::take);
+    ASSERT_EQ(mv2.kind, MoveKind::attack);
 }

@@ -30,7 +30,7 @@ std::optional<move> parseMove(const std::string &t_move)
         return std::nullopt;
     }
     move move;
-    move.kind = t_move[2] == '-' ? MoveKind::normal : MoveKind::take;
+    move.kind = t_move[2] == '-' ? MoveKind::normal : MoveKind::attack;
     for (size_t i = 0; i < t_move.size(); i += 3) {
         if (std::isalpha(t_move[i])) {
             // we have found character
