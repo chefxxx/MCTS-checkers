@@ -168,3 +168,87 @@ TEST(CPU_movegenTest, createAllPawnMoves_multiplePieces)
     EXPECT_TRUE(all_moves[2].to_mask == 1ULL << 27 && all_moves[2].from_mask == 1ULL << 20);
     EXPECT_TRUE(all_moves[3].to_mask == 1ULL << 29 && all_moves[3].from_mask == 1ULL << 20);
 }
+
+TEST(CPU_movegenTest, recursiveCreatePawnsAttacks_ZigZag)
+{
+    // Indices for 8x8 setup
+    constexpr int start_idx   = 9;   // B2
+    constexpr int victim1_idx = 18;  // C3 (Up-Right)
+    constexpr int victim2_idx = 34;  // C5 (Up-Left)
+    constexpr int victim3_idx = 50;  // C7
+    constexpr int final_idx   = 59;  // D8
+
+    constexpr size_t white_start_mask = 1ULL << start_idx;
+    constexpr size_t black_pieces     = 1ULL << victim1_idx | 1ULL << victim2_idx | 1ULL << victim3_idx;
+    constexpr size_t empty_files      = ~(white_start_mask | black_pieces);
+
+    std::vector<Move> result_moves;
+
+    // EXECUTE
+    recursiveCreatePawnsAttacks(
+        result_moves,
+        start_idx,
+        black_pieces,
+        empty_files,
+        0ULL,               // No captures yet
+        white_start_mask,   // Original start
+        white
+    );
+
+    // VERIFY
+    // There should be exactly one legal path found
+    ASSERT_EQ(result_moves.size(), 1);
+
+    constexpr size_t expected_captures = black_pieces;
+    const Move& m = result_moves[0];
+
+    EXPECT_EQ(m.from_mask, white_start_mask);
+    EXPECT_EQ(m.to_mask, (1ULL << final_idx));
+    EXPECT_EQ(m.captures_mask, expected_captures);
+}
+
+TEST(CPU_movegenTest, recursiveCreatePawnsAttacks_simpleBranching)
+{
+    // SETUP
+    constexpr int start_idx = 8;
+    constexpr size_t white_start_mask = (1ULL << start_idx);
+
+    // Opponents placed to create a fork in the path
+    constexpr size_t victim1 = (1ULL << 17); // B3
+    constexpr size_t victim2 = (1ULL << 35); // D5
+    constexpr size_t victim3 = (1ULL << 19); // D3
+
+    constexpr size_t opponent_pieces = victim1 | victim2 | victim3;
+    constexpr size_t empty_files = ~(white_start_mask | opponent_pieces);
+
+    std::vector<Move> result_moves;
+
+    // EXECUTE
+    recursiveCreatePawnsAttacks(
+        result_moves,
+        start_idx,
+        opponent_pieces,
+        empty_files,
+        0ULL,               // No captures yet
+        white_start_mask,   // Original start
+        white
+    );
+
+    // VERIFY
+    // We expect 2 distinct terminal moves from the same starting piece
+    ASSERT_EQ(result_moves.size(), 2);
+
+    // since the choice of directions while searching for moves
+    // is deterministic, always goes UP_LEFT, UP_RIGHT, DOWN_LEFT, DOWN_RIGHT
+    // we can do assertions here
+
+    const auto move1 = result_moves[0];
+    ASSERT_EQ(move1.from_mask, white_start_mask);
+    ASSERT_EQ(move1.to_mask, 1ULL << 44);
+    ASSERT_EQ(move1.captures_mask, victim1 | victim2);
+
+    const auto move2 = result_moves[1];
+    ASSERT_EQ(move2.from_mask, white_start_mask);
+    ASSERT_EQ(move2.to_mask, 1ULL << 12);
+    ASSERT_EQ(move2.captures_mask, victim1 | victim3);
+}
