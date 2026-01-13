@@ -37,7 +37,7 @@ enum Colour {
     white = 1,
 };
 
-inline std::ostream &operator<<(std::ostream &os, const Colour &t_colour)
+inline std::ostream& operator<<(std::ostream& os, const Colour& t_colour)
 {
     const std::string colStr = t_colour == black ? "black" : "white";
     return os << colStr;
@@ -91,8 +91,8 @@ struct Board
     // this is the state of the board
     // 0 represents black pieces
     // 1 represents white pieces
-    std::array<size_t, 2> pawns;
-    std::array<size_t, 2> kings;
+    std::array<size_t, 2> pawns{};
+    std::array<size_t, 2> kings{};
 
 private:
     void initBoard()
@@ -153,8 +153,8 @@ struct LookupTables
     }
 
     // lookup tables
-    size_t JumpTable[64][4];
-    size_t NeighbourTable[64][4];
+    size_t JumpTable[64][4]{};
+    size_t NeighbourTable[64][4]{};
 
     // TODO: initialization of king table
     // const size_t KingTable[64][4];

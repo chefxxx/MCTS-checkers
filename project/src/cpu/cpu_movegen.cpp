@@ -65,11 +65,20 @@ void createAllPawnsAttacks(std::vector<Move> &t_allMoves,
     size_t maskCopy = t_attackersMask;
     while (maskCopy) {
         const int attacker_idx = popLsb(maskCopy);
-        recursiveCreatePawnsAttacks(t_allMoves, attacker_idx, t_opponentPieces, t_emptyFiles, 0ULL, 1ULL << attacker_idx, t_attackersColour);
+        std::vector attackPath{attacker_idx};
+        recursiveCreatePawnsAttacks(t_allMoves,
+                                    attackPath,
+                                    attacker_idx,
+                                    t_opponentPieces,
+                                    t_emptyFiles,
+                                    0ULL,
+                                    1ULL << attacker_idx,
+                                    t_attackersColour);
     }
 }
 
-void recursiveCreatePawnsAttacks(std::vector<Move> &t_allMoves,
+void recursiveCreatePawnsAttacks(std::vector<Move>& t_allMoves,
+                                 std::vector<int>&  t_currentPath,
                                  const int          t_idx,
                                  const size_t       t_opponentPieces,
                                  const size_t       t_emptyFiles,
@@ -97,7 +106,16 @@ void recursiveCreatePawnsAttacks(std::vector<Move> &t_allMoves,
             const auto new_currentVictims = t_currentVictimsMask | victim_mask;
 
             const auto new_idx = popLsb(jump_mask);
-            recursiveCreatePawnsAttacks(t_allMoves, new_idx, t_opponentPieces, new_empty, new_currentVictims, t_originalStartingPositionMask, t_attackerColour);
+            t_currentPath.push_back(new_idx);
+            recursiveCreatePawnsAttacks(t_allMoves,
+                                        t_currentPath,
+                                        new_idx,
+                                        t_opponentPieces,
+                                        new_empty,
+                                        new_currentVictims,
+                                        t_originalStartingPositionMask,
+                                        t_attackerColour);
+            t_currentPath.pop_back();
         }
     }
     // add new move to vector
@@ -110,7 +128,7 @@ void recursiveCreatePawnsAttacks(std::vector<Move> &t_allMoves,
         // is for sure some index after at least one jump was made.
         assert(t_currentVictimsMask);
         const size_t to_mask = 1ULL << t_idx;
-        t_allMoves.emplace_back(t_originalStartingPositionMask, to_mask, t_currentVictimsMask, to_mask & promotion[t_attackerColour]);
+        t_allMoves.emplace_back(t_originalStartingPositionMask, to_mask, t_currentVictimsMask, to_mask & promotion[t_attackerColour], t_currentPath);
     }
 }
 
@@ -136,7 +154,8 @@ void createOnePawnMoves(std::vector<Move> &t_allMoves,
         // ReSharper disable once CppTooWideScope
         const size_t move_mask = canMove[t_moversColour][dir] * globalTables.NeighbourTable[t_idx][dir] & t_emptyFiles;
         if (move_mask) {
-            const auto move = Move(1ULL << t_idx, move_mask, move_mask & promotion[t_moversColour]);
+            size_t copy = move_mask;
+            const auto move = Move(1ULL << t_idx, move_mask, move_mask & promotion[t_moversColour], t_idx, popLsb(copy));
             t_allMoves.push_back(move);
         }
     }

@@ -183,17 +183,16 @@ TEST(CPU_movegenTest, recursiveCreatePawnsAttacks_ZigZag)
     constexpr size_t empty_files      = ~(white_start_mask | black_pieces);
 
     std::vector<Move> result_moves;
-
+    std::vector path{start_idx};
     // EXECUTE
-    recursiveCreatePawnsAttacks(
-        result_moves,
-        start_idx,
-        black_pieces,
-        empty_files,
-        0ULL,               // No captures yet
-        white_start_mask,   // Original start
-        white
-    );
+    recursiveCreatePawnsAttacks(result_moves,
+                                path,
+                                start_idx,
+                                black_pieces,
+                                empty_files, // No captures yet
+                                0ULL,        // Original start
+                                white_start_mask,
+                                white);
 
     // VERIFY
     // There should be exactly one legal path found
@@ -222,17 +221,16 @@ TEST(CPU_movegenTest, recursiveCreatePawnsAttacks_simpleBranching)
     constexpr size_t empty_files = ~(white_start_mask | opponent_pieces);
 
     std::vector<Move> result_moves;
-
+    std::vector path{start_idx};
     // EXECUTE
-    recursiveCreatePawnsAttacks(
-        result_moves,
-        start_idx,
-        opponent_pieces,
-        empty_files,
-        0ULL,               // No captures yet
-        white_start_mask,   // Original start
-        white
-    );
+    recursiveCreatePawnsAttacks(result_moves,
+                                path,
+                                start_idx,
+                                opponent_pieces,
+                                empty_files, // No captures yet
+                                0ULL,        // Original start
+                                white_start_mask,
+                                white);
 
     // VERIFY
     // We expect 2 distinct terminal moves from the same starting piece
@@ -275,8 +273,9 @@ TEST(CPU_movegenTest, WhiteJumpPromotes) {
     constexpr size_t opponents = (1ULL << victim_idx);
     constexpr size_t empty = ~( (1ULL << start_idx) | opponents );
     std::vector<Move> moves;
+    std::vector path{start_idx};
 
-    recursiveCreatePawnsAttacks(moves, start_idx, opponents, empty, 0, (1ULL << start_idx), white);
+    recursiveCreatePawnsAttacks(moves, path, start_idx, opponents, empty, 0, (1ULL << start_idx), white);
 
     ASSERT_EQ(moves.size(), 1);
     EXPECT_EQ(getLsb(moves[0].to_mask), landing_idx);
@@ -293,8 +292,9 @@ TEST(CPU_movegenTest, WhiteJumpThroughPromoteNoPromotion) {
     constexpr size_t opponents = (1ULL << victim1) | (1ULL << victim2);
     constexpr size_t empty = ~( (1ULL << start_idx) | opponents );
     std::vector<Move> moves;
+    std::vector path{start_idx};
 
-    recursiveCreatePawnsAttacks(moves, start_idx, opponents, empty, 0, (1ULL << start_idx), white);
+    recursiveCreatePawnsAttacks(moves, path, start_idx, opponents, empty, 0, (1ULL << start_idx), white);
 
     ASSERT_EQ(moves.size(), 1);
     EXPECT_EQ(getLsb(moves[0].to_mask), final_landing);
@@ -311,8 +311,8 @@ TEST(CPU_movegenTest, WhiteJumpBackwardsNoPromotion) {
     constexpr size_t opponents = (1ULL << victim_idx);
     constexpr size_t empty = ~( (1ULL << start_idx) | opponents );
     std::vector<Move> moves;
-
-    recursiveCreatePawnsAttacks(moves, start_idx, opponents, empty, 0, (1ULL << start_idx), white);
+    std::vector path{start_idx};
+    recursiveCreatePawnsAttacks(moves, path, start_idx, opponents, empty, 0, (1ULL << start_idx), white);
 
     ASSERT_EQ(moves.size(), 1);
     EXPECT_EQ(getLsb(moves[0].to_mask), landing_idx);
@@ -340,8 +340,9 @@ TEST(CPU_movegenTest, BlackJumpPromotes) {
     constexpr size_t opponents = (1ULL << victim_idx);
     constexpr size_t empty = ~( (1ULL << start_idx) | opponents );
     std::vector<Move> moves;
+    std::vector path{start_idx};
 
-    recursiveCreatePawnsAttacks(moves, start_idx, opponents, empty, 0, (1ULL << start_idx), black);
+    recursiveCreatePawnsAttacks(moves, path, start_idx, opponents, empty, 0, (1ULL << start_idx), black);
 
     ASSERT_EQ(moves.size(), 1);
     EXPECT_TRUE(moves[0].is_promotion);
@@ -357,8 +358,9 @@ TEST(CPU_movegenTest, BlackJumpThroughPromoteNoPromotion) {
     constexpr size_t opponents = (1ULL << victim1) | (1ULL << victim2);
     constexpr size_t empty = ~( (1ULL << start_idx) | opponents );
     std::vector<Move> moves;
+    std::vector path{start_idx};
 
-    recursiveCreatePawnsAttacks(moves, start_idx, opponents, empty, 0, (1ULL << start_idx), black);
+    recursiveCreatePawnsAttacks(moves, path, start_idx, opponents, empty, 0, (1ULL << start_idx), black);
 
     ASSERT_EQ(moves.size(), 1);
     EXPECT_EQ(getLsb(moves[0].to_mask), final_landing);
@@ -373,9 +375,46 @@ TEST(CPU_movegenTest, BlackJumpBackwardsNoPromotion) {
     constexpr size_t opponents = (1ULL << victim_idx);
     constexpr size_t empty = ~( (1ULL << start_idx) | opponents );
     std::vector<Move> moves;
+    std::vector path{start_idx};
 
-    recursiveCreatePawnsAttacks(moves, start_idx, opponents, empty, 0, (1ULL << start_idx), black);
+    recursiveCreatePawnsAttacks(moves, path, start_idx, opponents, empty, 0, (1ULL << start_idx), black);
 
     ASSERT_EQ(moves.size(), 1);
     EXPECT_FALSE(moves[0].is_promotion);
+}
+
+TEST(MovePrintingTest, NormalMoveSlide) {
+    constexpr int start_idx = 9;  // b2
+    constexpr int end_idx = 18;   // c3
+
+    // Slide Move: captures_mask is 0
+    const Move m(1ULL << start_idx, 1ULL << end_idx, false, start_idx, end_idx);
+
+    // Simulation of your printing loop
+    const auto result = stringMove(m);
+
+    EXPECT_EQ(result, "b2-c3");
+}
+
+TEST(MovePrintingTest, SimpleAttackJump) {
+    constexpr int start_idx = 0;   // a1
+    constexpr int end_idx = 18;    // c3
+    const std::vector path = {start_idx, end_idx};
+    constexpr auto captures = 1ULL << 9;
+
+    // Jump Move: captures_mask is non-zero
+    const Move m(1ULL << start_idx, 1ULL << end_idx, captures,false, path);
+    const auto result = stringMove(m);
+
+    EXPECT_EQ(result, "a1:c3");
+}
+
+TEST(MovePrintingTest, MultipleAttackJump) {
+    const std::vector path = {0, 18, 4, 22}; // a1, c3, e1, g3
+
+    // Multiple Jump: captures_mask would have 3 bits set
+    const Move m(1ULL << 0, 1ULL << 22, 1ULL << 9 | 1ULL << 11 | 1ULL << 13,false, path);
+    const auto result = stringMove(m);
+
+    EXPECT_EQ(result, "a1:c3:e1:g3");
 }

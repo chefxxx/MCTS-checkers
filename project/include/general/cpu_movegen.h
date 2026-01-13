@@ -33,6 +33,7 @@ void              createAllPawnsAttacks(std::vector<Move> &t_allMoves,
                                         size_t             t_emptyFiles,
                                         Colour             t_attackersColour);
 void recursiveCreatePawnsAttacks(std::vector<Move> &t_allMoves,
+                                              std::vector<int>  &t_currentPath,
                                               int                t_idx,
                                               size_t             t_opponentPieces,
                                               size_t             t_emptyFiles,
