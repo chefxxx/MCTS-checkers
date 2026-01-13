@@ -109,8 +109,8 @@ void recursiveCreatePawnsAttacks(std::vector<Move> &t_allMoves,
         // of the move generation construction. So the t_idx here
         // is for sure some index after at least one jump was made.
         assert(t_currentVictimsMask);
-
-        t_allMoves.emplace_back(t_originalStartingPositionMask, (1ULL << t_idx), t_currentVictimsMask);
+        const size_t to_mask = 1ULL << t_idx;
+        t_allMoves.emplace_back(t_originalStartingPositionMask, to_mask, t_currentVictimsMask, to_mask & promotion[t_attackerColour]);
     }
 }
 
@@ -136,7 +136,7 @@ void createOnePawnMoves(std::vector<Move> &t_allMoves,
         // ReSharper disable once CppTooWideScope
         const size_t move_mask = canMove[t_moversColour][dir] * globalTables.NeighbourTable[t_idx][dir] & t_emptyFiles;
         if (move_mask) {
-            const auto move = Move(1ULL << t_idx, move_mask);
+            const auto move = Move(1ULL << t_idx, move_mask, move_mask & promotion[t_moversColour]);
             t_allMoves.push_back(move);
         }
     }

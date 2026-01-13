@@ -68,11 +68,12 @@ struct PlayerMove
 
 struct Move
 {
-    explicit Move(const size_t t_from, const size_t t_to) : from_mask(t_from), to_mask(t_to), captures_mask(0ull) {}
-    explicit Move(const size_t t_from, const size_t t_to, const size_t t_captures) : from_mask(t_from), to_mask(t_to), captures_mask(t_captures) {}
+    explicit Move(const size_t t_from, const size_t t_to, const bool t_promotion) : from_mask(t_from), to_mask(t_to), captures_mask(0ull), is_promotion(t_promotion) {}
+    explicit Move(const size_t t_from, const size_t t_to, const size_t t_captures, const bool t_promotion) : from_mask(t_from), to_mask(t_to), captures_mask(t_captures), is_promotion(t_promotion) {}
     size_t from_mask;
     size_t to_mask;
     size_t captures_mask;
+    bool is_promotion;
 };
 
 #endif // MCTS_CHECKERS_MOVE_H

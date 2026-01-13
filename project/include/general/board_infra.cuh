@@ -11,10 +11,18 @@
 
 #include "bit_operations.h"
 
-constexpr size_t   NOT_FILE_A = 0xFEFEFEFEFEFEFEFEULL;
-constexpr size_t   NOT_FILE_H = 0x7F7F7F7F7F7F7F7FULL;
-constexpr uint64_t NOT_FILE_B = 0xFDFDFDFDFDFDFDFDULL;
-constexpr uint64_t NOT_FILE_G = 0xBFBFBFBFBFBFBFBFULL;
+constexpr size_t NOT_FILE_A = 0xFEFEFEFEFEFEFEFEULL;
+constexpr size_t NOT_FILE_H = 0x7F7F7F7F7F7F7F7FULL;
+constexpr size_t NOT_FILE_B = 0xFDFDFDFDFDFDFDFDULL;
+constexpr size_t NOT_FILE_G = 0xBFBFBFBFBFBFBFBFULL;
+
+constexpr size_t PROMOTION_BLACK = 0x00000000000000FFULL;
+constexpr size_t PROMOTION_WHITE = 0xFF00000000000000ULL;
+
+constexpr size_t promotion[2] {
+    PROMOTION_BLACK,
+    PROMOTION_WHITE
+};
 
 enum Direction
 {
