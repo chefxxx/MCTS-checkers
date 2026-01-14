@@ -13,6 +13,7 @@ struct LookupTables
     {
         initLUTs();
         initDiagonals();
+        initDirectionMapping();
     }
     constexpr void initLUTs()
     {
@@ -50,12 +51,23 @@ struct LookupTables
         }
     }
 
+    constexpr void initDirectionMapping() {
+        for (int i = 1; i < 8; ++i) {
+            diffToDir[64 + (i * 9)] = UP_RIGHT;  // +9, +18...
+            diffToDir[64 + (i * 7)] = UP_LEFT;   // +7, +14...
+            diffToDir[64 - (i * 7)] = DOWN_RIGHT; // -7, -14...
+            diffToDir[64 - (i * 9)] = DOWN_LEFT;  // -9, -18...
+        }
+    }
+
     // lookup tables
     size_t JumpTable[64][4]{};
     size_t NeighbourTable[64][4]{};
 
-    size_t diagonalMaskEx[64];
-    size_t anitDiagonalMaskEx[64];
+    size_t diagonalMaskEx[64]{};
+    size_t anitDiagonalMaskEx[64]{};
+
+    Direction diffToDir[128]{};
 };
 
 constexpr LookupTables globalTables;

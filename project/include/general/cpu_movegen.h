@@ -27,7 +27,8 @@ size_t            getPawnsQuietMovesMask(size_t t_moversPawns, size_t t_emptyFil
 // Kings move and attack mask creation functions
 size_t            diagonalKingMask(size_t t_boardState, int t_kingSquare);
 size_t            antiDiagonalKingMask(size_t t_boardState, int t_kingSquare);
-size_t            getKingsQuietMovesMask(size_t t_moversKings, size_t t_emptyFiles);
+size_t            bothDiagonalsKingMask(size_t t_boardState, int t_kingSquare);
+size_t            getKingsAttackMask(size_t t_kingsMask, size_t t_boardState, size_t t_opponentsPieces);
 
 // move creation functions
 void              createAllPawnsAttacks(std::vector<Move> &t_allMoves,

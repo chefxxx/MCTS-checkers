@@ -22,9 +22,12 @@ std::vector<Move> generateAllPossibleMoves(const Board &t_board, const Colour t_
     const size_t opponent_pawns = t_board.pawns[1 - t_color];
     const size_t opponent_kings = t_board.kings[1 - t_color];
     const size_t opponent_pieces = opponent_pawns | opponent_kings;
-    const size_t empty = ~(pieces | opponent_pieces);
+    const size_t all_board_pieces = pieces | opponent_pieces;
+    const size_t empty = ~all_board_pieces;
 
-    if (const size_t pawns_attackers = getPawnsAttackMask(pawns, opponent_pieces, empty)) {
+    const size_t pawns_attackers = getPawnsAttackMask(pawns, opponent_pieces, empty);
+    const size_t kings_attackers = getKingsAttackMask(kings, all_board_pieces, opponent_pieces);
+    if (pawns_attackers || kings_attackers) {
         // if there is a move that is a jump/attack we have to do this move
         createAllPawnsAttacks(result, pawns_attackers, opponent_pieces, empty, t_color);
     }
@@ -80,6 +83,31 @@ size_t antiDiagonalKingMask(const size_t t_boardState, const int t_kingSquare)
     forward ^= byte_swap64(reverse);
     forward &= globalTables.anitDiagonalMaskEx[t_kingSquare];
     return forward;
+}
+
+size_t bothDiagonalsKingMask(const size_t t_boardState, const int t_kingSquare)
+{
+    return diagonalKingMask(t_boardState, t_kingSquare) | antiDiagonalKingMask(t_boardState, t_kingSquare);
+}
+
+size_t getKingsAttackMask(size_t t_kingsMask, const size_t t_boardState, const size_t t_opponentsPieces)
+{
+    const size_t empty = ~t_boardState;
+    size_t result_kings = 0ULL;
+    while (t_kingsMask) {
+        const int k_idx = popLsb(t_kingsMask);
+        const size_t mask = bothDiagonalsKingMask(t_boardState, k_idx);
+        size_t possible_victims = mask & t_opponentsPieces;
+        while (possible_victims) {
+            const int v_idx = popLsb(possible_victims);
+            const int diff = k_idx - v_idx;
+            if (const Direction dir = globalTables.diffToDir[diff]; globalTables.NeighbourTable[v_idx][dir] & empty) {
+                result_kings |= 1ULL << k_idx;
+                break;
+            }
+        }
+    }
+    return result_kings;
 }
 
 void createAllPawnsAttacks(std::vector<Move> &t_allMoves,
