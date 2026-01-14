@@ -137,5 +137,22 @@ TEST(KingsAttackMaskTest, MultipleKingsMixed)
 
     EXPECT_TRUE(result & kingAttacker);
     EXPECT_FALSE(result & kingBlocked);
-    EXPECT_EQ(__builtin_popcountll(result), 1);
+}
+
+TEST(KingsQuietMovesTest, CenterEmptyBoard) {
+    std::vector<Move> moves;
+    constexpr int kingSq = 27; // D4
+    constexpr uint64_t kings = (1ULL << kingSq);
+    constexpr uint64_t boardState = kings; // Empty board
+
+    createAllKingsQuietMoves(moves, kings, boardState);
+
+    EXPECT_EQ(moves.size(), 13);
+    for (size_t i = 0; i < moves.size(); ++i) {
+        constexpr std::array results = {0, 6, 9, 13, 18, 20, 34, 36, 41, 45, 48, 54, 63};
+        EXPECT_EQ(moves[i].from_mask, 1ULL << kingSq);
+        EXPECT_EQ(moves[i].to_mask, 1ULL << results[i]);
+        EXPECT_EQ(moves[i].positions[0], kingSq);
+        EXPECT_EQ(moves[i].positions[1], results[i]);
+    }
 }

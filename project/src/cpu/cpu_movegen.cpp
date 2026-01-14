@@ -31,7 +31,7 @@ std::vector<Move> generateAllPossibleMoves(const Board &t_board, const Colour t_
     if (pawns_attackers || kings_attackers) {
         // if there is a move that is a jump/attack we have to do this move
         createAllPawnsAttacks(result, pawns_attackers, opponent_pieces, empty, t_color);
-        createAllKingsAttacks(result, kings_attackers, all_board_pieces, opponent_pieces);
+        //createAllKingsAttacks(result, kings_attackers, all_board_pieces, opponent_pieces);
     }
     else {
         // if there is no attack possibility we can think of sliding moves
