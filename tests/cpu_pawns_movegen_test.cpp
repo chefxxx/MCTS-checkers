@@ -10,7 +10,7 @@
 // black: 19, 43, 23
 // white on the move
 // result: 10, 34
-TEST(CPU_movegenTest, getPawnsAttackMask_returns_upRightAttacks)
+TEST(PawnsCPU_MovegenTest, getPawnsAttackMask_returns_upRightAttacks)
 {
     constexpr auto white_mask  = (1ULL << 10) | (1ULL << 14) | (1ULL << 34);
     constexpr auto black_mask  = (1ULL << 19) | (1ULL << 23) | (1ULL << 43);
@@ -24,7 +24,7 @@ TEST(CPU_movegenTest, getPawnsAttackMask_returns_upRightAttacks)
 // black: 25
 // landing: 32 (empty)
 // result: 18 (the jumper)
-TEST(CPU_movegenTest, getPawnsAttackMask_returns_upLeftAttacks)
+TEST(PawnsCPU_MovegenTest, getPawnsAttackMask_returns_upLeftAttacks)
 {
     constexpr uint64_t white_mask  = (1ULL << 18);
     constexpr uint64_t black_mask  = (1ULL << 25);
@@ -38,7 +38,7 @@ TEST(CPU_movegenTest, getPawnsAttackMask_returns_upLeftAttacks)
 // white: 35
 // landing: 28 (empty)
 // result: 42 (the jumper)
-TEST(CPU_movegenTest, getPawnsAttackMask_returns_downRightAttacks)
+TEST(PawnsCPU_MovegenTest, getPawnsAttackMask_returns_downRightAttacks)
 {
     constexpr uint64_t black_mask  = (1ULL << 42);
     constexpr uint64_t white_mask  = (1ULL << 35);
@@ -52,7 +52,7 @@ TEST(CPU_movegenTest, getPawnsAttackMask_returns_downRightAttacks)
 // white: 16 (File A)
 // black: 25
 // result: 0 (cannot jump left from File A)
-TEST(CPU_movegenTest, getPawnsAttackMask_does_not_wrap_fileA)
+TEST(PawnsCPU_MovegenTest, getPawnsAttackMask_does_not_wrap_fileA)
 {
     constexpr uint64_t white_mask  = (1ULL << 16);
     constexpr uint64_t black_mask  = (1ULL << 25);
@@ -66,7 +66,7 @@ TEST(CPU_movegenTest, getPawnsAttackMask_does_not_wrap_fileA)
 // black: 19, 21
 // landing: 28 (empty)
 // result: 10, 14
-TEST(CPU_movegenTest, getPawnsAttackMask_returns_multiple_attackers)
+TEST(PawnsCPU_MovegenTest, getPawnsAttackMask_returns_multiple_attackers)
 {
     constexpr uint64_t white_mask  = (1ULL << 10) | (1ULL << 14);
     constexpr uint64_t black_mask  = (1ULL << 19) | (1ULL << 21);
@@ -79,7 +79,7 @@ TEST(CPU_movegenTest, getPawnsAttackMask_returns_multiple_attackers)
 // white: 19, 26, 28
 // pawn 19 is blocked by 26 and 28,
 // so the only pawns to mover are 26 and 28
-TEST(CPU_movegenTest, getPawnsMovesMask_withBlockedWhitePawn)
+TEST(PawnsCPU_MovegenTest, getPawnsMovesMask_withBlockedWhitePawn)
 {
     constexpr uint64_t white_mask  = (1ULL << 19) | (1ULL << 26) | (1ULL << 28);
     constexpr uint64_t black_mask  = 0ULL;
@@ -92,7 +92,7 @@ TEST(CPU_movegenTest, getPawnsMovesMask_withBlockedWhitePawn)
 // black: 35
 // white: 0
 // Result: 35 should be able to move Down-Left (26) or Down-Right (28).
-TEST(CPU_movegenTest, getPawnsMovesMask_blackMovesDown)
+TEST(PawnsCPU_MovegenTest, getPawnsMovesMask_blackMovesDown)
 {
     constexpr uint64_t black_mask  = (1ULL << 35);
     constexpr uint64_t white_mask  = 0ULL;
@@ -105,7 +105,7 @@ TEST(CPU_movegenTest, getPawnsMovesMask_blackMovesDown)
 // white: 15, 22
 // Result: 15 cannot move, but 22 can
 // The NOT_FILE_H mask should prevent 15 from moving to 24
-TEST(CPU_movegenTest, getPawnsMovesMask_preventWrapFileH)
+TEST(PawnsCPU_MovegenTest, getPawnsMovesMask_preventWrapFileH)
 {
     constexpr uint64_t white_mask  = (1ULL << 15) | (1ULL << 22);
     constexpr uint64_t black_mask  = 0ULL;
@@ -120,7 +120,7 @@ TEST(CPU_movegenTest, getPawnsMovesMask_preventWrapFileH)
 
 // black: 44, 35, 37
 // Result: 35, 37
-TEST(CPU_movegenTest, getPawnsMovesMask_fULLyBlocked)
+TEST(PawnsCPU_MovegenTest, getPawnsMovesMask_fULLyBlocked)
 {
     constexpr uint64_t black_mask  = (1ULL << 44) | (1ULL << 35) | (1ULL << 37);
     constexpr uint64_t white_mask  = 0ULL;
@@ -133,7 +133,7 @@ TEST(CPU_movegenTest, getPawnsMovesMask_fULLyBlocked)
 // white: 27
 // empty: all squares except 27
 // expected: moves from 27 to 34 and 27 to 36
-TEST(CPU_movegenTest, createOnePawnsMove_whiteCenter)
+TEST(PawnsCPU_MovegenTest, createOnePawnsMove_whiteCenter)
 {
     constexpr int start_idx = 27;
     constexpr uint64_t white_mask = (1ULL << start_idx);
@@ -150,7 +150,7 @@ TEST(CPU_movegenTest, createOnePawnsMove_whiteCenter)
 
 // white: 18, 20
 // expected: 4 total moves (2 from each piece)
-TEST(CPU_movegenTest, createAllPawnMoves_multiplePieces)
+TEST(PawnsCPU_MovegenTest, createAllPawnMoves_multiplePieces)
 {
     constexpr uint64_t white_mask = (1ULL << 18) | (1ULL << 20);
     constexpr uint64_t empty_mask = ~white_mask;
@@ -169,7 +169,7 @@ TEST(CPU_movegenTest, createAllPawnMoves_multiplePieces)
     EXPECT_TRUE(all_moves[3].to_mask == 1ULL << 29 && all_moves[3].from_mask == 1ULL << 20);
 }
 
-TEST(CPU_movegenTest, recursiveCreatePawnsAttacks_ZigZag)
+TEST(PawnsCPU_MovegenTest, recursiveCreatePawnsAttacks_ZigZag)
 {
     // Indices for 8x8 setup
     constexpr int start_idx   = 9;   // B2
@@ -206,7 +206,7 @@ TEST(CPU_movegenTest, recursiveCreatePawnsAttacks_ZigZag)
     EXPECT_EQ(m.captures_mask, expected_captures);
 }
 
-TEST(CPU_movegenTest, recursiveCreatePawnsAttacks_simpleBranching)
+TEST(PawnsCPU_MovegenTest, recursiveCreatePawnsAttacks_simpleBranching)
 {
     // SETUP
     constexpr int start_idx = 8;
@@ -252,7 +252,7 @@ TEST(CPU_movegenTest, recursiveCreatePawnsAttacks_simpleBranching)
 }
 
 // 1. White normal move and promotes
-TEST(CPU_movegenTest, WhiteSlidePromotes) {
+TEST(PawnsCPU_MovegenTest, WhiteSlidePromotes) {
     constexpr int start_idx = 49; // B7
     constexpr uint64_t empty = ~(1ULL << 49);
     std::vector<Move> moves;
@@ -265,7 +265,7 @@ TEST(CPU_movegenTest, WhiteSlidePromotes) {
 }
 
 // 2. White attack move and promotes
-TEST(CPU_movegenTest, WhiteJumpPromotes) {
+TEST(PawnsCPU_MovegenTest, WhiteJumpPromotes) {
     constexpr int start_idx = 42;  // C6
     constexpr int victim_idx = 51; // D7
     constexpr int landing_idx = 60; // E8 (Rank 8)
@@ -283,7 +283,7 @@ TEST(CPU_movegenTest, WhiteJumpPromotes) {
 }
 
 // 3. White attack move THROUGH promote square, but does not promote
-TEST(CPU_movegenTest, WhiteJumpThroughPromoteNoPromotion) {
+TEST(PawnsCPU_MovegenTest, WhiteJumpThroughPromoteNoPromotion) {
     constexpr int start_idx = 42;     // C6
     constexpr int victim1 = 51;       // D7
     constexpr int victim2 = 53;       // F7
@@ -303,7 +303,7 @@ TEST(CPU_movegenTest, WhiteJumpThroughPromoteNoPromotion) {
 }
 
 // 4. White attack move and lands on Row 1 - does not promote
-TEST(CPU_movegenTest, WhiteJumpBackwardsNoPromotion) {
+TEST(PawnsCPU_MovegenTest, WhiteJumpBackwardsNoPromotion) {
     constexpr int start_idx = 18;  // C3
     constexpr int victim_idx = 9;  // B2
     constexpr int landing_idx = 0; // A1 (Rank 1)
@@ -320,7 +320,7 @@ TEST(CPU_movegenTest, WhiteJumpBackwardsNoPromotion) {
 }
 
 // 1. Black normal move and promotes
-TEST(CPU_movegenTest, BlackSlidePromotes) {
+TEST(PawnsCPU_MovegenTest, BlackSlidePromotes) {
     constexpr int start_idx = 9; // B2
     constexpr uint64_t empty = ~(1ULL << 9);
     std::vector<Move> moves;
@@ -333,7 +333,7 @@ TEST(CPU_movegenTest, BlackSlidePromotes) {
 }
 
 // 2. Black attack move and promotes
-TEST(CPU_movegenTest, BlackJumpPromotes) {
+TEST(PawnsCPU_MovegenTest, BlackJumpPromotes) {
     constexpr int start_idx = 18; // C3
     constexpr int victim_idx = 9; // B2
 
@@ -349,7 +349,7 @@ TEST(CPU_movegenTest, BlackJumpPromotes) {
 }
 
 // 3. Black attack move THROUGH promote square, but does not promote
-TEST(CPU_movegenTest, BlackJumpThroughPromoteNoPromotion) {
+TEST(PawnsCPU_MovegenTest, BlackJumpThroughPromoteNoPromotion) {
     constexpr int start_idx = 16;  // A3
     constexpr int victim1 = 9;     // B2
     constexpr int victim2 = 11;    // D2
@@ -368,7 +368,7 @@ TEST(CPU_movegenTest, BlackJumpThroughPromoteNoPromotion) {
 }
 
 // 4. Black attack move and lands on Row 8 - does not promote
-TEST(CPU_movegenTest, BlackJumpBackwardsNoPromotion) {
+TEST(PawnsCPU_MovegenTest, BlackJumpBackwardsNoPromotion) {
     constexpr int start_idx = 42;  // C6
     constexpr int victim_idx = 51; // D7
 

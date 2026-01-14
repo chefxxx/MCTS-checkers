@@ -62,3 +62,75 @@ TEST(KingMoveGenTest, CornerCases) {
     EXPECT_EQ(d0, expectedD);
     EXPECT_EQ(a0, expectedA);
 }
+
+TEST(KingsAttackMaskTest, EmptyBoardNoAttacks) {
+    constexpr uint64_t kingSq = 27; // D4
+    constexpr uint64_t kings = (1ULL << kingSq);
+    constexpr uint64_t boardState = kings;
+    constexpr uint64_t opponents = 0ULL;
+
+    const uint64_t result = getKingsAttackMask(kings, boardState, opponents);
+    EXPECT_EQ(result, 0ULL);
+}
+
+TEST(KingsAttackMaskTest, SimpleCapture) {
+    constexpr int k_idx = 18; // C3
+    constexpr int v_idx = 27; // D4
+    constexpr uint64_t kings = (1ULL << k_idx);
+    constexpr uint64_t opponents = (1ULL << v_idx);
+    constexpr uint64_t boardState = kings | opponents; // E5 is empty
+
+    const uint64_t result = getKingsAttackMask(kings, boardState, opponents);
+    EXPECT_EQ(result, kings);
+}
+
+TEST(KingsAttackMaskTest, FlyingKingLongCapture) {
+    constexpr int k_idx = 0;  // A1
+    constexpr int v_idx = 45; // F6
+    constexpr uint64_t kings = (1ULL << k_idx);
+    constexpr uint64_t opponents = (1ULL << v_idx);
+    constexpr uint64_t boardState = kings | opponents; // Square 54 (G7) is empty
+
+    const uint64_t result = getKingsAttackMask(kings, boardState, opponents);
+    EXPECT_EQ(result, kings);
+}
+
+TEST(KingsAttackMaskTest, BlockedLandingSquare) {
+    constexpr int k_idx = 18; // C3
+    constexpr int v_idx = 27; // D4
+    constexpr int blocker = 36; // E5
+    constexpr uint64_t kings = (1ULL << k_idx) | (1ULL << blocker);
+    constexpr uint64_t opponents = (1ULL << v_idx);
+    constexpr uint64_t boardState = kings | opponents;
+
+    const uint64_t result = getKingsAttackMask(kings, boardState, opponents);
+    EXPECT_EQ(result, 0ULL);
+}
+
+TEST(KingsAttackMaskTest, VictimOnEdgeNoJump) {
+    constexpr int k_idx = 54; // G7
+    constexpr int v_idx = 63; // H8
+    constexpr uint64_t kings = (1ULL << k_idx);
+    constexpr uint64_t opponents = (1ULL << v_idx);
+    constexpr uint64_t boardState = kings | opponents;
+
+    const uint64_t result = getKingsAttackMask(kings, boardState, opponents);
+    EXPECT_EQ(result, 0ULL);
+}
+
+TEST(KingsAttackMaskTest, MultipleKingsMixed) {
+    constexpr uint64_t kingAttacker = (1ULL << 18); // C3 -> jump D4 to E5
+    constexpr uint64_t kingBlocked = (1ULL << 0);   // A1 -> victim B2 but C3 is kingAttacker
+    constexpr uint64_t victim1 = (1ULL << 27);      // D4
+    constexpr uint64_t victim2 = (1ULL << 9);       // B2
+
+    constexpr uint64_t kings = kingAttacker | kingBlocked;
+    constexpr uint64_t opponents = victim1 | victim2;
+    constexpr uint64_t boardState = kings | opponents;
+
+    const uint64_t result = getKingsAttackMask(kings, boardState, opponents);
+
+    EXPECT_TRUE(result & kingAttacker);
+    EXPECT_FALSE(result & kingBlocked);
+    EXPECT_EQ(__builtin_popcountll(result), 1);
+}

@@ -100,8 +100,8 @@ size_t getKingsAttackMask(size_t t_kingsMask, const size_t t_boardState, const s
         size_t possible_victims = mask & t_opponentsPieces;
         while (possible_victims) {
             const int v_idx = popLsb(possible_victims);
-            const int diff = k_idx - v_idx;
-            if (const Direction dir = globalTables.diffToDir[diff]; globalTables.NeighbourTable[v_idx][dir] & empty) {
+            const int diff = v_idx - k_idx;
+            if (const Direction dir = globalTables.diffToDir[diff + 64]; globalTables.NeighbourTable[v_idx][dir] & empty) {
                 result_kings |= 1ULL << k_idx;
                 break;
             }
