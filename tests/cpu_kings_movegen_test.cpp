@@ -156,3 +156,107 @@ TEST(KingsQuietMovesTest, CenterEmptyBoard) {
         EXPECT_EQ(moves[i].positions[1], results[i]);
     }
 }
+
+TEST(KingsQuietMovesTest, BlockedByFriendly) {
+    std::vector<Move> moves;
+    constexpr int kingSq = 27;   // D4
+    constexpr int blocker = 36;  // E5 (Directly NE)
+    constexpr uint64_t kings = (1ULL << kingSq);
+    constexpr uint64_t boardState = kings | (1ULL << blocker);
+
+    createAllKingsQuietMoves(moves, kings, boardState);
+
+    // NE direction (36, 45, 54, 63) is now blocked.
+    // Original: {0, 6, 9, 13, 18, 20, 34, 36, 41, 45, 48, 54, 63}
+    // New: Removes 36, 45, 54, 63. Total size: 9
+    EXPECT_EQ(moves.size(), 9);
+
+    for (size_t i = 0; i < moves.size(); ++i) {
+        constexpr std::array expectedResults = {0, 6, 9, 13, 18, 20, 34, 41, 48};
+        EXPECT_EQ(moves[i].from_mask, 1ULL << kingSq);
+        EXPECT_EQ(moves[i].to_mask, 1ULL << expectedResults[i]);
+        EXPECT_EQ(moves[i].positions[0], kingSq);
+        EXPECT_EQ(moves[i].positions[1], expectedResults[i]);
+    }
+}
+
+TEST(KingsQuietMovesTest, EdgeMobilityA4) {
+    std::vector<Move> moves;
+    constexpr int kingSq = 24; // A4
+    constexpr uint64_t kings = (1ULL << kingSq);
+    constexpr uint64_t boardState = kings;
+
+    createAllKingsQuietMoves(moves, kings, boardState);
+
+    // Diagonals from A4 (24):
+    // NE: 33, 42, 51, 60
+    // SE: 17, 10, 3
+    // (NW and SW are off-board)
+    EXPECT_EQ(moves.size(), 7);
+
+    for (size_t i = 0; i < moves.size(); ++i) {
+        constexpr std::array results = {3, 10, 17, 33, 42, 51, 60};
+        EXPECT_EQ(moves[i].to_mask, 1ULL << results[i]);
+    }
+}
+
+TEST(KingsQuietMovesTest, BlockedByOpponent) {
+    std::vector<Move> moves;
+    constexpr int kingSq = 18;    // C3
+    constexpr int opponent1 = 9;   // B2 (Directly SW)
+    constexpr uint64_t kings = (1ULL << kingSq);
+    constexpr uint64_t boardState = kings | (1ULL << opponent1);
+
+    // Important note:
+    //
+    // createAllKingsQuiteMoves function does not check for the
+    // attack possibilities, that is in this case it is enough to
+    // add blocking piece at 9.
+    createAllKingsQuietMoves(moves, kings, boardState);
+
+    // Expected destinations in LSB-to-MSB order:
+    // SE direction: 4, 11
+    // NW direction: 25, 32, 39, 46, 53, 60
+    // NE direction: 27, 36, 45, 54, 63
+    // Note: 9 (Opponent) and 0 (Behind opponent) are excluded.
+    constexpr std::array results = {4, 11, 25, 27, 32, 36, 45, 54, 63};
+
+    ASSERT_EQ(moves.size(), results.size());
+    for (size_t i = 0; i < moves.size(); ++i) {
+        EXPECT_EQ(moves[i].from_mask, 1ULL << kingSq);
+        EXPECT_EQ(moves[i].to_mask, 1ULL << results[i]);
+        EXPECT_EQ(moves[i].positions[0], kingSq);
+        EXPECT_EQ(moves[i].positions[1], results[i]);
+    }
+}
+
+TEST(KingsQuietMovesTest, MultipleKingsCorner) {
+    std::vector<Move> moves;
+    constexpr int k1 = 0;  // A1
+    constexpr int k2 = 63; // H8
+    constexpr uint64_t kings = (1ULL << k1) | (1ULL << k2);
+    constexpr uint64_t boardState = kings;
+
+    createAllKingsQuietMoves(moves, kings, boardState);
+
+    // Note: Because the other king is on the board, the long diagonal is blocked
+    // at the very last square for both.
+    constexpr std::array resultsK1 = {9, 18, 27, 36, 45, 54};
+
+    // Total moves should be 12.
+    ASSERT_EQ(moves.size(), 12);
+
+    // Verify first 6 moves (from King 0)
+    for (size_t i = 0; i < 6; ++i) {
+        EXPECT_EQ(moves[i].from_mask, 1ULL << k1);
+        EXPECT_EQ(moves[i].to_mask, 1ULL << resultsK1[i]);
+        EXPECT_EQ(moves[i].positions[0], k1);
+    }
+
+    for (size_t i = 0; i < 6; ++i) {
+        const size_t moveIdx = i + 6;
+        EXPECT_EQ(moves[moveIdx].from_mask, 1ULL << k2);
+        EXPECT_EQ(moves[moveIdx].to_mask, 1ULL << resultsK1[i]);
+        EXPECT_EQ(moves[moveIdx].positions[0], k2);
+    }
+}
