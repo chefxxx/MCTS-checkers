@@ -31,11 +31,12 @@ size_t bothDiagonalsKingMask(size_t t_boardState, int t_kingSquare);
 size_t getKingsAttackMask(size_t t_kingsMask, size_t t_boardState, size_t t_opponentsPieces);
 
 // Kings moves creation functions
-
 void createAllKingsAttacks(std::vector<Move> &t_allMoves,
                            size_t             t_kingsMask,
                            size_t             t_boardState,
                            size_t             t_opponentPieces);
+
+void createAllKingsQuietMoves(std::vector<Move> &t_allMoves, size_t t_kingsMask, size_t t_boardState);
 
 // Pawns moves creation functions
 void createAllPawnsAttacks(std::vector<Move> &t_allMoves,

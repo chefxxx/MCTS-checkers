@@ -31,11 +31,13 @@ std::vector<Move> generateAllPossibleMoves(const Board &t_board, const Colour t_
     if (pawns_attackers || kings_attackers) {
         // if there is a move that is a jump/attack we have to do this move
         createAllPawnsAttacks(result, pawns_attackers, opponent_pieces, empty, t_color);
+        createAllKingsAttacks(result, kings_attackers, all_board_pieces, opponent_pieces);
     }
     else {
         // if there is no attack possibility we can think of sliding moves
         const size_t pawns_movers = getPawnsQuietMovesMask(pawns, empty, t_color);
         createAllPawnsQuietMoves(result, pawns_movers, empty, t_color);
+        createAllKingsQuietMoves(result, kings, all_board_pieces);
     }
     return result;
 }
@@ -118,6 +120,19 @@ size_t getKingsAttackMask(size_t t_kingsMask, const size_t t_boardState, const s
         }
     }
     return result_kings;
+}
+
+void createAllKingsQuietMoves(std::vector<Move> &t_allMoves, size_t t_kingsMask, const size_t t_boardState)
+{
+    const size_t empty = ~t_boardState;
+    while (t_kingsMask) {
+        const int k_idx = popLsb(t_kingsMask);
+        size_t moves_mask = bothDiagonalsKingMask(t_boardState, k_idx) & empty;
+        while (moves_mask) {
+            const int destination_idx = popLsb(moves_mask);
+            t_allMoves.emplace_back(1ULL << k_idx, 1ULL << destination_idx, false, k_idx, destination_idx);
+        }
+    }
 }
 
 void createAllPawnsAttacks(std::vector<Move> &t_allMoves,
