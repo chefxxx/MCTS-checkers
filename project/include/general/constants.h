@@ -15,25 +15,16 @@ constexpr size_t NOT_FILE_G = 0xBFBFBFBFBFBFBFBFULL;
 constexpr size_t PROMOTION_BLACK = 0x00000000000000FFULL;
 constexpr size_t PROMOTION_WHITE = 0xFF00000000000000ULL;
 
-constexpr size_t promotion[2] {
-    PROMOTION_BLACK,
-    PROMOTION_WHITE
-};
+constexpr size_t promotion[2]{PROMOTION_BLACK, PROMOTION_WHITE};
 
-enum Direction
-{
-    UP_RIGHT = 0,
-    UP_LEFT    = 1,
-    DOWN_RIGHT = 2,
-    DOWN_LEFT  = 3
-};
+enum Direction { UP_RIGHT = 0, UP_LEFT = 1, DOWN_RIGHT = 2, DOWN_LEFT = 3 };
 
 enum Colour {
     black = 0,
     white = 1,
 };
 
-inline std::ostream& operator<<(std::ostream& os, const Colour& t_colour)
+inline std::ostream &operator<<(std::ostream &os, const Colour &t_colour)
 {
     const std::string colStr = t_colour == black ? "black" : "white";
     return os << colStr;

@@ -15,7 +15,7 @@ TEST(PawnsCPU_MovegenTest, getPawnsAttackMask_returns_upRightAttacks)
     constexpr auto white_mask  = (1ULL << 10) | (1ULL << 14) | (1ULL << 34);
     constexpr auto black_mask  = (1ULL << 19) | (1ULL << 23) | (1ULL << 43);
     constexpr auto result_mask = (1ULL << 10) | (1ULL << 34);
-    constexpr auto empty_mask = ~(white_mask | black_mask);
+    constexpr auto empty_mask  = ~(white_mask | black_mask);
     const auto     test_case   = getPawnsAttackMask(white_mask, black_mask, empty_mask);
     EXPECT_EQ(result_mask, test_case);
 }
@@ -29,8 +29,8 @@ TEST(PawnsCPU_MovegenTest, getPawnsAttackMask_returns_upLeftAttacks)
     constexpr uint64_t white_mask  = (1ULL << 18);
     constexpr uint64_t black_mask  = (1ULL << 25);
     constexpr uint64_t result_mask = (1ULL << 18);
-    constexpr auto empty_mask = ~(white_mask | black_mask);
-    const auto test_case = getPawnsAttackMask(white_mask, black_mask, empty_mask);
+    constexpr auto     empty_mask  = ~(white_mask | black_mask);
+    const auto         test_case   = getPawnsAttackMask(white_mask, black_mask, empty_mask);
     EXPECT_EQ(result_mask, test_case);
 }
 
@@ -43,7 +43,7 @@ TEST(PawnsCPU_MovegenTest, getPawnsAttackMask_returns_downRightAttacks)
     constexpr uint64_t black_mask  = (1ULL << 42);
     constexpr uint64_t white_mask  = (1ULL << 35);
     constexpr uint64_t result_mask = (1ULL << 42);
-    constexpr auto empty_mask = ~(white_mask | black_mask);
+    constexpr auto     empty_mask  = ~(white_mask | black_mask);
     // We pass black_mask as t_mask because black is the "attacker" here
     const auto test_case = getPawnsAttackMask(black_mask, white_mask, empty_mask);
     EXPECT_EQ(result_mask, test_case);
@@ -57,8 +57,8 @@ TEST(PawnsCPU_MovegenTest, getPawnsAttackMask_does_not_wrap_fileA)
     constexpr uint64_t white_mask  = (1ULL << 16);
     constexpr uint64_t black_mask  = (1ULL << 25);
     constexpr uint64_t result_mask = 0ULL;
-    constexpr auto empty_mask = ~(white_mask | black_mask);
-    const auto test_case = getPawnsAttackMask(black_mask, white_mask, empty_mask);
+    constexpr auto     empty_mask  = ~(white_mask | black_mask);
+    const auto         test_case   = getPawnsAttackMask(black_mask, white_mask, empty_mask);
     EXPECT_EQ(result_mask, test_case);
 }
 
@@ -71,8 +71,8 @@ TEST(PawnsCPU_MovegenTest, getPawnsAttackMask_returns_multiple_attackers)
     constexpr uint64_t white_mask  = (1ULL << 10) | (1ULL << 14);
     constexpr uint64_t black_mask  = (1ULL << 19) | (1ULL << 21);
     constexpr uint64_t result_mask = (1ULL << 10) | (1ULL << 14);
-    constexpr auto empty_mask = ~(white_mask | black_mask);
-    const auto test_case = getPawnsAttackMask(white_mask, black_mask, empty_mask);
+    constexpr auto     empty_mask  = ~(white_mask | black_mask);
+    const auto         test_case   = getPawnsAttackMask(white_mask, black_mask, empty_mask);
     EXPECT_EQ(result_mask, test_case);
 }
 
@@ -84,8 +84,8 @@ TEST(PawnsCPU_MovegenTest, getPawnsMovesMask_withBlockedWhitePawn)
     constexpr uint64_t white_mask  = (1ULL << 19) | (1ULL << 26) | (1ULL << 28);
     constexpr uint64_t black_mask  = 0ULL;
     constexpr uint64_t result_mask = (1ULL << 26) | (1ULL << 28);
-    constexpr auto empty_mask = ~(white_mask | black_mask);
-    const auto test_case = getPawnsQuietMovesMask(white_mask, empty_mask, white);
+    constexpr auto     empty_mask  = ~(white_mask | black_mask);
+    const auto         test_case   = getPawnsQuietMovesMask(white_mask, empty_mask, white);
     ASSERT_EQ(test_case, result_mask);
 }
 
@@ -97,8 +97,8 @@ TEST(PawnsCPU_MovegenTest, getPawnsMovesMask_blackMovesDown)
     constexpr uint64_t black_mask  = (1ULL << 35);
     constexpr uint64_t white_mask  = 0ULL;
     constexpr uint64_t result_mask = (1ULL << 35);
-    constexpr auto empty_mask = ~(white_mask | black_mask);
-    const auto test_case = getPawnsQuietMovesMask(black_mask, empty_mask, black);
+    constexpr auto     empty_mask  = ~(white_mask | black_mask);
+    const auto         test_case   = getPawnsQuietMovesMask(black_mask, empty_mask, black);
     ASSERT_EQ(test_case, result_mask);
 }
 
@@ -110,7 +110,7 @@ TEST(PawnsCPU_MovegenTest, getPawnsMovesMask_preventWrapFileH)
     constexpr uint64_t white_mask  = (1ULL << 15) | (1ULL << 22);
     constexpr uint64_t black_mask  = 0ULL;
     constexpr uint64_t result_mask = (1ULL << 22);
-    constexpr auto empty_mask = ~(white_mask | black_mask);
+    constexpr auto     empty_mask  = ~(white_mask | black_mask);
 
     // We check if it correctly identifies 15 as a not mover
     // without allowing it to "teleport" across the board.
@@ -125,8 +125,8 @@ TEST(PawnsCPU_MovegenTest, getPawnsMovesMask_fULLyBlocked)
     constexpr uint64_t black_mask  = (1ULL << 44) | (1ULL << 35) | (1ULL << 37);
     constexpr uint64_t white_mask  = 0ULL;
     constexpr uint64_t result_mask = (1ULL << 35) | (1ULL << 37);
-    constexpr auto empty_mask = ~(white_mask | black_mask);
-    const auto test_case = getPawnsQuietMovesMask(black_mask, empty_mask, black);
+    constexpr auto     empty_mask  = ~(white_mask | black_mask);
+    const auto         test_case   = getPawnsQuietMovesMask(black_mask, empty_mask, black);
     ASSERT_EQ(test_case, result_mask);
 }
 
@@ -135,7 +135,7 @@ TEST(PawnsCPU_MovegenTest, getPawnsMovesMask_fULLyBlocked)
 // expected: moves from 27 to 34 and 27 to 36
 TEST(PawnsCPU_MovegenTest, createOnePawnsMove_whiteCenter)
 {
-    constexpr int start_idx = 27;
+    constexpr int      start_idx  = 27;
     constexpr uint64_t white_mask = (1ULL << start_idx);
     constexpr uint64_t empty_mask = ~white_mask;
 
@@ -172,18 +172,18 @@ TEST(PawnsCPU_MovegenTest, createAllPawnMoves_multiplePieces)
 TEST(PawnsCPU_MovegenTest, recursiveCreatePawnsAttacks_ZigZag)
 {
     // Indices for 8x8 setup
-    constexpr int start_idx   = 9;   // B2
-    constexpr int victim1_idx = 18;  // C3 (Up-Right)
-    constexpr int victim2_idx = 34;  // C5 (Up-Left)
-    constexpr int victim3_idx = 50;  // C7
-    constexpr int final_idx   = 59;  // D8
+    constexpr int start_idx   = 9;  // B2
+    constexpr int victim1_idx = 18; // C3 (Up-Right)
+    constexpr int victim2_idx = 34; // C5 (Up-Left)
+    constexpr int victim3_idx = 50; // C7
+    constexpr int final_idx   = 59; // D8
 
     constexpr size_t white_start_mask = 1ULL << start_idx;
     constexpr size_t black_pieces     = 1ULL << victim1_idx | 1ULL << victim2_idx | 1ULL << victim3_idx;
     constexpr size_t empty_files      = ~(white_start_mask | black_pieces);
 
     std::vector<Move> result_moves;
-    std::vector path{start_idx};
+    std::vector       path{start_idx};
     // EXECUTE
     recursiveCreatePawnsAttacks(result_moves,
                                 path,
@@ -199,7 +199,7 @@ TEST(PawnsCPU_MovegenTest, recursiveCreatePawnsAttacks_ZigZag)
     ASSERT_EQ(result_moves.size(), 1);
 
     constexpr size_t expected_captures = black_pieces;
-    const Move& m = result_moves[0];
+    const Move      &m                 = result_moves[0];
 
     EXPECT_EQ(m.from_mask, white_start_mask);
     EXPECT_EQ(m.to_mask, (1ULL << final_idx));
@@ -209,7 +209,7 @@ TEST(PawnsCPU_MovegenTest, recursiveCreatePawnsAttacks_ZigZag)
 TEST(PawnsCPU_MovegenTest, recursiveCreatePawnsAttacks_simpleBranching)
 {
     // SETUP
-    constexpr int start_idx = 8;
+    constexpr int    start_idx        = 8;
     constexpr size_t white_start_mask = (1ULL << start_idx);
 
     // Opponents placed to create a fork in the path
@@ -218,10 +218,10 @@ TEST(PawnsCPU_MovegenTest, recursiveCreatePawnsAttacks_simpleBranching)
     constexpr size_t victim3 = (1ULL << 19); // D3
 
     constexpr size_t opponent_pieces = victim1 | victim2 | victim3;
-    constexpr size_t empty_files = ~(white_start_mask | opponent_pieces);
+    constexpr size_t empty_files     = ~(white_start_mask | opponent_pieces);
 
     std::vector<Move> result_moves;
-    std::vector path{start_idx};
+    std::vector       path{start_idx};
     // EXECUTE
     recursiveCreatePawnsAttacks(result_moves,
                                 path,
@@ -252,28 +252,30 @@ TEST(PawnsCPU_MovegenTest, recursiveCreatePawnsAttacks_simpleBranching)
 }
 
 // 1. White normal move and promotes
-TEST(PawnsCPU_MovegenTest, WhiteSlidePromotes) {
-    constexpr int start_idx = 49; // B7
-    constexpr uint64_t empty = ~(1ULL << 49);
-    std::vector<Move> moves;
+TEST(PawnsCPU_MovegenTest, WhiteSlidePromotes)
+{
+    constexpr int      start_idx = 49; // B7
+    constexpr uint64_t empty     = ~(1ULL << 49);
+    std::vector<Move>  moves;
 
     createOnePawnQuietMoves(moves, start_idx, empty, white);
     // Expected: 49 -> 56 (Up-Left) or 49 -> 58 (Up-Right). Both are Rank 8.
-    for(const auto& m : moves) {
+    for (const auto &m : moves) {
         EXPECT_TRUE(m.is_promotion);
     }
 }
 
 // 2. White attack move and promotes
-TEST(PawnsCPU_MovegenTest, WhiteJumpPromotes) {
-    constexpr int start_idx = 42;  // C6
-    constexpr int victim_idx = 51; // D7
+TEST(PawnsCPU_MovegenTest, WhiteJumpPromotes)
+{
+    constexpr int start_idx   = 42; // C6
+    constexpr int victim_idx  = 51; // D7
     constexpr int landing_idx = 60; // E8 (Rank 8)
 
-    constexpr size_t opponents = (1ULL << victim_idx);
-    constexpr size_t empty = ~( (1ULL << start_idx) | opponents );
+    constexpr size_t  opponents = (1ULL << victim_idx);
+    constexpr size_t  empty     = ~((1ULL << start_idx) | opponents);
     std::vector<Move> moves;
-    std::vector path{start_idx};
+    std::vector       path{start_idx};
 
     recursiveCreatePawnsAttacks(moves, path, start_idx, opponents, empty, 0, (1ULL << start_idx), white);
 
@@ -283,16 +285,17 @@ TEST(PawnsCPU_MovegenTest, WhiteJumpPromotes) {
 }
 
 // 3. White attack move THROUGH promote square, but does not promote
-TEST(PawnsCPU_MovegenTest, WhiteJumpThroughPromoteNoPromotion) {
-    constexpr int start_idx = 42;     // C6
-    constexpr int victim1 = 51;       // D7
-    constexpr int victim2 = 53;       // F7
+TEST(PawnsCPU_MovegenTest, WhiteJumpThroughPromoteNoPromotion)
+{
+    constexpr int start_idx     = 42; // C6
+    constexpr int victim1       = 51; // D7
+    constexpr int victim2       = 53; // F7
     constexpr int final_landing = 46; // G6 (Rank 6 - Final)
 
-    constexpr size_t opponents = (1ULL << victim1) | (1ULL << victim2);
-    constexpr size_t empty = ~( (1ULL << start_idx) | opponents );
+    constexpr size_t  opponents = (1ULL << victim1) | (1ULL << victim2);
+    constexpr size_t  empty     = ~((1ULL << start_idx) | opponents);
     std::vector<Move> moves;
-    std::vector path{start_idx};
+    std::vector       path{start_idx};
 
     recursiveCreatePawnsAttacks(moves, path, start_idx, opponents, empty, 0, (1ULL << start_idx), white);
 
@@ -303,15 +306,16 @@ TEST(PawnsCPU_MovegenTest, WhiteJumpThroughPromoteNoPromotion) {
 }
 
 // 4. White attack move and lands on Row 1 - does not promote
-TEST(PawnsCPU_MovegenTest, WhiteJumpBackwardsNoPromotion) {
-    constexpr int start_idx = 18;  // C3
-    constexpr int victim_idx = 9;  // B2
-    constexpr int landing_idx = 0; // A1 (Rank 1)
+TEST(PawnsCPU_MovegenTest, WhiteJumpBackwardsNoPromotion)
+{
+    constexpr int start_idx   = 18; // C3
+    constexpr int victim_idx  = 9;  // B2
+    constexpr int landing_idx = 0;  // A1 (Rank 1)
 
-    constexpr size_t opponents = (1ULL << victim_idx);
-    constexpr size_t empty = ~( (1ULL << start_idx) | opponents );
+    constexpr size_t  opponents = (1ULL << victim_idx);
+    constexpr size_t  empty     = ~((1ULL << start_idx) | opponents);
     std::vector<Move> moves;
-    std::vector path{start_idx};
+    std::vector       path{start_idx};
     recursiveCreatePawnsAttacks(moves, path, start_idx, opponents, empty, 0, (1ULL << start_idx), white);
 
     ASSERT_EQ(moves.size(), 1);
@@ -320,27 +324,29 @@ TEST(PawnsCPU_MovegenTest, WhiteJumpBackwardsNoPromotion) {
 }
 
 // 1. Black normal move and promotes
-TEST(PawnsCPU_MovegenTest, BlackSlidePromotes) {
-    constexpr int start_idx = 9; // B2
-    constexpr uint64_t empty = ~(1ULL << 9);
-    std::vector<Move> moves;
+TEST(PawnsCPU_MovegenTest, BlackSlidePromotes)
+{
+    constexpr int      start_idx = 9; // B2
+    constexpr uint64_t empty     = ~(1ULL << 9);
+    std::vector<Move>  moves;
 
     createOnePawnQuietMoves(moves, start_idx, empty, black);
     // Expected: 9 -> 0 (Down-Left) or 9 -> 2 (Down-Right). Both Rank 1.
-    for(const auto& m : moves) {
+    for (const auto &m : moves) {
         EXPECT_TRUE(m.is_promotion);
     }
 }
 
 // 2. Black attack move and promotes
-TEST(PawnsCPU_MovegenTest, BlackJumpPromotes) {
-    constexpr int start_idx = 18; // C3
-    constexpr int victim_idx = 9; // B2
+TEST(PawnsCPU_MovegenTest, BlackJumpPromotes)
+{
+    constexpr int start_idx  = 18; // C3
+    constexpr int victim_idx = 9;  // B2
 
-    constexpr size_t opponents = (1ULL << victim_idx);
-    constexpr size_t empty = ~( (1ULL << start_idx) | opponents );
+    constexpr size_t  opponents = (1ULL << victim_idx);
+    constexpr size_t  empty     = ~((1ULL << start_idx) | opponents);
     std::vector<Move> moves;
-    std::vector path{start_idx};
+    std::vector       path{start_idx};
 
     recursiveCreatePawnsAttacks(moves, path, start_idx, opponents, empty, 0, (1ULL << start_idx), black);
 
@@ -349,16 +355,17 @@ TEST(PawnsCPU_MovegenTest, BlackJumpPromotes) {
 }
 
 // 3. Black attack move THROUGH promote square, but does not promote
-TEST(PawnsCPU_MovegenTest, BlackJumpThroughPromoteNoPromotion) {
-    constexpr int start_idx = 16;  // A3
-    constexpr int victim1 = 9;     // B2
-    constexpr int victim2 = 11;    // D2
+TEST(PawnsCPU_MovegenTest, BlackJumpThroughPromoteNoPromotion)
+{
+    constexpr int start_idx     = 16; // A3
+    constexpr int victim1       = 9;  // B2
+    constexpr int victim2       = 11; // D2
     constexpr int final_landing = 20; // E3 (Rank 3 - Final)
 
-    constexpr size_t opponents = (1ULL << victim1) | (1ULL << victim2);
-    constexpr size_t empty = ~( (1ULL << start_idx) | opponents );
+    constexpr size_t  opponents = (1ULL << victim1) | (1ULL << victim2);
+    constexpr size_t  empty     = ~((1ULL << start_idx) | opponents);
     std::vector<Move> moves;
-    std::vector path{start_idx};
+    std::vector       path{start_idx};
 
     recursiveCreatePawnsAttacks(moves, path, start_idx, opponents, empty, 0, (1ULL << start_idx), black);
 
@@ -368,14 +375,15 @@ TEST(PawnsCPU_MovegenTest, BlackJumpThroughPromoteNoPromotion) {
 }
 
 // 4. Black attack move and lands on Row 8 - does not promote
-TEST(PawnsCPU_MovegenTest, BlackJumpBackwardsNoPromotion) {
-    constexpr int start_idx = 42;  // C6
+TEST(PawnsCPU_MovegenTest, BlackJumpBackwardsNoPromotion)
+{
+    constexpr int start_idx  = 42; // C6
     constexpr int victim_idx = 51; // D7
 
-    constexpr size_t opponents = (1ULL << victim_idx);
-    constexpr size_t empty = ~( (1ULL << start_idx) | opponents );
+    constexpr size_t  opponents = (1ULL << victim_idx);
+    constexpr size_t  empty     = ~((1ULL << start_idx) | opponents);
     std::vector<Move> moves;
-    std::vector path{start_idx};
+    std::vector       path{start_idx};
 
     recursiveCreatePawnsAttacks(moves, path, start_idx, opponents, empty, 0, (1ULL << start_idx), black);
 

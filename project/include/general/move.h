@@ -47,8 +47,8 @@ inline uint8_t strToPos(const std::string &t_pos)
 
 inline std::string posToStr(const int t_pos)
 {
-    const int row = t_pos / 8 ;
-    const int col = t_pos % 8;
+    const int  row     = t_pos / 8;
+    const int  col     = t_pos % 8;
     const char colChar = static_cast<char>('a' + col);
     const char rowChar = static_cast<char>('1' + row);
     return {colChar, rowChar};
@@ -81,18 +81,38 @@ struct PlayerMove
 // by this struct.
 struct Move
 {
-    explicit Move(const size_t t_from, const size_t t_to, const bool t_promotion, const int t_fromIdx, const int t_toIdx)
-    : from_mask(t_from), to_mask(t_to), captures_mask(0ull), is_promotion(t_promotion), positions({t_fromIdx, t_toIdx}) {}
-    explicit Move(const size_t t_from, const size_t t_to, const size_t t_captures, const bool t_promotion, std::vector<int> t_path)
-    : from_mask(t_from), to_mask(t_to), captures_mask(t_captures), is_promotion(t_promotion), positions(std::move(t_path)) {}
-    size_t from_mask;
-    size_t to_mask;
-    size_t captures_mask;
-    bool is_promotion;
+    explicit Move(const size_t t_from,
+                  const size_t t_to,
+                  const bool   t_promotion,
+                  const int    t_fromIdx,
+                  const int    t_toIdx)
+        : from_mask(t_from)
+        , to_mask(t_to)
+        , captures_mask(0ull)
+        , is_promotion(t_promotion)
+        , positions({t_fromIdx, t_toIdx})
+    {
+    }
+    explicit Move(const size_t     t_from,
+                  const size_t     t_to,
+                  const size_t     t_captures,
+                  const bool       t_promotion,
+                  std::vector<int> t_path)
+        : from_mask(t_from)
+        , to_mask(t_to)
+        , captures_mask(t_captures)
+        , is_promotion(t_promotion)
+        , positions(std::move(t_path))
+    {
+    }
+    size_t           from_mask;
+    size_t           to_mask;
+    size_t           captures_mask;
+    bool             is_promotion;
     std::vector<int> positions;
 };
 
-inline std::ostream& operator<<(std::ostream& os, const Move& t_move)
+inline std::ostream &operator<<(std::ostream &os, const Move &t_move)
 {
     const char delim = t_move.captures_mask ? ':' : '-';
     os << posToStr(t_move.positions[0]);
@@ -102,7 +122,7 @@ inline std::ostream& operator<<(std::ostream& os, const Move& t_move)
     return os;
 }
 
-inline std::string stringMove(const Move& t_move)
+inline std::string stringMove(const Move &t_move)
 {
     std::stringstream ss;
     ss << t_move;

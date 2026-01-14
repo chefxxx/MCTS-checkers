@@ -35,26 +35,31 @@ struct LookupTables
     constexpr void initDiagonals()
     {
         for (int i = 0; i < 64; ++i) {
-            size_t diag     = 0ULL;
-            size_t antiDiag = 0ULL;
-            const int tr = i / 8;
-            const int tf = i % 8;
+            size_t    diag     = 0ULL;
+            size_t    antiDiag = 0ULL;
+            const int tr       = i / 8;
+            const int tf       = i % 8;
 
-            for (int r = tr + 1, f = tf + 1; r <= 7 && f <= 7; r++, f++) diag |= (1ULL << (r * 8 + f));
-            for (int r = tr - 1, f = tf - 1; r >= 0 && f >= 0; r--, f--) diag |= (1ULL << (r * 8 + f));
+            for (int r = tr + 1, f = tf + 1; r <= 7 && f <= 7; r++, f++)
+                diag |= (1ULL << (r * 8 + f));
+            for (int r = tr - 1, f = tf - 1; r >= 0 && f >= 0; r--, f--)
+                diag |= (1ULL << (r * 8 + f));
 
-            for (int r = tr + 1, f = tf - 1; r <= 7 && f >= 0; r++, f--) antiDiag |= (1ULL << (r * 8 + f));
-            for (int r = tr - 1, f = tf + 1; r >= 0 && f <= 7; r--, f++) antiDiag |= (1ULL << (r * 8 + f));
+            for (int r = tr + 1, f = tf - 1; r <= 7 && f >= 0; r++, f--)
+                antiDiag |= (1ULL << (r * 8 + f));
+            for (int r = tr - 1, f = tf + 1; r >= 0 && f <= 7; r--, f++)
+                antiDiag |= (1ULL << (r * 8 + f));
 
-            diagonalMaskEx[i] = diag;
+            diagonalMaskEx[i]     = diag;
             anitDiagonalMaskEx[i] = antiDiag;
         }
     }
 
-    constexpr void initDirectionMapping() {
+    constexpr void initDirectionMapping()
+    {
         for (int i = 1; i < 8; ++i) {
-            diffToDir[64 + (i * 9)] = UP_RIGHT;  // +9, +18...
-            diffToDir[64 + (i * 7)] = UP_LEFT;   // +7, +14...
+            diffToDir[64 + (i * 9)] = UP_RIGHT;   // +9, +18...
+            diffToDir[64 + (i * 7)] = UP_LEFT;    // +7, +14...
             diffToDir[64 - (i * 7)] = DOWN_RIGHT; // -7, -14...
             diffToDir[64 - (i * 9)] = DOWN_LEFT;  // -9, -18...
         }

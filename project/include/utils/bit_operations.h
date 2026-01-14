@@ -27,10 +27,7 @@ __device__ __host__ __forceinline__ bool checkBitAtIdx(const size_t a, const siz
 }
 
 // this func toggles the bit at the given index (0 -> 1 or 1 -> 0)
-__device__ __host__ __forceinline__ void flipBitAtIdx(size_t &a, const size_t idx)
-{
-    a ^= (MIN_LSB << idx);
-}
+__device__ __host__ __forceinline__ void flipBitAtIdx(size_t &a, const size_t idx) { a ^= (MIN_LSB << idx); }
 
 // this func sets to 0 bit of given idx
 __device__ __host__ __forceinline__ void resetBitAtIdx(size_t &a, const size_t idx) { a &= ~(MIN_LSB << idx); }
