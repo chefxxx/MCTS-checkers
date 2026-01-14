@@ -6,6 +6,14 @@
 
 #include <cassert>
 
+#if WIN32
+#include <stdlib.h>
+size_t byte_swap64(const size_t x) { return _byteswap_uint64(x); }
+#else
+#include <byteswap.h>
+size_t byte_swap64(const size_t x) { return __bswap_64(x); }
+#endif
+
 std::vector<Move> generateAllPossibleMoves(const Board &t_board, const Colour t_color)
 {
     std::vector<Move> result;
