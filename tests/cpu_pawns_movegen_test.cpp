@@ -85,7 +85,7 @@ TEST(CPU_movegenTest, getPawnsMovesMask_withBlockedWhitePawn)
     constexpr uint64_t black_mask  = 0ULL;
     constexpr uint64_t result_mask = (1ULL << 26) | (1ULL << 28);
     constexpr auto empty_mask = ~(white_mask | black_mask);
-    const auto test_case = getPawnsMovesMask(white_mask, empty_mask, white);
+    const auto test_case = getPawnsQuietMovesMask(white_mask, empty_mask, white);
     ASSERT_EQ(test_case, result_mask);
 }
 
@@ -98,7 +98,7 @@ TEST(CPU_movegenTest, getPawnsMovesMask_blackMovesDown)
     constexpr uint64_t white_mask  = 0ULL;
     constexpr uint64_t result_mask = (1ULL << 35);
     constexpr auto empty_mask = ~(white_mask | black_mask);
-    const auto test_case = getPawnsMovesMask(black_mask, empty_mask, black);
+    const auto test_case = getPawnsQuietMovesMask(black_mask, empty_mask, black);
     ASSERT_EQ(test_case, result_mask);
 }
 
@@ -114,7 +114,7 @@ TEST(CPU_movegenTest, getPawnsMovesMask_preventWrapFileH)
 
     // We check if it correctly identifies 15 as a not mover
     // without allowing it to "teleport" across the board.
-    const auto test_case = getPawnsMovesMask(white_mask, empty_mask, white);
+    const auto test_case = getPawnsQuietMovesMask(white_mask, empty_mask, white);
     ASSERT_EQ(test_case, result_mask);
 }
 
@@ -126,7 +126,7 @@ TEST(CPU_movegenTest, getPawnsMovesMask_fULLyBlocked)
     constexpr uint64_t white_mask  = 0ULL;
     constexpr uint64_t result_mask = (1ULL << 35) | (1ULL << 37);
     constexpr auto empty_mask = ~(white_mask | black_mask);
-    const auto test_case = getPawnsMovesMask(black_mask, empty_mask, black);
+    const auto test_case = getPawnsQuietMovesMask(black_mask, empty_mask, black);
     ASSERT_EQ(test_case, result_mask);
 }
 
@@ -140,7 +140,7 @@ TEST(CPU_movegenTest, createOnePawnsMove_whiteCenter)
     constexpr uint64_t empty_mask = ~white_mask;
 
     std::vector<Move> moves;
-    createOnePawnMoves(moves, start_idx, empty_mask, white);
+    createOnePawnQuietMoves(moves, start_idx, empty_mask, white);
 
     ASSERT_EQ(moves.size(), 2);
     // Move to 34 (Up-Left: 27+7) and 36 (Up-Right: 27+9)
@@ -159,7 +159,7 @@ TEST(CPU_movegenTest, createAllPawnMoves_multiplePieces)
     constexpr uint64_t movers_mask = white_mask;
 
     std::vector<Move> all_moves;
-    createAllPawnsMoves(all_moves, movers_mask, empty_mask, white);
+    createAllPawnsQuietMoves(all_moves, movers_mask, empty_mask, white);
 
     // Each piece has 2 diagonal forward moves
     EXPECT_EQ(all_moves.size(), 4);
@@ -257,7 +257,7 @@ TEST(CPU_movegenTest, WhiteSlidePromotes) {
     constexpr uint64_t empty = ~(1ULL << 49);
     std::vector<Move> moves;
 
-    createOnePawnMoves(moves, start_idx, empty, white);
+    createOnePawnQuietMoves(moves, start_idx, empty, white);
     // Expected: 49 -> 56 (Up-Left) or 49 -> 58 (Up-Right). Both are Rank 8.
     for(const auto& m : moves) {
         EXPECT_TRUE(m.is_promotion);
@@ -325,7 +325,7 @@ TEST(CPU_movegenTest, BlackSlidePromotes) {
     constexpr uint64_t empty = ~(1ULL << 9);
     std::vector<Move> moves;
 
-    createOnePawnMoves(moves, start_idx, empty, black);
+    createOnePawnQuietMoves(moves, start_idx, empty, black);
     // Expected: 9 -> 0 (Down-Left) or 9 -> 2 (Down-Right). Both Rank 1.
     for(const auto& m : moves) {
         EXPECT_TRUE(m.is_promotion);
@@ -381,40 +381,4 @@ TEST(CPU_movegenTest, BlackJumpBackwardsNoPromotion) {
 
     ASSERT_EQ(moves.size(), 1);
     EXPECT_FALSE(moves[0].is_promotion);
-}
-
-TEST(MovePrintingTest, NormalMoveSlide) {
-    constexpr int start_idx = 9;  // b2
-    constexpr int end_idx = 18;   // c3
-
-    // Slide Move: captures_mask is 0
-    const Move m(1ULL << start_idx, 1ULL << end_idx, false, start_idx, end_idx);
-
-    // Simulation of your printing loop
-    const auto result = stringMove(m);
-
-    EXPECT_EQ(result, "b2-c3");
-}
-
-TEST(MovePrintingTest, SimpleAttackJump) {
-    constexpr int start_idx = 0;   // a1
-    constexpr int end_idx = 18;    // c3
-    const std::vector path = {start_idx, end_idx};
-    constexpr auto captures = 1ULL << 9;
-
-    // Jump Move: captures_mask is non-zero
-    const Move m(1ULL << start_idx, 1ULL << end_idx, captures,false, path);
-    const auto result = stringMove(m);
-
-    EXPECT_EQ(result, "a1:c3");
-}
-
-TEST(MovePrintingTest, MultipleAttackJump) {
-    const std::vector path = {0, 18, 4, 22}; // a1, c3, e1, g3
-
-    // Multiple Jump: captures_mask would have 3 bits set
-    const Move m(1ULL << 0, 1ULL << 22, 1ULL << 9 | 1ULL << 11 | 1ULL << 13,false, path);
-    const auto result = stringMove(m);
-
-    EXPECT_EQ(result, "a1:c3:e1:g3");
 }

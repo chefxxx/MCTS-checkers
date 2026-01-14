@@ -58,6 +58,7 @@ constexpr int MAX_MOVE_SEQUENCE = 8;
 
 enum class MoveKind { null = -1, normal = 0, attack = 1 };
 
+// TODO: change PlayerMove underlying into Move
 struct PlayerMove
 {
     void addPosition(const std::string &t_pos)
@@ -76,6 +77,8 @@ struct PlayerMove
     MoveKind                               kind  = MoveKind::null;
 };
 
+// Note: move struct handles promotion conditions, so all player logic should be handled
+// by this struct.
 struct Move
 {
     explicit Move(const size_t t_from, const size_t t_to, const bool t_promotion, const int t_fromIdx, const int t_toIdx)

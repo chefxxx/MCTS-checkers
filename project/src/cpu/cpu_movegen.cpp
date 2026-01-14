@@ -2,18 +2,11 @@
 // Created by chefxx on 11.01.2026.
 //
 
+#include <cassert>
+
 #include "cpu_movegen.h"
 #include "lookup_tables.h"
 
-#include <cassert>
-
-#if WIN32
-#include <stdlib.h>
-size_t byte_swap64(const size_t x) { return _byteswap_uint64(x); }
-#else
-#include <byteswap.h>
-size_t byte_swap64(const size_t x) { return __bswap_64(x); }
-#endif
 
 std::vector<Move> generateAllPossibleMoves(const Board &t_board, const Colour t_color)
 {
@@ -37,8 +30,8 @@ std::vector<Move> generateAllPossibleMoves(const Board &t_board, const Colour t_
     }
     else {
         // if there is no attack possibility we can think of sliding moves
-        const size_t pawns_movers = getPawnsMovesMask(pawns, empty, t_color);
-        createAllPawnsMoves(result, pawns_movers, empty, t_color);
+        const size_t pawns_movers = getPawnsQuietMovesMask(pawns, empty, t_color);
+        createAllPawnsQuietMoves(result, pawns_movers, empty, t_color);
     }
     return result;
 }
@@ -52,7 +45,7 @@ size_t getPawnsAttackMask(const size_t t_attackerPawns, const size_t t_opponentP
     return attacks_upRight | attacks_downRight | attacks_upLeft | attacks_downLeft;
 }
 
-size_t getPawnsMovesMask(const size_t t_moversPawns, const size_t t_emptyFiles, const Colour t_moversColour)
+size_t getPawnsQuietMovesMask(const size_t t_moversPawns, const size_t t_emptyFiles, const Colour t_moversColour)
 {
     // It is assumed that program "sees" the board from white perspective
     // so for white pawns only "up" slides are permitted, meaning
@@ -63,6 +56,30 @@ size_t getPawnsMovesMask(const size_t t_moversPawns, const size_t t_emptyFiles, 
     const size_t move_downRight = canMove[t_moversColour][DOWN_RIGHT] * ((t_moversPawns & NOT_FILE_H) >> 7 & t_emptyFiles) << 7;
     const size_t move_downLeft  = canMove[t_moversColour][DOWN_LEFT] * ((t_moversPawns & NOT_FILE_A) >> 9 & t_emptyFiles) << 9;
     return move_upRight | move_upLeft | move_downRight | move_downLeft;
+}
+
+// https://www.chessprogramming.org/Hyperbola_Quintessence
+size_t diagonalKingMask(const size_t t_boardState, const int t_kingSquare)
+{
+    size_t forward = t_boardState & globalTables.diagonalMaskEx[t_kingSquare];
+    size_t reverse = byte_swap64(forward);
+    forward -= 1ULL << t_kingSquare;
+    reverse -= byte_swap64(1ULL << t_kingSquare);
+    forward ^= byte_swap64(reverse);
+    forward &= globalTables.diagonalMaskEx[t_kingSquare];
+    return forward;
+}
+
+// https://www.chessprogramming.org/Hyperbola_Quintessence
+size_t antiDiagonalKingMask(const size_t t_boardState, const int t_kingSquare)
+{
+    size_t forward = t_boardState & globalTables.anitDiagonalMaskEx[t_kingSquare];
+    size_t reverse = byte_swap64(forward);
+    forward -= 1ULL << t_kingSquare;
+    reverse -= byte_swap64(1ULL << t_kingSquare);
+    forward ^= byte_swap64(reverse);
+    forward &= globalTables.anitDiagonalMaskEx[t_kingSquare];
+    return forward;
 }
 
 void createAllPawnsAttacks(std::vector<Move> &t_allMoves,
@@ -141,7 +158,7 @@ void recursiveCreatePawnsAttacks(std::vector<Move>& t_allMoves,
     }
 }
 
-void createAllPawnsMoves(std::vector<Move> &t_allMoves,
+void createAllPawnsQuietMoves(std::vector<Move> &t_allMoves,
                         const size_t       t_moversMask,
                         const size_t       t_emptyFiles,
                         const Colour       t_moversColour)
@@ -149,11 +166,11 @@ void createAllPawnsMoves(std::vector<Move> &t_allMoves,
     size_t maskCopy = t_moversMask;
     while (maskCopy) {
         const int mover_idx = popLsb(maskCopy);
-        createOnePawnMoves(t_allMoves, mover_idx, t_emptyFiles, t_moversColour);
+        createOnePawnQuietMoves(t_allMoves, mover_idx, t_emptyFiles, t_moversColour);
     }
 }
 
-void createOnePawnMoves(std::vector<Move> &t_allMoves,
+void createOnePawnQuietMoves(std::vector<Move> &t_allMoves,
                         const int          t_idx,
                         const size_t       t_emptyFiles,
                         const Colour       t_moversColour)

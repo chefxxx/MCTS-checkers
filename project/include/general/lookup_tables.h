@@ -45,8 +45,8 @@ struct LookupTables
             for (int r = tr + 1, f = tf - 1; r <= 7 && f >= 0; r++, f--) antiDiag |= (1ULL << (r * 8 + f));
             for (int r = tr - 1, f = tf + 1; r >= 0 && f <= 7; r--, f++) antiDiag |= (1ULL << (r * 8 + f));
 
-            diagonalMask[i] = diag | 1ULL << i;
-            anitDiagonalMask[i] = antiDiag | 1ULL << i;
+            diagonalMaskEx[i] = diag;
+            anitDiagonalMaskEx[i] = antiDiag;
         }
     }
 
@@ -54,8 +54,8 @@ struct LookupTables
     size_t JumpTable[64][4]{};
     size_t NeighbourTable[64][4]{};
 
-    size_t diagonalMask[64];
-    size_t anitDiagonalMask[64];
+    size_t diagonalMaskEx[64];
+    size_t anitDiagonalMaskEx[64];
 };
 
 constexpr LookupTables globalTables;
