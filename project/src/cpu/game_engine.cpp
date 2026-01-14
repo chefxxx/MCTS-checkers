@@ -13,7 +13,7 @@ Colour drawStartingColour()
     std::random_device            rd;
     std::mt19937                  gen(rd());
     std::uniform_int_distribution distrib(0, 1);
-    return distrib(gen) == 0 ? Colour::black : Colour::white;
+    return distrib(gen) == 0 ? black : white;
 }
 
 std::optional<PlayerMove> parseMove(const std::string &t_move)

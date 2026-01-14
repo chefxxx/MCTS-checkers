@@ -10,38 +10,8 @@
 #include <string>
 
 #include "bit_operations.h"
+#include "constants.h"
 
-constexpr size_t NOT_FILE_A = 0xFEFEFEFEFEFEFEFEULL;
-constexpr size_t NOT_FILE_H = 0x7F7F7F7F7F7F7F7FULL;
-constexpr size_t NOT_FILE_B = 0xFDFDFDFDFDFDFDFDULL;
-constexpr size_t NOT_FILE_G = 0xBFBFBFBFBFBFBFBFULL;
-
-constexpr size_t PROMOTION_BLACK = 0x00000000000000FFULL;
-constexpr size_t PROMOTION_WHITE = 0xFF00000000000000ULL;
-
-constexpr size_t promotion[2] {
-    PROMOTION_BLACK,
-    PROMOTION_WHITE
-};
-
-enum Direction
-{
-    UP_RIGHT = 0,
-    UP_LEFT    = 1,
-    DOWN_RIGHT = 2,
-    DOWN_LEFT  = 3
-};
-
-enum Colour {
-    black = 0,
-    white = 1,
-};
-
-inline std::ostream& operator<<(std::ostream& os, const Colour& t_colour)
-{
-    const std::string colStr = t_colour == black ? "black" : "white";
-    return os << colStr;
-}
 
 struct Board
 {
@@ -129,37 +99,5 @@ private:
     std::array<char, 8> rowsNames{};
     std::string         columnsNamesRow;
 };
-
-struct LookupTables
-{
-    constexpr LookupTables()
-    {
-        initLUTs();
-    }
-    constexpr void initLUTs()
-    {
-        for (int i = 0; i < 64; ++i) {
-            const size_t index            = MIN_LSB << i;
-            NeighbourTable[i][UP_RIGHT]   = (index & NOT_FILE_H) << 9;
-            NeighbourTable[i][UP_LEFT]    = (index & NOT_FILE_A) << 7;
-            NeighbourTable[i][DOWN_RIGHT] = (index & NOT_FILE_H) >> 7;
-            NeighbourTable[i][DOWN_LEFT]  = (index & NOT_FILE_A) >> 9;
-
-            JumpTable[i][UP_RIGHT]   = (index & NOT_FILE_G & NOT_FILE_H) << 18;
-            JumpTable[i][UP_LEFT]    = (index & NOT_FILE_A & NOT_FILE_B) << 14;
-            JumpTable[i][DOWN_RIGHT] = (index & NOT_FILE_G & NOT_FILE_H) >> 14;
-            JumpTable[i][DOWN_LEFT]  = (index & NOT_FILE_A & NOT_FILE_B) >> 18;
-        }
-    }
-
-    // lookup tables
-    size_t JumpTable[64][4]{};
-    size_t NeighbourTable[64][4]{};
-
-    // TODO: initialization of king table
-    // const size_t KingTable[64][4];
-};
-
-constexpr LookupTables globalTables;
 
 #endif

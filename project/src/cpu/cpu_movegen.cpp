@@ -3,6 +3,7 @@
 //
 
 #include "cpu_movegen.h"
+#include "lookup_tables.h"
 
 #include <cassert>
 
@@ -23,11 +24,11 @@ std::vector<Move> generateAllPossibleMoves(const Board &t_board, const Colour t_
 
     // remember to correctly initialize all variables!
     const size_t pawns = t_board.pawns[t_color];
-    // TODO: const size_t kings = t_board.m_kings[t_color];
-    const size_t pieces = pawns;
+    const size_t kings = t_board.kings[t_color];
+    const size_t pieces = pawns | kings;
     const size_t opponent_pawns = t_board.pawns[1 - t_color];
-    // TODO: const size_t opponent_kings = t_board.m_kings[1 - t_color];
-    const size_t opponent_pieces = opponent_pawns;
+    const size_t opponent_kings = t_board.kings[1 - t_color];
+    const size_t opponent_pieces = opponent_pawns | opponent_kings;
     const size_t empty = ~(pieces | opponent_pieces);
 
     if (const size_t pawns_attackers = getPawnsAttackMask(pawns, opponent_pieces, empty)) {
