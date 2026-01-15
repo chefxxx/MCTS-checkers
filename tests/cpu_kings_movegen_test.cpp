@@ -320,7 +320,7 @@ TEST(KingsAttackTest, MandatoryDoubleJump) {
     }
 }
 
-TEST(KingsAttackTest, GhostPieceBlocker) {
+TEST(KingsAttackTest, MultipleChoicesAndGhostPieceBlocker) {
     std::vector<Move> moves;
     std::vector<int> path;
 
@@ -330,9 +330,20 @@ TEST(KingsAttackTest, GhostPieceBlocker) {
 
     constexpr uint64_t kings = (1ULL << kingSq);
     constexpr uint64_t opponents = 1ULL << 20 | 1ULL << 52 | 1ULL << 50 | 1ULL << 27;
-    // 36 is our piece that blocks the one attack path to force what I want to check
     constexpr uint64_t board = kings | opponents;
     path.push_back(kingSq);
 
     recursiveCreateAllKingsAttacks(moves, path, kingSq, board, opponents, kings, 0);
+
+    EXPECT_EQ(moves.size(), 3);
+    for (int i = 0; i < 3; ++i) {
+        constexpr std::array expectedMove1{2, 29, 57};
+        EXPECT_EQ(moves[0].positions[i], expectedMove1[i]);
+    }
+    for (int i = 0; i < 4; ++i) {
+        constexpr std::array expectedMove3 = {2, 38, 59, 41};
+        constexpr std::array expectedMove2 = {2, 38, 59, 32};
+        EXPECT_EQ(moves[1].positions[i], expectedMove2[i]);
+        EXPECT_EQ(moves[2].positions[i], expectedMove3[i]);
+    }
 }
