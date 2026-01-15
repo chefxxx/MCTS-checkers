@@ -35,6 +35,12 @@ void createAllKingsAttacks(std::vector<Move> &t_allMoves,
                            size_t             t_kingsMask,
                            size_t             t_boardState,
                            size_t             t_opponentPieces);
+void recursiveCreateAllKingsAttacks(std::vector<Move> &t_allMoves,
+                                    std::vector<Move> &t_attackPath,
+                                    int                t_kingIdx,
+                                    size_t             t_boardState,
+                                    size_t             t_opponentPieces,
+                                    size_t             t_originalStartingPositionMask);
 
 void createAllKingsQuietMoves(std::vector<Move> &t_allMoves, size_t t_kingsMask, size_t t_boardState);
 

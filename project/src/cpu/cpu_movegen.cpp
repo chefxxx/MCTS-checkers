@@ -31,7 +31,7 @@ std::vector<Move> generateAllPossibleMoves(const Board &t_board, const Colour t_
     if (pawns_attackers || kings_attackers) {
         // if there is a move that is a jump/attack we have to do this move
         createAllPawnsAttacks(result, pawns_attackers, opponent_pieces, empty, t_color);
-        //createAllKingsAttacks(result, kings_attackers, all_board_pieces, opponent_pieces);
+        createAllKingsAttacks(result, kings_attackers, all_board_pieces, opponent_pieces);
     }
     else {
         // if there is no attack possibility we can think of sliding moves
@@ -122,6 +122,44 @@ size_t getKingsAttackMask(size_t t_kingsMask, const size_t t_boardState, const s
     return result_kings;
 }
 
+void createAllKingsAttacks(std::vector<Move> &t_allMoves,
+                           size_t             t_kingsMask,
+                           const size_t       t_boardState,
+                           const size_t       t_opponentPieces)
+{
+    while (t_kingsMask) {
+        const int k_idx = popLsb(t_kingsMask);
+        recursiveCreateAllKingsAttacks(t_allMoves, TODO, k_idx, t_boardState, t_opponentPieces, TODO);
+    }
+}
+
+void recursiveCreateAllKingsAttacks(std::vector<Move> &t_allMoves,
+                                    std::vector<Move> &t_attackPath,
+                                    int                t_kingIdx,
+                                    size_t             t_boardState,
+                                    size_t             t_opponentPieces,
+                                    size_t             t_originalStartingPositionMask)
+{
+    const size_t rayMask = bothDiagonalsKingMask(t_boardState, t_kingIdx);
+    const size_t empty   = ~t_boardState;
+    if (size_t attack_mask = rayMask & t_opponentPieces) {
+        while (attack_mask) {
+            const int v_idx = popLsb(attack_mask);
+        }
+    }
+    else {
+        size_t quiet_mask = rayMask & empty;
+        while (quiet_mask) {
+            const int destination_idx = popLsb(quiet_mask);
+            t_allMoves.emplace_back(
+                t_originalStartingPositionMask,
+                1ULL << destination_idx,
+                false,
+                t_attackPath);
+        }
+    }
+}
+
 void createAllKingsQuietMoves(std::vector<Move> &t_allMoves, size_t t_kingsMask, const size_t t_boardState)
 {
     const size_t empty = ~t_boardState;
@@ -179,7 +217,7 @@ void recursiveCreatePawnsAttacks(std::vector<Move> &t_allMoves,
             // update masks
             foundJump = true;
 
-            const auto new_empty          = (t_emptyFiles | 1ULL << t_idx) & ~jump_mask;
+            const auto new_empty      = (t_emptyFiles | 1ULL << t_idx) & ~jump_mask;
             const auto new_currentVictims = t_currentVictimsMask | victim_mask;
 
             const auto new_idx = popLsb(jump_mask);
