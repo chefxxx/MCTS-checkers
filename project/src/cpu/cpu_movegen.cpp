@@ -129,10 +129,11 @@ void createAllKingsAttacks(std::vector<Move> &t_allMoves,
                            const size_t       t_opponentPieces)
 {
     while (t_kingsMask) {
-        const int k_idx = popLsb(t_kingsMask);
+        const int        k_idx = popLsb(t_kingsMask);
         std::vector<int> attackPath;
         attackPath.push_back(k_idx);
-        recursiveCreateAllKingsAttacks(t_allMoves, attackPath, k_idx, t_boardState, t_opponentPieces, 1ULL << k_idx, 0ULL);
+        recursiveCreateAllKingsAttacks(
+            t_allMoves, attackPath, k_idx, t_boardState, t_opponentPieces, 1ULL << k_idx, 0ULL);
     }
 }
 
@@ -146,30 +147,39 @@ void recursiveCreateAllKingsAttacks(std::vector<Move> &t_allMoves,
 {
     bool found_jump = false;
 
-    const size_t rays = bothDiagonalsKingMask(t_boardState, t_kingIdx);
-    size_t victims    = rays & t_opponentPieces & ~t_currentVictims;
+    const size_t rays    = bothDiagonalsKingMask(t_boardState, t_kingIdx);
+    size_t       victims = rays & t_opponentPieces & ~t_currentVictims;
 
     while (victims) {
-        const int v_idx = popLsb(victims);
-        const int diff  = v_idx - t_kingIdx;
-        const auto dir  = globalTables.diffToDir[64 + diff];
-        size_t landing_mask = globalTables.rayMasks[v_idx][dir] & bothDiagonalsKingMask(t_boardState, v_idx) & ~t_boardState;
-        size_t attacks_possibilities_after_landing = getKingsAttackMask(landing_mask, t_boardState, t_opponentPieces & ~(1ULL << v_idx));
+        const int  v_idx = popLsb(victims);
+        const int  diff  = v_idx - t_kingIdx;
+        const auto dir   = globalTables.diffToDir[64 + diff];
+        size_t     landing_mask =
+            globalTables.rayMasks[v_idx][dir] & bothDiagonalsKingMask(t_boardState, v_idx) & ~t_boardState;
+        size_t attacks_possibilities_after_landing =
+            getKingsAttackMask(landing_mask, t_boardState, t_opponentPieces & ~(1ULL << v_idx));
         landing_mask = attacks_possibilities_after_landing ? attacks_possibilities_after_landing : landing_mask;
         while (landing_mask) {
             const int landing_idx = popLsb(landing_mask);
-            found_jump = true;
+            found_jump            = true;
 
             t_attackPath.push_back(landing_idx);
-            const auto new_boardState= (t_boardState & ~(1ULL << t_kingIdx)) | 1ULL << landing_idx;
+            const auto new_boardState     = (t_boardState & ~(1ULL << t_kingIdx)) | 1ULL << landing_idx;
             const auto new_currentVictims = t_currentVictims | 1ULL << v_idx;
-            recursiveCreateAllKingsAttacks(t_allMoves, t_attackPath, landing_idx, new_boardState, t_opponentPieces, t_originalStartingPositionMask, new_currentVictims);
+            recursiveCreateAllKingsAttacks(t_allMoves,
+                                           t_attackPath,
+                                           landing_idx,
+                                           new_boardState,
+                                           t_opponentPieces,
+                                           t_originalStartingPositionMask,
+                                           new_currentVictims);
             t_attackPath.pop_back();
         }
     }
     if (!found_jump) {
         // add move to t_all
-        t_allMoves.emplace_back(t_originalStartingPositionMask, 1ULL << t_kingIdx, t_currentVictims, false,  t_attackPath);
+        t_allMoves.emplace_back(
+            t_originalStartingPositionMask, 1ULL << t_kingIdx, t_currentVictims, false, t_attackPath);
     }
 }
 
@@ -177,8 +187,8 @@ void createAllKingsQuietMoves(std::vector<Move> &t_allMoves, size_t t_kingsMask,
 {
     const size_t empty = ~t_boardState;
     while (t_kingsMask) {
-        const int k_idx = popLsb(t_kingsMask);
-        size_t moves_mask = bothDiagonalsKingMask(t_boardState, k_idx) & empty;
+        const int k_idx      = popLsb(t_kingsMask);
+        size_t    moves_mask = bothDiagonalsKingMask(t_boardState, k_idx) & empty;
         while (moves_mask) {
             const int destination_idx = popLsb(moves_mask);
             t_allMoves.emplace_back(1ULL << k_idx, 1ULL << destination_idx, false, k_idx, destination_idx);
@@ -194,7 +204,7 @@ void createAllPawnsAttacks(std::vector<Move> &t_allMoves,
 {
     size_t maskCopy = t_attackersMask;
     while (maskCopy) {
-        const int   attacker_idx = popLsb(maskCopy);
+        const int        attacker_idx = popLsb(maskCopy);
         std::vector<int> attackPath;
         attackPath.push_back(attacker_idx);
         recursiveCreatePawnsAttacks(t_allMoves,
@@ -231,7 +241,7 @@ void recursiveCreatePawnsAttacks(std::vector<Move> &t_allMoves,
             // update masks
             foundJump = true;
 
-            const auto new_empty      = (t_emptyFiles | 1ULL << t_idx) & ~jump_mask;
+            const auto new_empty          = (t_emptyFiles | 1ULL << t_idx) & ~jump_mask;
             const auto new_currentVictims = t_currentVictimsMask | victim_mask;
 
             const auto new_idx = popLsb(jump_mask);

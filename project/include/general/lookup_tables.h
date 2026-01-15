@@ -35,12 +35,12 @@ struct LookupTables
     constexpr void initDiagonals()
     {
         for (int i = 0; i < 64; ++i) {
-            size_t upRightRay   = 0ULL;
-            size_t upLeftRay    = 0ULL;
-            size_t downRightRay = 0ULL;
-            size_t downLeftRay  = 0ULL;
-            const int tr         = i / 8;
-            const int tf         = i % 8;
+            size_t    upRightRay   = 0ULL;
+            size_t    upLeftRay    = 0ULL;
+            size_t    downRightRay = 0ULL;
+            size_t    downLeftRay  = 0ULL;
+            const int tr           = i / 8;
+            const int tf           = i % 8;
 
             for (int r = tr + 1, f = tf + 1; r <= 7 && f <= 7; r++, f++)
                 upRightRay |= (1ULL << (r * 8 + f));
@@ -52,11 +52,11 @@ struct LookupTables
             for (int r = tr - 1, f = tf + 1; r >= 0 && f <= 7; r--, f++)
                 downRightRay |= (1ULL << (r * 8 + f));
 
-            diagonalMaskEx[i]     = upRightRay | downLeftRay;
-            anitDiagonalMaskEx[i] = upLeftRay | downRightRay;
-            rayMasks[i][UP_LEFT] = upLeftRay;
-            rayMasks[i][UP_RIGHT] = upRightRay;
-            rayMasks[i][DOWN_LEFT] = downLeftRay;
+            diagonalMaskEx[i]       = upRightRay | downLeftRay;
+            anitDiagonalMaskEx[i]   = upLeftRay | downRightRay;
+            rayMasks[i][UP_LEFT]    = upLeftRay;
+            rayMasks[i][UP_RIGHT]   = upRightRay;
+            rayMasks[i][DOWN_LEFT]  = downLeftRay;
             rayMasks[i][DOWN_RIGHT] = downRightRay;
         }
     }

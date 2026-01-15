@@ -139,10 +139,11 @@ TEST(KingsAttackMaskTest, MultipleKingsMixed)
     EXPECT_FALSE(result & kingBlocked);
 }
 
-TEST(KingsQuietMovesTest, CenterEmptyBoard) {
-    std::vector<Move> moves;
-    constexpr int kingSq = 27; // D4
-    constexpr uint64_t kings = (1ULL << kingSq);
+TEST(KingsQuietMovesTest, CenterEmptyBoard)
+{
+    std::vector<Move>  moves;
+    constexpr int      kingSq     = 27; // D4
+    constexpr uint64_t kings      = (1ULL << kingSq);
     constexpr uint64_t boardState = kings; // Empty board
 
     createAllKingsQuietMoves(moves, kings, boardState);
@@ -157,11 +158,12 @@ TEST(KingsQuietMovesTest, CenterEmptyBoard) {
     }
 }
 
-TEST(KingsQuietMovesTest, BlockedByFriendly) {
-    std::vector<Move> moves;
-    constexpr int kingSq = 27;   // D4
-    constexpr int blocker = 36;  // E5 (Directly NE)
-    constexpr uint64_t kings = (1ULL << kingSq);
+TEST(KingsQuietMovesTest, BlockedByFriendly)
+{
+    std::vector<Move>  moves;
+    constexpr int      kingSq     = 27; // D4
+    constexpr int      blocker    = 36; // E5 (Directly NE)
+    constexpr uint64_t kings      = (1ULL << kingSq);
     constexpr uint64_t boardState = kings | (1ULL << blocker);
 
     createAllKingsQuietMoves(moves, kings, boardState);
@@ -180,10 +182,11 @@ TEST(KingsQuietMovesTest, BlockedByFriendly) {
     }
 }
 
-TEST(KingsQuietMovesTest, EdgeMobilityA4) {
-    std::vector<Move> moves;
-    constexpr int kingSq = 24; // A4
-    constexpr uint64_t kings = (1ULL << kingSq);
+TEST(KingsQuietMovesTest, EdgeMobilityA4)
+{
+    std::vector<Move>  moves;
+    constexpr int      kingSq     = 24; // A4
+    constexpr uint64_t kings      = (1ULL << kingSq);
     constexpr uint64_t boardState = kings;
 
     createAllKingsQuietMoves(moves, kings, boardState);
@@ -200,11 +203,12 @@ TEST(KingsQuietMovesTest, EdgeMobilityA4) {
     }
 }
 
-TEST(KingsQuietMovesTest, BlockedByOpponent) {
-    std::vector<Move> moves;
-    constexpr int kingSq = 18;    // C3
-    constexpr int opponent1 = 9;   // B2 (Directly SW)
-    constexpr uint64_t kings = (1ULL << kingSq);
+TEST(KingsQuietMovesTest, BlockedByOpponent)
+{
+    std::vector<Move>  moves;
+    constexpr int      kingSq     = 18; // C3
+    constexpr int      opponent1  = 9;  // B2 (Directly SW)
+    constexpr uint64_t kings      = (1ULL << kingSq);
     constexpr uint64_t boardState = kings | (1ULL << opponent1);
 
     // Important note:
@@ -230,11 +234,12 @@ TEST(KingsQuietMovesTest, BlockedByOpponent) {
     }
 }
 
-TEST(KingsQuietMovesTest, MultipleKingsCorner) {
-    std::vector<Move> moves;
-    constexpr int k1 = 0;  // A1
-    constexpr int k2 = 63; // H8
-    constexpr uint64_t kings = (1ULL << k1) | (1ULL << k2);
+TEST(KingsQuietMovesTest, MultipleKingsCorner)
+{
+    std::vector<Move>  moves;
+    constexpr int      k1         = 0;  // A1
+    constexpr int      k2         = 63; // H8
+    constexpr uint64_t kings      = (1ULL << k1) | (1ULL << k2);
     constexpr uint64_t boardState = kings;
 
     createAllKingsQuietMoves(moves, kings, boardState);
@@ -261,16 +266,17 @@ TEST(KingsQuietMovesTest, MultipleKingsCorner) {
     }
 }
 
-TEST(KingsAttackTest, SingleFlyingJumpMultipleLandings) {
+TEST(KingsAttackTest, SingleFlyingJumpMultipleLandings)
+{
     std::vector<Move> moves;
-    std::vector<int> path;
-    constexpr int kingSq = 0;   // A1
-    constexpr int victimSq = 18; // C3
+    std::vector<int>  path;
+    constexpr int     kingSq   = 0;  // A1
+    constexpr int     victimSq = 18; // C3
     // Potential landings: 27 (D4), 36 (E5), 45 (F6), 54 (G7), 63 (H8)
 
-    constexpr uint64_t kings = (1ULL << kingSq);
+    constexpr uint64_t kings     = (1ULL << kingSq);
     constexpr uint64_t opponents = (1ULL << victimSq);
-    constexpr uint64_t board = kings | opponents;
+    constexpr uint64_t board     = kings | opponents;
 
     path.push_back(kingSq);
     recursiveCreateAllKingsAttacks(moves, path, kingSq, board, opponents, kings, 0);
@@ -286,19 +292,20 @@ TEST(KingsAttackTest, SingleFlyingJumpMultipleLandings) {
     }
 }
 
-TEST(KingsAttackTest, MandatoryDoubleJump) {
+TEST(KingsAttackTest, MandatoryDoubleJump)
+{
     std::vector<Move> moves;
-    std::vector<int> path;
+    std::vector<int>  path;
 
-    constexpr int kingSq = 0;    // A1
-    constexpr int victim1 = 18;  // C3
-    constexpr int victim2 = 45;  // F6
+    constexpr int kingSq  = 0;  // A1
+    constexpr int victim1 = 18; // C3
+    constexpr int victim2 = 45; // F6
     // Logic: 0 jumps 18, must land on 27 (D4) to be able to jump 45.
     // From 27, it jumps 45 and can land on 54 (G7) or 63 (H8).
 
-    constexpr uint64_t kings = (1ULL << kingSq);
+    constexpr uint64_t kings     = (1ULL << kingSq);
     constexpr uint64_t opponents = (1ULL << victim1) | (1ULL << victim2);
-    constexpr uint64_t board = kings | opponents;
+    constexpr uint64_t board     = kings | opponents;
 
     path.push_back(kingSq);
     recursiveCreateAllKingsAttacks(moves, path, kingSq, board, opponents, kings, 0);
@@ -320,17 +327,18 @@ TEST(KingsAttackTest, MandatoryDoubleJump) {
     }
 }
 
-TEST(KingsAttackTest, MultipleChoicesAndGhostPieceBlocker) {
+TEST(KingsAttackTest, MultipleChoicesAndGhostPieceBlocker)
+{
     std::vector<Move> moves;
-    std::vector<int> path;
+    std::vector<int>  path;
 
     constexpr int kingSq = 2;
     // King jumps 9, lands on 18. Now 18 wants to jump 27, but 9 is still there!
     // The King's ray should be blocked by the 'ghost' at 9 if it tries to look "backwards".
 
-    constexpr uint64_t kings = (1ULL << kingSq);
+    constexpr uint64_t kings     = (1ULL << kingSq);
     constexpr uint64_t opponents = 1ULL << 20 | 1ULL << 52 | 1ULL << 50 | 1ULL << 27;
-    constexpr uint64_t board = kings | opponents;
+    constexpr uint64_t board     = kings | opponents;
     path.push_back(kingSq);
 
     recursiveCreateAllKingsAttacks(moves, path, kingSq, board, opponents, kings, 0);
@@ -345,5 +353,42 @@ TEST(KingsAttackTest, MultipleChoicesAndGhostPieceBlocker) {
         constexpr std::array expectedMove2 = {2, 38, 59, 32};
         EXPECT_EQ(moves[1].positions[i], expectedMove2[i]);
         EXPECT_EQ(moves[2].positions[i], expectedMove3[i]);
+    }
+}
+
+TEST(KingsAttackTest, FourWayBranchingAndCompletion) {
+    std::vector<Move> moves;
+    std::vector<int> path;
+
+    constexpr int kingSq = 27;   // D4
+
+    // Opponent pieces
+    constexpr int vNE = 36;      // E5
+    constexpr int vNW = 34;      // C5
+    constexpr int vSE_1 = 20;    // E3
+    constexpr int vSE_2 = 18;    // G3 (Actually let's use 11 for a cleaner jump)
+    // Note: To make SE a double jump: 27 jumps 20, lands on 13.
+    // From 13, it jumps 11 and lands on 4.
+
+    constexpr uint64_t kings = (1ULL << kingSq);
+    constexpr uint64_t opponents = (1ULL << vNE) | (1ULL << vNW) | (1ULL << vSE_1) | (1ULL << vSE_2);
+    constexpr uint64_t board = kings | opponents;
+
+    path.push_back(kingSq);
+    recursiveCreateAllKingsAttacks(moves, path, kingSq, board, opponents, kings, 0);
+
+    // Expected Results:
+    // 1. NE Branch: One jump to F6(45), G7(54), H8(63). (3 moves)
+    // 2. NW Branch: One jump to B6(41), A7(48). (2 moves)
+    // 3. SE Branch: Must jump 20, land on 13, then jump 11, then land on 4 or 2. (2 moves)
+    // Total expected moves: 7
+
+    ASSERT_EQ(moves.size(), 9);
+    for (int i = 0; i < 9; ++i) {
+        constexpr std::array expectedTakes{18, 18, 20, 20, 34, 34, 36, 36, 36};
+        constexpr std::array expectedTo{0, 9, 6, 13, 41, 48, 45, 54, 63};
+        EXPECT_EQ(moves[i].to_mask, 1ULL << expectedTo[i]);
+        EXPECT_EQ(moves[i].positions[1], expectedTo[i]);
+        EXPECT_EQ(moves[i].captures_mask, 1ULL << expectedTakes[i]);
     }
 }
