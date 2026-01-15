@@ -130,7 +130,8 @@ void createAllKingsAttacks(std::vector<Move> &t_allMoves,
 {
     while (t_kingsMask) {
         const int k_idx = popLsb(t_kingsMask);
-        std::vector attackPath{k_idx};
+        std::vector<int> attackPath;
+        attackPath.push_back(k_idx);
         recursiveCreateAllKingsAttacks(t_allMoves, attackPath, k_idx, t_boardState, t_opponentPieces, 1ULL << k_idx, 0ULL);
     }
 }
@@ -151,9 +152,10 @@ void recursiveCreateAllKingsAttacks(std::vector<Move> &t_allMoves,
     while (victims) {
         const int v_idx = popLsb(victims);
         const int diff  = v_idx - t_kingIdx;
-        const auto dir  = globalTables.diffToDir[diff];
-        size_t landing_mask = globalTables.rayMasks[v_idx][dir] & bothDiagonalsKingMask(t_boardState, v_idx);
-
+        const auto dir  = globalTables.diffToDir[64 + diff];
+        size_t landing_mask = globalTables.rayMasks[v_idx][dir] & bothDiagonalsKingMask(t_boardState, v_idx) & ~t_boardState;
+        size_t attacks_possibilities_after_landing = getKingsAttackMask(landing_mask, t_boardState, t_opponentPieces & ~(1ULL << v_idx));
+        landing_mask = attacks_possibilities_after_landing ? attacks_possibilities_after_landing : landing_mask;
         while (landing_mask) {
             const int landing_idx = popLsb(landing_mask);
             found_jump = true;
@@ -193,7 +195,8 @@ void createAllPawnsAttacks(std::vector<Move> &t_allMoves,
     size_t maskCopy = t_attackersMask;
     while (maskCopy) {
         const int   attacker_idx = popLsb(maskCopy);
-        std::vector attackPath{attacker_idx};
+        std::vector<int> attackPath;
+        attackPath.push_back(attacker_idx);
         recursiveCreatePawnsAttacks(t_allMoves,
                                     attackPath,
                                     attacker_idx,

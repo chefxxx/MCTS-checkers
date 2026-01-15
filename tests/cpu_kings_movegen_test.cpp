@@ -260,3 +260,79 @@ TEST(KingsQuietMovesTest, MultipleKingsCorner) {
         EXPECT_EQ(moves[moveIdx].positions[0], k2);
     }
 }
+
+TEST(KingsAttackTest, SingleFlyingJumpMultipleLandings) {
+    std::vector<Move> moves;
+    std::vector<int> path;
+    constexpr int kingSq = 0;   // A1
+    constexpr int victimSq = 18; // C3
+    // Potential landings: 27 (D4), 36 (E5), 45 (F6), 54 (G7), 63 (H8)
+
+    constexpr uint64_t kings = (1ULL << kingSq);
+    constexpr uint64_t opponents = (1ULL << victimSq);
+    constexpr uint64_t board = kings | opponents;
+
+    path.push_back(kingSq);
+    recursiveCreateAllKingsAttacks(moves, path, kingSq, board, opponents, kings, 0);
+
+    // There should be 5 possible moves (one for each landing square behind C3)
+    ASSERT_EQ(moves.size(), 5);
+
+    // Sort or check specific landing squares
+    for (size_t i = 0; i < moves.size(); ++i) {
+        constexpr std::array expectedLandings = {27, 36, 45, 54, 63};
+        EXPECT_EQ(moves[i].to_mask, 1ULL << expectedLandings[i]);
+        EXPECT_EQ(moves[i].captures_mask, 1ULL << victimSq);
+    }
+}
+
+TEST(KingsAttackTest, MandatoryDoubleJump) {
+    std::vector<Move> moves;
+    std::vector<int> path;
+
+    constexpr int kingSq = 0;    // A1
+    constexpr int victim1 = 18;  // C3
+    constexpr int victim2 = 45;  // F6
+    // Logic: 0 jumps 18, must land on 27 (D4) to be able to jump 45.
+    // From 27, it jumps 45 and can land on 54 (G7) or 63 (H8).
+
+    constexpr uint64_t kings = (1ULL << kingSq);
+    constexpr uint64_t opponents = (1ULL << victim1) | (1ULL << victim2);
+    constexpr uint64_t board = kings | opponents;
+
+    path.push_back(kingSq);
+    recursiveCreateAllKingsAttacks(moves, path, kingSq, board, opponents, kings, 0);
+
+    // If the King lands on 36, 45, 54, 63 after the first jump, it cannot jump victim2.
+    // But in most rulesets, you must choose the path that continues the jump.
+    // Therefore, only moves ending at 54 or 63 (after jumping BOTH) are valid.
+
+    EXPECT_EQ(moves.size(), 4);
+
+    for (int i = 0; i < 4; ++i) {
+        constexpr std::array expectedMidPoints{27, 27, 36, 36};
+        constexpr std::array expectedLandings{54, 63, 54, 63};
+        EXPECT_EQ(moves[i].to_mask, 1ULL << expectedLandings[i]);
+        EXPECT_EQ(moves[i].from_mask, 1ULL << kingSq);
+        EXPECT_EQ(moves[i].positions[0], kingSq);
+        EXPECT_EQ(moves[i].positions[1], expectedMidPoints[i]);
+        EXPECT_EQ(moves[i].positions[2], expectedLandings[i]);
+    }
+}
+
+TEST(KingsAttackTest, GhostPieceBlocker) {
+    std::vector<Move> moves;
+    std::vector<int> path;
+
+    constexpr int kingSq = 2;
+    // King jumps 9, lands on 18. Now 18 wants to jump 27, but 9 is still there!
+    // The King's ray should be blocked by the 'ghost' at 9 if it tries to look "backwards".
+
+    constexpr uint64_t kings = (1ULL << kingSq);
+    constexpr uint64_t opponents = 1ULL << 20 | 1ULL << 52 | 1ULL << 50 | 1ULL << 27;
+    // 36 is our piece that blocks the one attack path to force what I want to check
+    constexpr uint64_t board = kings | opponents;
+    path.push_back(kingSq);
+
+    recursiveCreateAllKingsAttacks(moves, path, kingSq, board, opponents, kings, 0);
+}
