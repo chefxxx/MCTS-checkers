@@ -5,6 +5,7 @@
 #include "cpu_movegen.h"
 
 #include <cassert>
+#include <driver_types.h>
 
 #include "lookup_tables.h"
 
@@ -129,34 +130,44 @@ void createAllKingsAttacks(std::vector<Move> &t_allMoves,
 {
     while (t_kingsMask) {
         const int k_idx = popLsb(t_kingsMask);
-        recursiveCreateAllKingsAttacks(t_allMoves, TODO, k_idx, t_boardState, t_opponentPieces, TODO);
+        std::vector attackPath{k_idx};
+        recursiveCreateAllKingsAttacks(t_allMoves, attackPath, k_idx, t_boardState, t_opponentPieces, 1ULL << k_idx, 0ULL);
     }
 }
 
 void recursiveCreateAllKingsAttacks(std::vector<Move> &t_allMoves,
-                                    std::vector<Move> &t_attackPath,
-                                    int                t_kingIdx,
-                                    size_t             t_boardState,
-                                    size_t             t_opponentPieces,
-                                    size_t             t_originalStartingPositionMask)
+                                    std::vector<int>  &t_attackPath,
+                                    const int          t_kingIdx,
+                                    const size_t       t_boardState,
+                                    const size_t       t_opponentPieces,
+                                    const size_t       t_originalStartingPositionMask,
+                                    const size_t       t_currentVictims)
 {
-    const size_t rayMask = bothDiagonalsKingMask(t_boardState, t_kingIdx);
-    const size_t empty   = ~t_boardState;
-    if (size_t attack_mask = rayMask & t_opponentPieces) {
-        while (attack_mask) {
-            const int v_idx = popLsb(attack_mask);
+    bool found_jump = false;
+
+    const size_t rays = bothDiagonalsKingMask(t_boardState, t_kingIdx);
+    size_t victims    = rays & t_opponentPieces & ~t_currentVictims;
+
+    while (victims) {
+        const int v_idx = popLsb(victims);
+        const int diff  = v_idx - t_kingIdx;
+        const auto dir  = globalTables.diffToDir[diff];
+        size_t landing_mask = globalTables.rayMasks[v_idx][dir] & bothDiagonalsKingMask(t_boardState, v_idx);
+
+        while (landing_mask) {
+            const int landing_idx = popLsb(landing_mask);
+            found_jump = true;
+
+            t_attackPath.push_back(landing_idx);
+            const auto new_boardState= (t_boardState & ~(1ULL << t_kingIdx)) | 1ULL << landing_idx;
+            const auto new_currentVictims = t_currentVictims | 1ULL << v_idx;
+            recursiveCreateAllKingsAttacks(t_allMoves, t_attackPath, landing_idx, new_boardState, t_opponentPieces, t_originalStartingPositionMask, new_currentVictims);
+            t_attackPath.pop_back();
         }
     }
-    else {
-        size_t quiet_mask = rayMask & empty;
-        while (quiet_mask) {
-            const int destination_idx = popLsb(quiet_mask);
-            t_allMoves.emplace_back(
-                t_originalStartingPositionMask,
-                1ULL << destination_idx,
-                false,
-                t_attackPath);
-        }
+    if (!found_jump) {
+        // add move to t_all
+        t_allMoves.emplace_back(t_originalStartingPositionMask, 1ULL << t_kingIdx, t_currentVictims, false,  t_attackPath);
     }
 }
 
