@@ -3,10 +3,9 @@
 //
 
 #include "game_engine.h"
+#include "logger.h"
 
 #include <random>
-
-#include "logger.h"
 
 Colour drawStartingColour()
 {
@@ -16,6 +15,7 @@ Colour drawStartingColour()
     return distrib(gen) == 0 ? black : white;
 }
 
+// TODO: refactor, so in player move "Move" struct is used
 std::optional<PlayerMove> parseMove(const std::string &t_move)
 {
     if (t_move.size() < 5) {

@@ -6,6 +6,7 @@
 #define MCTS_CHECKERS_BIT_OPERATIONS_H
 
 #include <bit>
+#include <cstddef>
 
 // --- Make this compile with .cpp files ---
 #ifndef __CUDACC__

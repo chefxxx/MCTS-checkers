@@ -1,9 +1,7 @@
 #include "game_engine.h"
-#include "mcts_engine.cuh"
 
 int main(int argc, const char **argv)
 {
-
     std::cout << "Welcome to checkers.mcts!\n";
     std::cout << "Press any key to draw a colour and start the game...\n";
     std::cin.get();
@@ -15,24 +13,8 @@ int main(int argc, const char **argv)
     bool         gameRunning  = true;
 
     // initialize board from player's colour perspective
-    Board board{playerColour};
-    board.printBoard();
+    const GameManager manager{playerColour};
+    manager.printBoard();
 
-    while (gameRunning) {
-        if (current_turn == playerColour) {
-            playPlayer(board, playerColour);
-        }
-        else {
-            playAI_gpu(board, aiColour);
-        }
-
-        if (board.isGameOver()) {
-            // game over
-            gameRunning = false;
-        }
-        else {
-            current_turn = current_turn == Colour::white ? Colour::black : Colour::white;
-        }
-    }
     return 0;
 }
