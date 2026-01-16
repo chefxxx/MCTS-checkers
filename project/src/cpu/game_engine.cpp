@@ -3,9 +3,10 @@
 //
 
 #include "game_engine.h"
-#include "logger.h"
 
 #include <random>
+
+#include "logger.h"
 
 Colour drawStartingColour()
 {

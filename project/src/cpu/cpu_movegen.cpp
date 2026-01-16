@@ -2,11 +2,12 @@
 // Created by chefxx on 11.01.2026.
 //
 
+#include "cpu_movegen.h"
+
 #include <cassert>
 
 #include "bit_operations.h"
 #include "lookup_tables.h"
-#include "cpu_movegen.h"
 
 
 std::vector<Move> generateAllPossibleMoves(const Board &t_board, const Colour t_color)

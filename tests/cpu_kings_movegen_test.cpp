@@ -356,23 +356,24 @@ TEST(KingsAttackTest, MultipleChoicesAndGhostPieceBlocker)
     }
 }
 
-TEST(KingsAttackTest, FourWayBranchingAndCompletion) {
+TEST(KingsAttackTest, FourWayBranchingAndCompletion)
+{
     std::vector<Move> moves;
-    std::vector<int> path;
+    std::vector<int>  path;
 
-    constexpr int kingSq = 27;   // D4
+    constexpr int kingSq = 27; // D4
 
     // Opponent pieces
-    constexpr int vNE = 36;      // E5
-    constexpr int vNW = 34;      // C5
-    constexpr int vSE_1 = 20;    // E3
-    constexpr int vSE_2 = 18;    // G3 (Actually let's use 11 for a cleaner jump)
+    constexpr int vNE   = 36; // E5
+    constexpr int vNW   = 34; // C5
+    constexpr int vSE_1 = 20; // E3
+    constexpr int vSE_2 = 18; // G3 (Actually let's use 11 for a cleaner jump)
     // Note: To make SE a double jump: 27 jumps 20, lands on 13.
     // From 13, it jumps 11 and lands on 4.
 
-    constexpr uint64_t kings = (1ULL << kingSq);
+    constexpr uint64_t kings     = (1ULL << kingSq);
     constexpr uint64_t opponents = (1ULL << vNE) | (1ULL << vNW) | (1ULL << vSE_1) | (1ULL << vSE_2);
-    constexpr uint64_t board = kings | opponents;
+    constexpr uint64_t board     = kings | opponents;
 
     path.push_back(kingSq);
     recursiveCreateAllKingsAttacks(moves, path, kingSq, board, opponents, kings, 0);

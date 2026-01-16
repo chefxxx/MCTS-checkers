@@ -15,11 +15,13 @@
 
 struct GameManager
 {
-    explicit GameManager(const Colour t_perspective) : m_perspective(t_perspective)
+    explicit GameManager(const Colour t_perspective)
+        : m_perspective(t_perspective)
     {
-        initBoard();
+        initPerspective();
+        board.initStartingBoard();
     }
-    Board board;
+    Board board{};
 
     void printBoard() const
     {
@@ -56,26 +58,10 @@ struct GameManager
         std::cout << middleRow;
         std::cout << columnsNamesRow;
     }
+
 private:
-
-    void initBoard()
+    void initPerspective()
     {
-        constexpr size_t firstRowMask  = 85;
-        constexpr size_t secondRowMask = 170;
-
-        board.pawns[white] = 0ull;
-        board.pawns[black] = 0ull;
-
-        // initialize white player rocks
-        board.pawns[white] |= firstRowMask;
-        board.pawns[white] |= secondRowMask << 8;
-        board.pawns[white] |= firstRowMask << 16;
-
-        // initialize black player rocks
-        board.pawns[black] |= secondRowMask << 40;
-        board.pawns[black] |= firstRowMask << 48;
-        board.pawns[black] |= secondRowMask << 56;
-
         // perspective only affects printing
         if (m_perspective == black) {
             columnsNamesRow = "    h   g   f   e   d   c   b   a \n";
