@@ -71,3 +71,46 @@ TEST(MovePathTest, EmptyPath) {
     EXPECT_EQ(printer.positions.size(), 0);
     EXPECT_FALSE(printer.capture);
 }
+
+TEST(MovePrintingTest, SimpleMoveFormat) {
+    // a1 (0) to b2 (9)
+    const LightMovePath light({0, 9}, false);
+    const auto printer = PrintingMovePath(light.packed_path);
+
+    EXPECT_EQ(stringMove(printer), "a1-b2");
+}
+
+// Test 2: Single Capture (Delimiter ':')
+TEST(MovePrintingTest, SimpleCaptureFormat) {
+    // c3 (18) to e5 (36)
+    const LightMovePath light({18, 36}, true);
+    const auto printer = PrintingMovePath(light.packed_path);
+
+    EXPECT_EQ(stringMove(printer), "c3:e5");
+}
+
+// Test 3: Multi-Jump Sequence (Draughts style)
+TEST(MovePrintingTest, MultiJumpFormat) {
+    // a1 (0) -> c3 (18) -> e5 (36)
+    const LightMovePath light({0, 18, 36}, true);
+    const auto printer = PrintingMovePath(light.packed_path);
+
+    EXPECT_EQ(stringMove(printer), "a1:c3:e5");
+}
+
+// Test 4: Board Boundaries
+TEST(MovePrintingTest, BoundarySquares) {
+    const LightMovePath light({0, 63}, false);
+    const auto printer = PrintingMovePath(light.packed_path);
+
+    EXPECT_EQ(stringMove(printer), "a1-h8");
+}
+
+// Test 5: Long Sequence (Max 9)
+TEST(MovePrintingTest, MaxPathPrinting) {
+    // a1, b1, c1, d1, e1, f1, g1, h1, h2
+    const LightMovePath light({0, 1, 2, 3, 4, 5, 6, 7, 56}, true);
+    const auto printer = PrintingMovePath(light.packed_path);
+
+    EXPECT_EQ(stringMove(printer), "a1:b1:c1:d1:e1:f1:g1:h1:a8");
+}

@@ -113,23 +113,6 @@ struct Move
     std::vector<int> positions;
 };
 
-inline std::ostream &operator<<(std::ostream &os, const Move &t_move)
-{
-    const char delim = t_move.captures_mask ? ':' : '-';
-    os << posToStr(t_move.positions[0]);
-    for (size_t i = 1; i < t_move.positions.size(); ++i) {
-        os << delim << posToStr(t_move.positions[i]);
-    }
-    return os;
-}
-
-inline std::string stringMove(const Move &t_move)
-{
-    std::stringstream ss;
-    ss << t_move;
-    return ss.str();
-}
-
 struct LightMovePath
 {
     explicit LightMovePath(const std::vector<int> &t_positions, const bool t_capture)
@@ -139,7 +122,6 @@ struct LightMovePath
 
     void pack_path(const std::vector<int>& positions, const bool t_capture) {
         // Store the number of squares in the first 4 bits (max 15)
-        packed_path = 0ULL;
         packed_path |= positions.size() & 0xF;
         packed_path |=  (t_capture & 1ULL) << 63 ;
         for (size_t i = 0; i < positions.size() && i < 10; ++i) {
@@ -148,7 +130,7 @@ struct LightMovePath
         }
     }
 
-    size_t packed_path;
+    size_t packed_path = 0ULL;
 };
 
 struct PrintingMovePath
@@ -169,5 +151,22 @@ struct PrintingMovePath
     std::vector<int> positions;
     bool capture;
 };
+
+inline std::ostream &operator<<(std::ostream &os, const PrintingMovePath &t_move)
+{
+    const char delim = t_move.capture ? ':' : '-';
+    os << posToStr(t_move.positions[0]);
+    for (size_t i = 1; i < t_move.positions.size(); ++i) {
+        os << delim << posToStr(t_move.positions[i]);
+    }
+    return os;
+}
+
+inline std::string stringMove(const PrintingMovePath &t_move)
+{
+    std::stringstream ss;
+    ss << t_move;
+    return ss.str();
+}
 
 #endif // MCTS_CHECKERS_MOVE_H
