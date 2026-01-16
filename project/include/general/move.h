@@ -8,6 +8,7 @@
 #include <array>
 #include <vector>
 
+#include "bit_operations.h"
 #include "logger.h"
 
 // Program "sees" the board from this perspective
@@ -128,5 +129,45 @@ inline std::string stringMove(const Move &t_move)
     ss << t_move;
     return ss.str();
 }
+
+struct LightMovePath
+{
+    explicit LightMovePath(const std::vector<int> &t_positions, const bool t_capture)
+    {
+        pack_path(t_positions, t_capture);
+    }
+
+    void pack_path(const std::vector<int>& positions, const bool t_capture) {
+        // Store the number of squares in the first 4 bits (max 15)
+        packed_path = 0ULL;
+        packed_path |= positions.size() & 0xF;
+        packed_path |=  (t_capture & 1ULL) << 63 ;
+        for (size_t i = 0; i < positions.size() && i < 10; ++i) {
+            const size_t square = positions[i] & 0x3F; // 6 bits for 0-63
+            packed_path |= (square << (4 + (i * 6)));
+        }
+    }
+
+    size_t packed_path;
+};
+
+struct PrintingMovePath
+{
+    explicit PrintingMovePath(const size_t t_packedPath)
+    {
+        unpack_path(t_packedPath);
+    }
+
+    void unpack_path(const size_t t_packed) {
+        const int count = t_packed & 0xF;
+        capture = checkBitAtIdx(t_packed, 63);
+        for (int i = 0; i < count; ++i) {
+            positions.push_back((t_packed >> (4 + (i * 6))) & 0x3F);
+        }
+    }
+
+    std::vector<int> positions;
+    bool capture;
+};
 
 #endif // MCTS_CHECKERS_MOVE_H
