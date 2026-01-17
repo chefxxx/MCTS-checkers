@@ -13,4 +13,3 @@ TEST(MctsTreeBasicTests, creationTest)
     const MctsTree mcts_tree{board, white};
     ASSERT_FALSE(mcts_tree.root == nullptr);
 }
-

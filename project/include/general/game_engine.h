@@ -16,7 +16,7 @@
 struct GameManager
 {
     explicit GameManager(const Colour t_perspective)
-        : m_perspective(t_perspective)
+        : m_player_colour(t_perspective), m_ai_colour(static_cast<Colour>(1 - t_perspective))
     {
         initPerspective();
         board.initStartingBoard();
@@ -34,7 +34,7 @@ struct GameManager
             std::cout << rowsNames[visualRow];
             for (int visualCol = 0; visualCol < 8; ++visualCol) {
                 int actualRow, actualCol;
-                if (m_perspective == black) {
+                if (m_player_colour == black) {
                     actualRow = visualRow;
                     actualCol = 7 - visualCol;
                 }
@@ -59,11 +59,16 @@ struct GameManager
         std::cout << columnsNamesRow;
     }
 
+    void playTheGame();
+    void runMctsSimulation();
+    std::optional<PlayerMove> parseMove(const std::string &t_move);
+    void makePlayerMove();
+
 private:
     void initPerspective()
     {
         // perspective only affects printing
-        if (m_perspective == black) {
+        if (m_player_colour == black) {
             columnsNamesRow = "    h   g   f   e   d   c   b   a \n";
             rowsNames       = {'1', '2', '3', '4', '5', '6', '7', '8'};
         }
@@ -74,12 +79,12 @@ private:
     }
 
     // perspective and printing utils
-    Colour              m_perspective;
+    Colour              m_player_colour;
+    Colour              m_ai_colour;
     std::array<char, 8> rowsNames{};
     std::string         columnsNamesRow;
 };
 
-Colour                    drawStartingColour();
-std::optional<PlayerMove> parseMove(const std::string &t_move);
+Colour drawStartingColour();
 
 #endif // MCTS_CHECKERS_GAME_ENGINE_H

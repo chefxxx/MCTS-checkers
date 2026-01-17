@@ -8,13 +8,9 @@ int main(int argc, const char **argv)
     const auto playerColour = drawStartingColour();
     std::cout << "You are " << playerColour << "!\n";
 
-    const Colour aiColour     = playerColour == Colour::black ? Colour::white : Colour::black;
-    auto         current_turn = Colour::white;
-    bool         gameRunning  = true;
-
     // initialize board from player's colour perspective
-    const GameManager manager{playerColour};
+    GameManager manager{playerColour};
     manager.printBoard();
-
+    manager.playTheGame();
     return 0;
 }

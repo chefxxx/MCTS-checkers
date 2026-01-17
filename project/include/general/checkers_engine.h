@@ -7,8 +7,9 @@
 
 #include "board_infra.cuh"
 #include "move.h"
+#include "constants.h"
 
 Board applyMove(const Board &t_board, const Move &t_move, Colour t_colour);
-void checkEndOfGameConditions();
+GameState checkEndOfGameConditions();
 
 #endif // MCTS_CHECKERS_CPU_CHECKERS_ENGINE_H

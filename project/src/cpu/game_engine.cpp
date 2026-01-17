@@ -6,7 +6,32 @@
 
 #include <random>
 
+#include "checkers_engine.h"
 #include "logger.h"
+
+void GameManager::playTheGame()
+{
+    GameState state = CONTINUES;
+    Colour turn = white;
+
+    // Note:
+    // game state is perceived from the players perspective,
+    // meaning that is state == LOST, then player lost etc.
+    while (state == CONTINUES) {
+        if (turn == m_player_colour) {
+            // player
+        }
+        else {
+            // ai
+            runMctsSimulation();
+        }
+
+        turn = static_cast<Colour>(1 - turn);
+        state = checkEndOfGameConditions();
+    }
+
+    std::cout << "You " << state << "!\n";
+}
 
 Colour drawStartingColour()
 {
@@ -36,3 +61,9 @@ std::optional<PlayerMove> parseMove(const std::string &t_move)
     }
     return move;
 }
+
+void runMctsSimulation()
+{
+
+}
+

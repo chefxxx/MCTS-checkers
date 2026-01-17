@@ -19,6 +19,8 @@ constexpr size_t promotion[2]{PROMOTION_BLACK, PROMOTION_WHITE};
 
 enum Direction { UP_RIGHT = 0, UP_LEFT = 1, DOWN_RIGHT = 2, DOWN_LEFT = 3 };
 
+enum GameState { LOST = 0, DRAW = 1, WON = 2, CONTINUES = 3 };
+
 enum Colour {
     black = 0,
     white = 1,
@@ -27,6 +29,12 @@ enum Colour {
 inline std::ostream &operator<<(std::ostream &os, const Colour &t_colour)
 {
     const std::string colStr = t_colour == black ? "black" : "white";
+    return os << colStr;
+}
+
+inline std::ostream &operator<<(std::ostream &os, const GameState &t_game_state)
+{
+    const std::string colStr = t_game_state == WON ? "won" : "lost";
     return os << colStr;
 }
 

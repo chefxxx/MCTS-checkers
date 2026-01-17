@@ -6,6 +6,7 @@
 #define BOARD_INFRA_H
 
 #include <array>
+
 #include "constants.h"
 
 struct Board
