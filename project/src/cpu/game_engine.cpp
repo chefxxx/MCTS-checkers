@@ -22,7 +22,7 @@ void GameManager::playTheGame()
             makePlayerMove();
         }
         else {
-            runMctsSimulation();
+            //runMctsSimulation();
         }
 
         turn = static_cast<Colour>(1 - turn);
@@ -32,15 +32,15 @@ void GameManager::playTheGame()
     std::cout << "You " << state << "!\n";
 }
 
-void GameManager::runMctsSimulation()
-{
-
-}
-
-std::optional<Move> GameManager::parseMove(const std::string &t_move)
-{
-
-}
+// void GameManager::runMctsSimulation()
+// {
+//
+// }
+//
+// std::optional<Move> GameManager::parseMove(const std::string &t_move)
+// {
+//
+// }
 
 bool GameManager::makePlayerMove()
 {
@@ -52,20 +52,17 @@ bool GameManager::makePlayerMove()
     }
     if (moveStr[2] == '-') {
         // normal move case
-
     }
     for (size_t i = 0; i < moveStr.size(); i += 3) {
         if (std::isalpha(moveStr[i])) {
             // we have found character
-            if (i + 1 < t_move.size() && std::isdigit(t_move[i + 1])) {
-                std::string curr = t_move.substr(i, 2);
-            }
         }
         else {
             logger::warn("Wrong move format, try again");
             return false;
         }
     }
+    return true;
 }
 
 Colour drawStartingColour()

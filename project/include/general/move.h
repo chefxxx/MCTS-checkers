@@ -65,32 +65,27 @@ struct Move
 {
     explicit Move(const size_t t_from,
                   const size_t t_to,
-                  const bool   t_promotion,
                   const int    t_fromIdx,
                   const int    t_toIdx)
         : from_mask(t_from)
         , to_mask(t_to)
         , captures_mask(0ull)
-        , is_promotion(t_promotion)
         , positions({t_fromIdx, t_toIdx})
     {
     }
     explicit Move(const size_t     t_from,
                   const size_t     t_to,
                   const size_t     t_captures,
-                  const bool       t_promotion,
                   std::vector<int> t_path)
         : from_mask(t_from)
         , to_mask(t_to)
         , captures_mask(t_captures)
-        , is_promotion(t_promotion)
         , positions(std::move(t_path))
     {
     }
     size_t from_mask;
     size_t to_mask;
     size_t captures_mask;
-    bool   is_promotion;
     // TODO: add limitation to this vector's size to 9
     // TODO: this is due to the bitpacking in LightMovePath
     std::vector<int> positions;

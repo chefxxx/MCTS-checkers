@@ -179,7 +179,7 @@ void recursiveCreateAllKingsAttacks(std::vector<Move> &t_allMoves,
     if (!found_jump) {
         // add move to t_all
         t_allMoves.emplace_back(
-            t_originalStartingPositionMask, 1ULL << t_kingIdx, t_currentVictims, false, t_attackPath);
+            t_originalStartingPositionMask, 1ULL << t_kingIdx, t_currentVictims, t_attackPath);
     }
 }
 
@@ -191,7 +191,7 @@ void createAllKingsQuietMoves(std::vector<Move> &t_allMoves, size_t t_kingsMask,
         size_t    moves_mask = bothDiagonalsKingMask(t_boardState, k_idx) & empty;
         while (moves_mask) {
             const int destination_idx = popLsb(moves_mask);
-            t_allMoves.emplace_back(1ULL << k_idx, 1ULL << destination_idx, false, k_idx, destination_idx);
+            t_allMoves.emplace_back(1ULL << k_idx, 1ULL << destination_idx, k_idx, destination_idx);
         }
     }
 }
@@ -270,7 +270,6 @@ void recursiveCreatePawnsAttacks(std::vector<Move> &t_allMoves,
         t_allMoves.emplace_back(t_originalStartingPositionMask,
                                 to_mask,
                                 t_currentVictimsMask,
-                                to_mask & promotion[t_attackerColour],
                                 t_currentPath);
     }
 }
@@ -299,7 +298,7 @@ void createOnePawnQuietMoves(std::vector<Move> &t_allMoves,
         if (move_mask) {
             size_t     copy = move_mask;
             const auto move =
-                Move(1ULL << t_idx, move_mask, move_mask & promotion[t_moversColour], t_idx, popLsb(copy));
+                Move(1ULL << t_idx, move_mask, t_idx, popLsb(copy));
             t_allMoves.push_back(move);
         }
     }

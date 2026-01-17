@@ -60,8 +60,8 @@ struct GameManager
     }
 
     void playTheGame();
-    void runMctsSimulation();
-    std::optional<Move> parseMove(const std::string &t_move);
+    //void runMctsSimulation();
+    //std::optional<Move> parseMove(const std::string &t_move);
     bool makePlayerMove();
 
 private:

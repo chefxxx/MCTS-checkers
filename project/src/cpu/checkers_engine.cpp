@@ -15,3 +15,8 @@ Board applyMove(const Board &t_board, const Move &t_move, const Colour t_colour)
     board_copy.pawns[t_colour] |= t_move.to_mask;
     return board_copy;
 }
+
+GameState checkEndOfGameConditions()
+{
+    return CONTINUES;
+}
