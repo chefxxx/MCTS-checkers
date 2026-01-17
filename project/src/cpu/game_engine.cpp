@@ -19,10 +19,9 @@ void GameManager::playTheGame()
     // meaning that is state == LOST, then player lost etc.
     while (state == CONTINUES) {
         if (turn == m_player_colour) {
-            // player
+            makePlayerMove();
         }
         else {
-            // ai
             runMctsSimulation();
         }
 
@@ -31,6 +30,42 @@ void GameManager::playTheGame()
     }
 
     std::cout << "You " << state << "!\n";
+}
+
+void GameManager::runMctsSimulation()
+{
+
+}
+
+std::optional<Move> GameManager::parseMove(const std::string &t_move)
+{
+
+}
+
+bool GameManager::makePlayerMove()
+{
+    logger::info("Please enter your move...");
+    std::string moveStr;
+    std::getline(std::cin, moveStr);
+    if (moveStr.size() < 5) {
+        logger::warn("Wrong move format, try again!");
+    }
+    if (moveStr[2] == '-') {
+        // normal move case
+
+    }
+    for (size_t i = 0; i < moveStr.size(); i += 3) {
+        if (std::isalpha(moveStr[i])) {
+            // we have found character
+            if (i + 1 < t_move.size() && std::isdigit(t_move[i + 1])) {
+                std::string curr = t_move.substr(i, 2);
+            }
+        }
+        else {
+            logger::warn("Wrong move format, try again");
+            return false;
+        }
+    }
 }
 
 Colour drawStartingColour()
@@ -42,25 +77,25 @@ Colour drawStartingColour()
 }
 
 // TODO: refactor, so in player move "Move" struct is used
-std::optional<PlayerMove> parseMove(const std::string &t_move)
-{
-    if (t_move.size() < 5) {
-        logger::warn("Not valid move format, try again!");
-        return std::nullopt;
-    }
-    PlayerMove move;
-    move.kind = t_move[2] == '-' ? MoveKind::normal : MoveKind::attack;
-    for (size_t i = 0; i < t_move.size(); i += 3) {
-        if (std::isalpha(t_move[i])) {
-            // we have found character
-            if (i + 1 < t_move.size() && std::isdigit(t_move[i + 1])) {
-                std::string curr = t_move.substr(i, 2);
-                move.addPosition(curr);
-            }
-        }
-    }
-    return move;
-}
+// std::optional<PlayerMove> parseMove(const std::string &t_move)
+// {
+//     if (t_move.size() < 5) {
+//         logger::warn("Not valid move format, try again!");
+//         return std::nullopt;
+//     }
+//     PlayerMove move;
+//     move.kind = t_move[2] == '-' ? MoveKind::normal : MoveKind::attack;
+//     for (size_t i = 0; i < t_move.size(); i += 3) {
+//         if (std::isalpha(t_move[i])) {
+//             // we have found character
+//             if (i + 1 < t_move.size() && std::isdigit(t_move[i + 1])) {
+//                 std::string curr = t_move.substr(i, 2);
+//                 move.addPosition(curr);
+//             }
+//         }
+//     }
+//     return move;
+// }
 
 void runMctsSimulation()
 {

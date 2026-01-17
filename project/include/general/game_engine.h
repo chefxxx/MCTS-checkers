@@ -15,8 +15,8 @@
 
 struct GameManager
 {
-    explicit GameManager(const Colour t_perspective)
-        : m_player_colour(t_perspective), m_ai_colour(static_cast<Colour>(1 - t_perspective))
+    explicit GameManager(const Colour t_perspective, const double t_ai_time)
+        : m_player_colour(t_perspective), m_ai_colour(static_cast<Colour>(1 - t_perspective)), m_ai_time_per_turn(t_ai_time)
     {
         initPerspective();
         board.initStartingBoard();
@@ -61,8 +61,8 @@ struct GameManager
 
     void playTheGame();
     void runMctsSimulation();
-    std::optional<PlayerMove> parseMove(const std::string &t_move);
-    void makePlayerMove();
+    std::optional<Move> parseMove(const std::string &t_move);
+    bool makePlayerMove();
 
 private:
     void initPerspective()
@@ -79,10 +79,16 @@ private:
     }
 
     // perspective and printing utils
-    Colour              m_player_colour;
-    Colour              m_ai_colour;
     std::array<char, 8> rowsNames{};
     std::string         columnsNamesRow;
+
+    // -------------
+    // game settings
+    // -------------
+    Colour              m_player_colour;
+    Colour              m_ai_colour;
+    std::string         m_mode;
+    double              m_ai_time_per_turn;
 };
 
 Colour drawStartingColour();

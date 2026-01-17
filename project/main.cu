@@ -1,15 +1,27 @@
 #include "game_engine.h"
 
-int main(int argc, const char **argv)
+void usage()
 {
-    std::cout << "Welcome to checkers.mcts!\n";
-    std::cout << "Press any key to draw a colour and start the game...\n";
+    logger::err("Usage: ./MCTS-checkers [mode=<cpu>] [time-for-ai-turn=<1> (in seconds)]");
+    return exit(EXIT_FAILURE);
+}
+
+int main(const int argc, const char **argv)
+{
+    if (argc != 3) {
+        usage();
+    }
+    std::string mode = argv[1];
+    const double time = std::stoi(argv[2]);
+
+    logger::info("Welcome to checkers.mcts!");
+    logger::info("Press any key to draw a colour and start the game...");
     std::cin.get();
     const auto playerColour = drawStartingColour();
-    std::cout << "You are " << playerColour << "!\n";
+    logger::info("You are {} !", playerColour);
 
     // initialize board from player's colour perspective
-    GameManager manager{playerColour};
+    GameManager manager{playerColour, time};
     manager.printBoard();
     manager.playTheGame();
     return 0;

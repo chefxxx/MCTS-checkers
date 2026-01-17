@@ -59,25 +59,6 @@ constexpr int MAX_MOVE_SEQUENCE = 8;
 
 enum class MoveKind { null = -1, normal = 0, attack = 1 };
 
-// TODO: change PlayerMove underlying into Move
-struct PlayerMove
-{
-    void addPosition(const std::string &t_pos)
-    {
-        const auto idx = strToPos(t_pos);
-        if (count < MAX_MOVE_SEQUENCE) {
-            positions[count] = idx;
-            count++;
-        }
-        else {
-            logger::warn("Maximum moves sequence exceeded!");
-        }
-    }
-    std::array<uint8_t, MAX_MOVE_SEQUENCE> positions{};
-    uint8_t                                count = 0;
-    MoveKind                               kind  = MoveKind::null;
-};
-
 // Note: move struct handles promotion conditions, so all player logic should be handled
 // by this struct.
 struct Move
