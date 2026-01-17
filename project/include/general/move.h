@@ -57,31 +57,46 @@ inline std::string posToStr(const int t_pos)
 
 constexpr int MAX_MOVE_SEQUENCE = 8;
 
-enum class MoveKind { null = -1, normal = 0, attack = 1 };
+enum class MoveKind { null = -1, quiet = 0, attack = 1 };
 
 // Note: move struct handles promotion conditions, so all player logic should be handled
 // by this struct.
 struct Move
 {
-    explicit Move(const size_t t_from,
-                  const size_t t_to,
-                  const int    t_fromIdx,
+    explicit Move(const int    t_fromIdx,
                   const int    t_toIdx)
-        : from_mask(t_from)
-        , to_mask(t_to)
+        : from_mask(1ULL << t_fromIdx)
+        , to_mask(1ULL << t_toIdx)
         , captures_mask(0ull)
         , positions({t_fromIdx, t_toIdx})
+        , kind(MoveKind::quiet)
     {
     }
-    explicit Move(const size_t     t_from,
-                  const size_t     t_to,
-                  const size_t     t_captures,
+    explicit Move(const size_t     t_captures,
                   std::vector<int> t_path)
-        : from_mask(t_from)
-        , to_mask(t_to)
+        : from_mask(1ULL << t_path[0])
+        , to_mask(1ULL << t_path[t_path.size() - 1])
         , captures_mask(t_captures)
         , positions(std::move(t_path))
+        , kind(MoveKind::attack)
     {
+    }
+
+    /** @brief This constructor is strictly used in
+     * the plyer input move scenario.
+     *
+     * @param t_path
+     */
+    explicit Move(std::vector<int> t_path)
+        : from_mask(1ULL << t_path[0])
+        , to_mask(1ULL << t_path[t_path.size() - 1])
+        , positions(std::move(t_path))
+    {
+        size_t captures = 0ULL;
+        for (size_t i = 1; i < t_path.size() - 1; i++) {
+            captures |= (1ULL << t_path[i]);
+        }
+        captures_mask = captures;
     }
     size_t from_mask;
     size_t to_mask;
@@ -89,6 +104,7 @@ struct Move
     // TODO: add limitation to this vector's size to 9
     // TODO: this is due to the bitpacking in LightMovePath
     std::vector<int> positions;
+    MoveKind kind = MoveKind::null;
 };
 
 struct LightMovePath

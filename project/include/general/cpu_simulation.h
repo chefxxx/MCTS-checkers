@@ -1,0 +1,10 @@
+//
+// Created by chefxx on 17.01.2026.
+//
+
+#ifndef MCTS_CHECKERS_CPU_SIMULATION_H
+#define MCTS_CHECKERS_CPU_SIMULATION_H
+
+void runCPU_MCTS();
+
+#endif // MCTS_CHECKERS_CPU_SIMULATION_H

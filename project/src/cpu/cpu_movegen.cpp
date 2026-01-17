@@ -178,8 +178,7 @@ void recursiveCreateAllKingsAttacks(std::vector<Move> &t_allMoves,
     }
     if (!found_jump) {
         // add move to t_all
-        t_allMoves.emplace_back(
-            t_originalStartingPositionMask, 1ULL << t_kingIdx, t_currentVictims, t_attackPath);
+        t_allMoves.emplace_back(t_currentVictims, t_attackPath);
     }
 }
 
@@ -191,7 +190,7 @@ void createAllKingsQuietMoves(std::vector<Move> &t_allMoves, size_t t_kingsMask,
         size_t    moves_mask = bothDiagonalsKingMask(t_boardState, k_idx) & empty;
         while (moves_mask) {
             const int destination_idx = popLsb(moves_mask);
-            t_allMoves.emplace_back(1ULL << k_idx, 1ULL << destination_idx, k_idx, destination_idx);
+            t_allMoves.emplace_back(k_idx,destination_idx);
         }
     }
 }
@@ -266,10 +265,7 @@ void recursiveCreatePawnsAttacks(std::vector<Move> &t_allMoves,
         // of the move generation construction. So the t_idx here
         // is for sure some index after at least one jump was made.
         assert(t_currentVictimsMask);
-        const size_t to_mask = 1ULL << t_idx;
-        t_allMoves.emplace_back(t_originalStartingPositionMask,
-                                to_mask,
-                                t_currentVictimsMask,
+        t_allMoves.emplace_back(t_currentVictimsMask,
                                 t_currentPath);
     }
 }
@@ -294,11 +290,10 @@ void createOnePawnQuietMoves(std::vector<Move> &t_allMoves,
     // check directions of moves and create them
     for (const int dir : {UP_LEFT, UP_RIGHT, DOWN_LEFT, DOWN_RIGHT}) {
         // ReSharper disable once CppTooWideScope
-        const size_t move_mask = canMove[t_moversColour][dir] * globalTables.NeighbourTable[t_idx][dir] & t_emptyFiles;
+        size_t move_mask = canMove[t_moversColour][dir] * globalTables.NeighbourTable[t_idx][dir] & t_emptyFiles;
         if (move_mask) {
-            size_t     copy = move_mask;
             const auto move =
-                Move(1ULL << t_idx, move_mask, t_idx, popLsb(copy));
+                Move(t_idx, popLsb(move_mask));
             t_allMoves.push_back(move);
         }
     }

@@ -8,7 +8,7 @@
 #include <vector>
 
 #include "bit_operations.h"
-#include "board_infra.cuh"
+#include "board_infra.h"
 #include "constants.h"
 #include "move.h"
 

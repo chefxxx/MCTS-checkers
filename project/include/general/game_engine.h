@@ -9,7 +9,7 @@
 #include <string>
 
 #include "bit_operations.h"
-#include "board_infra.cuh"
+#include "board_infra.h"
 #include "constants.h"
 #include "move.h"
 
@@ -60,9 +60,9 @@ struct GameManager
     }
 
     void playTheGame();
-    //void runMctsSimulation();
-    //std::optional<Move> parseMove(const std::string &t_move);
-    bool makePlayerMove();
+    void aiTurn();
+    static std::optional<Move> parsePlayerMove();
+    void playerTurn();
 
 private:
     void initPerspective()

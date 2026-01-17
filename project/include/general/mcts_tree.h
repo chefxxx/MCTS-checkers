@@ -9,7 +9,7 @@
 #include <cmath>
 #include <memory>
 
-#include "board_infra.cuh"
+#include "board_infra.h"
 #include "move.h"
 
 // class to manage mcts tree on the cpu
