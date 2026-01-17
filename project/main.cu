@@ -2,7 +2,7 @@
 
 void usage()
 {
-    logger::err("Usage: ./MCTS-checkers [mode=<cpu>] [time-for-ai-turn=<1> (in seconds)]");
+    logger::err("Usage: ./MCTS-checkers [mode=<cpu/gpu>] [time-for-ai-turn=<1> (in seconds)]");
     return exit(EXIT_FAILURE);
 }
 

@@ -2,12 +2,13 @@
 // Created by chefxx on 10.01.2026.
 //
 
+#include "game_engine.h"
+
 #include <random>
 
 #include "checkers_engine.h"
-#include "game_engine.h"
-#include "cpu_simulation.h"
 #include "logger.h"
+#include "simulation.h"
 
 void GameManager::playTheGame()
 {

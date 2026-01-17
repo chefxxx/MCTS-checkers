@@ -7,6 +7,8 @@
 
 #include <iostream>
 
+constexpr int DRAW_LIMIT = 30;
+
 constexpr size_t NOT_FILE_A = 0xFEFEFEFEFEFEFEFEULL;
 constexpr size_t NOT_FILE_H = 0x7F7F7F7F7F7F7F7FULL;
 constexpr size_t NOT_FILE_B = 0xFDFDFDFDFDFDFDFDULL;

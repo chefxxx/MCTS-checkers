@@ -19,8 +19,7 @@ constexpr double C = 2;
 struct MctsNode
 {
     explicit MctsNode(MctsNode *t_parent, const Board &t_board, const Colour t_colour)
-        : kings_quiet_moves_counter(0)
-        , colour_of_player_to_move(t_colour)
+        : colour_of_player_to_move(t_colour)
         , parent(t_parent)
         , current_score(0)
         , number_of_visits(0)
@@ -30,7 +29,6 @@ struct MctsNode
 
     explicit MctsNode(MctsNode *t_parent, const Board &t_board, const LightMovePath &t_movePath, const Colour t_colour)
         : move_packed_path(t_movePath)
-        , kings_quiet_moves_counter(0)
         , colour_of_player_to_move(t_colour)
         , parent(t_parent)
         , current_score(0)
@@ -47,13 +45,6 @@ struct MctsNode
 
     // Move applied in this node
     LightMovePath move_packed_path{};
-
-    // draw moves counter
-    // TODO: for now it is initialized to 0
-    // i am guessing it should be initialized
-    // in some applyMove() func
-    //
-    uint16_t kings_quiet_moves_counter;
 
     // This board represents game state in this
     // node after applying "move"

@@ -17,6 +17,8 @@ struct Board
     std::array<size_t, 2> pawns{};
     std::array<size_t, 2> kings{};
 
+    uint16_t kings_quiet_moves;
+
     void initStartingBoard()
     {
         constexpr size_t firstRowMask  = 85;
@@ -24,6 +26,9 @@ struct Board
 
         pawns[white] = 0ull;
         pawns[black] = 0ull;
+        kings_quiet_moves = 0;
+        kings[white] = 0ULL;
+        kings[black] = 0ULL;
 
         // initialize white player rocks
         pawns[white] |= firstRowMask;

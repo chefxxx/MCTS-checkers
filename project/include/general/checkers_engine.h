@@ -12,6 +12,6 @@
 #include "move.h"
 
 std::optional<Board> applyMove(const Board &t_board, const Move &t_move, Colour t_colour);
-GameState checkEndOfGameConditions();
+GameState checkEndOfGameConditions(const Board &t_board, Colour t_playerWhoJustMadeAMove);
 
 #endif // MCTS_CHECKERS_CPU_CHECKERS_ENGINE_H
