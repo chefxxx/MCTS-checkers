@@ -11,6 +11,7 @@
 #include "bit_operations.h"
 #include "board_infra.h"
 #include "constants.h"
+#include "mcts_tree.h"
 #include "move.h"
 
 struct GameManager
@@ -20,6 +21,7 @@ struct GameManager
     {
         initPerspective();
         board.initStartingBoard();
+        m_tree.initTree(board, m_ai_colour);
     }
     Board board{};
 
@@ -89,6 +91,9 @@ private:
     Colour              m_ai_colour;
     std::string         m_mode;
     double              m_ai_time_per_turn;
+
+    //
+    MctsTree m_tree;
 };
 
 Colour drawStartingColour();

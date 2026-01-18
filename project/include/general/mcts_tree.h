@@ -87,7 +87,7 @@ struct MctsTree
     // Creation of empty tree,
     // used at the beginning of the game
     // ---------------------------------
-
+    MctsTree() {}
     explicit MctsTree(const Board &t_board, const Colour t_colour)
         : colour_of_ai(t_colour)
     {
@@ -101,14 +101,20 @@ struct MctsTree
     }
 
     std::unique_ptr<MctsNode> root = nullptr;
-    Colour                    colour_of_ai;
+    Colour                    colour_of_ai = none;
 
     ~MctsTree() = default;
 
+    void initTree(const Board &t_board, const Colour t_colour)
+    {
+        root = std::make_unique<MctsNode>(nullptr, t_board, t_colour);
+    }
     [[nodiscard]] static MctsNode *selectNode(MctsNode *t_root);
-    static void                    expandNode(MctsNode *t_node);
+    [[nodiscard]] static Board     chooseBestMove(const MctsNode *t_root);
     [[nodiscard]] static int       rollout();
+    static void                    expandNode(MctsNode *t_node);
     static void                    backpropagate(MctsNode *t_leaf, double t_score);
+
 };
 
 

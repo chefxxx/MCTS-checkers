@@ -25,9 +25,8 @@ void GameManager::playTheGame()
         else {
             aiTurn();
         }
-
+        state = checkEndOfGameConditions(board, turn);
         turn = static_cast<Colour>(1 - turn);
-        state = checkEndOfGameConditions();
     }
 
     std::cout << "You " << state << "!\n";
@@ -36,7 +35,7 @@ void GameManager::playTheGame()
 void GameManager::aiTurn()
 {
     if (m_mode == "cpu") {
-        runCPU_MCTS();
+        board = runCPU_MCTS(m_tree.root, TODO);
     }
     else {
         throw "Not implemented!\n";

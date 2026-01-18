@@ -28,6 +28,22 @@ MctsNode *MctsTree::selectNode(MctsNode *t_root)
     return selectNode(best_node);
 }
 
+// Note:
+//
+// Currently a robust child is chosen.
+Board MctsTree::chooseBestMove(const MctsNode *t_root)
+{
+    const MctsNode* robust_child = t_root->children[0].get();
+    int max_n = -1;
+    for (auto& child : t_root->children) {
+        if (child->number_of_visits > max_n) {
+            max_n = child->number_of_visits;
+            robust_child = child.get();
+        }
+    }
+    return robust_child->board;
+}
+
 // TODO: somewhere here you have to check game state conditions etc.
 void MctsTree::expandNode(MctsNode *t_node)
 {
