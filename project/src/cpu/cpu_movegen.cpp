@@ -190,7 +190,7 @@ void createAllKingsQuietMoves(std::vector<Move> &t_allMoves, size_t t_kingsMask,
         size_t    moves_mask = bothDiagonalsKingMask(t_boardState, k_idx) & empty;
         while (moves_mask) {
             const int destination_idx = popLsb(moves_mask);
-            t_allMoves.emplace_back(k_idx,destination_idx);
+            t_allMoves.emplace_back(k_idx, destination_idx);
         }
     }
 }
@@ -265,8 +265,7 @@ void recursiveCreatePawnsAttacks(std::vector<Move> &t_allMoves,
         // of the move generation construction. So the t_idx here
         // is for sure some index after at least one jump was made.
         assert(t_currentVictimsMask);
-        t_allMoves.emplace_back(t_currentVictimsMask,
-                                t_currentPath);
+        t_allMoves.emplace_back(t_currentVictimsMask, t_currentPath);
     }
 }
 
@@ -292,8 +291,7 @@ void createOnePawnQuietMoves(std::vector<Move> &t_allMoves,
         // ReSharper disable once CppTooWideScope
         size_t move_mask = canMove[t_moversColour][dir] * globalTables.NeighbourTable[t_idx][dir] & t_emptyFiles;
         if (move_mask) {
-            const auto move =
-                Move(t_idx, popLsb(move_mask));
+            const auto move = Move(t_idx, popLsb(move_mask));
             t_allMoves.push_back(move);
         }
     }

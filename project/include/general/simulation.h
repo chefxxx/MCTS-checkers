@@ -5,13 +5,10 @@
 #ifndef MCTS_CHECKERS_CPU_SIMULATION_H
 #define MCTS_CHECKERS_CPU_SIMULATION_H
 
-
-#include <memory>
-
 #include "board_infra.h"
 #include "mcts_tree.h"
 
-Board runCPU_MCTS(const std::unique_ptr<MctsNode> &t_root, double t_timeLimit);
-void  mctsIteration(const std::unique_ptr<MctsNode> &t_root);
+Board runCPU_MCTS(const MctsTree &t_tree, double t_timeLimit);
+void  mctsIteration(const MctsTree &t_tree);
 
 #endif // MCTS_CHECKERS_CPU_SIMULATION_H

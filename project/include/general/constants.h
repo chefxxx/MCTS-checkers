@@ -7,9 +7,9 @@
 
 #include <iostream>
 
-constexpr int DRAW_LIMIT = 30;
+constexpr int    DRAW_LIMIT              = 30;
 constexpr double TURN_TIME_MULTIPLICATOR = 0.97;
-constexpr int ITERATION_CHECK = 128;
+constexpr int    ITERATION_CHECK         = 128;
 
 constexpr size_t NOT_FILE_A = 0xFEFEFEFEFEFEFEFEULL;
 constexpr size_t NOT_FILE_H = 0x7F7F7F7F7F7F7F7FULL;
@@ -25,11 +25,7 @@ enum Direction { UP_RIGHT = 0, UP_LEFT = 1, DOWN_RIGHT = 2, DOWN_LEFT = 3 };
 
 enum GameState { LOST = 0, DRAW = 1, WON = 2, CONTINUES = 3 };
 
-enum Colour {
-    black = 0,
-    white = 1,
-    none = 2
-};
+enum Colour { black = 0, white = 1, none = 2 };
 
 inline std::ostream &operator<<(std::ostream &os, const Colour &t_colour)
 {

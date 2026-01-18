@@ -37,8 +37,9 @@ std::optional<Board> applyMove(const Board &t_board, const Move &t_move, const C
     }
 
     // update kings quiet moves
-    board_copy.kings_quiet_moves =
-        (t_move.from_mask & t_board.kings[t_colour]) > 0 && t_move.captures_mask > 0 ? board_copy.kings_quiet_moves + 1 : 0;
+    board_copy.kings_quiet_moves = (t_move.from_mask & t_board.kings[t_colour]) > 0 && t_move.captures_mask > 0
+                                     ? board_copy.kings_quiet_moves + 1
+                                     : 0;
 
     // update opponents pieces with captures_mask, since it is 0ULL
     // if no attack move, then we can safely do it
@@ -65,7 +66,8 @@ GameState checkEndOfGameConditions(const Board &t_board, const Colour t_playerWh
         return WON;
     }
 
-    if (const auto moves = generateAllPossibleMoves(t_board, static_cast<Colour>(1 - t_playerWhoJustMadeAMove)); moves.empty()) {
+    if (const auto moves = generateAllPossibleMoves(t_board, static_cast<Colour>(1 - t_playerWhoJustMadeAMove));
+        moves.empty()) {
         return WON;
     }
     return CONTINUES;

@@ -24,11 +24,11 @@ struct Board
         constexpr size_t firstRowMask  = 85;
         constexpr size_t secondRowMask = 170;
 
-        pawns[white] = 0ull;
-        pawns[black] = 0ull;
+        pawns[white]      = 0ull;
+        pawns[black]      = 0ull;
         kings_quiet_moves = 0;
-        kings[white] = 0ULL;
-        kings[black] = 0ULL;
+        kings[white]      = 0ULL;
+        kings[black]      = 0ULL;
 
         // initialize white player rocks
         pawns[white] |= firstRowMask;
@@ -40,6 +40,17 @@ struct Board
         pawns[black] |= firstRowMask << 48;
         pawns[black] |= secondRowMask << 56;
     }
+
+    bool operator==(const Board &other) const
+    {
+        return pawns[white] == other.pawns[white] && pawns[black] == other.pawns[black] &&
+               kings[white] == other.kings[white] && kings[black] == other.kings[black] &&
+                   kings_quiet_moves == other.kings_quiet_moves;
+
+    }
+    bool operator!=(const Board &other) const { return !(*this == other); }
 };
+
+
 
 #endif

@@ -70,7 +70,7 @@ struct MctsNode
     double current_score;
     double number_of_visits;
 
-    [[nodiscard]] double parent_visits() const { return parent ? parent->number_of_visits : number_of_visits; }
+    [[nodiscard]] double parent_visits() const { return number_of_visits; }
     [[nodiscard]] double calculate_UCB() const
     {
         if (number_of_visits == 0) {
@@ -100,7 +100,7 @@ struct MctsTree
         root = std::make_unique<MctsNode>(nullptr, t_board, t_colour);
     }
 
-    std::unique_ptr<MctsNode> root = nullptr;
+    std::unique_ptr<MctsNode> root         = nullptr;
     Colour                    colour_of_ai = none;
 
     ~MctsTree() = default;
@@ -109,8 +109,10 @@ struct MctsTree
     {
         root = std::make_unique<MctsNode>(nullptr, t_board, t_colour);
     }
+    void updateRoot(const MctsNode *t_new_root);
 };
 
+[[nodiscard]] MctsNode *findPlayerMove(MctsNode *t_root, const Board &t_board, LightMovePath t_move);
 [[nodiscard]] MctsNode *selectNode(MctsNode *t_root);
 [[nodiscard]] Board     chooseBestMove(const MctsNode *t_root);
 [[nodiscard]] int       rollout();

@@ -63,8 +63,7 @@ enum class MoveKind { null = -1, quiet = 0, attack = 1 };
 // by this struct.
 struct Move
 {
-    explicit Move(const int    t_fromIdx,
-                  const int    t_toIdx)
+    explicit Move(const int t_fromIdx, const int t_toIdx)
         : from_mask(1ULL << t_fromIdx)
         , to_mask(1ULL << t_toIdx)
         , captures_mask(0ull)
@@ -72,8 +71,7 @@ struct Move
         , kind(MoveKind::quiet)
     {
     }
-    explicit Move(const size_t     t_captures,
-                  std::vector<int> t_path)
+    explicit Move(const size_t t_captures, std::vector<int> t_path)
         : from_mask(1ULL << t_path[0])
         , to_mask(1ULL << t_path[t_path.size() - 1])
         , captures_mask(t_captures)
@@ -104,7 +102,7 @@ struct Move
     // TODO: add limitation to this vector's size to 9
     // TODO: this is due to the bitpacking in LightMovePath
     std::vector<int> positions;
-    MoveKind kind = MoveKind::null;
+    MoveKind         kind = MoveKind::null;
 };
 
 struct LightMovePath
@@ -133,6 +131,11 @@ struct LightMovePath
     }
 
     int64_t packed_path = 0ULL;
+
+    bool operator==(const LightMovePath &other) const
+    {
+        return packed_path == other.packed_path;
+    }
 };
 
 struct PrintingMovePath

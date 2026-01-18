@@ -10,6 +10,39 @@
 #include "checkers_engine.h"
 #include "cpu_movegen.h"
 
+
+void MctsTree::updateRoot(const MctsNode *t_new_root)
+{
+    assert(t_new_root != root.get());
+    assert(t_new_root != nullptr);
+    assert(t_new_root->parent != nullptr);
+    MctsNode* parent = t_new_root->parent;
+
+    const auto it = std::ranges::find_if(
+        parent->children,
+        [t_new_root](const std::unique_ptr<MctsNode>& ptr) {
+            return ptr.get() == t_new_root;
+        });
+
+    assert(it != parent->children.end());
+    MctsNode *new_raw = it->release();
+    assert(new_raw == t_new_root);
+    parent->children.erase(it);
+    root.reset(new_raw);
+    root->parent = nullptr;
+}
+
+MctsNode *findPlayerMove(const MctsNode *t_root, const Board &t_board, const LightMovePath t_move)
+{
+    if (!t_root) return nullptr;
+    for (const auto& child : t_root->children) {
+        if (child->board == t_board && child->move_packed_path == t_move) {
+            return child.get();
+        }
+    }
+    return nullptr;
+}
+
 MctsNode *selectNode(MctsNode *t_root)
 {
     if (t_root != nullptr && t_root->children.empty()) {
@@ -33,7 +66,8 @@ MctsNode *selectNode(MctsNode *t_root)
 // Currently a robust child is chosen.
 Board chooseBestMove(const MctsNode *t_root)
 {
-    if (t_root->children.empty()) return t_root->board;
+    if (t_root->children.empty())
+        return t_root->board;
 
     const MctsNode *robust_child = t_root->children[0].get();
     int             max_n        = -1;
@@ -74,7 +108,7 @@ void backpropagate(MctsNode *t_leaf, const double t_score, const Colour t_aiColo
     MctsNode *tmp = t_leaf;
     while (tmp != nullptr) {
         const double node_score = tmp->colour_of_player_to_move == t_aiColour ? t_score : 1.0 - t_score;
-        tmp->current_score+= node_score;
+        tmp->current_score += node_score;
         tmp->number_of_visits++;
         tmp = tmp->parent;
     }

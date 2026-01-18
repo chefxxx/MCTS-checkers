@@ -13,7 +13,7 @@
 #include <type_traits>
 
 #include "helper_cuda.h"
-#include "logger_util.h"
+#include "logger.h"
 
 namespace cuda {
 template <class T> concept cuda_pointerable_type = std::is_array_v<T> == !std::is_array_v<T> && !std::is_pointer_v<T>;
@@ -74,7 +74,7 @@ public:
     constexpr ~unique_ptr() noexcept
     {
         if (mDevPtr) {
-            logger::info("Destroying mem_cuda::unique_ptr and releasing memory...");
+            logger::info("Destroying mem_cuda::unique_ptr and releasing memory...\n");
             get_deleter()(get());
         }
     }
@@ -186,7 +186,7 @@ template <cuda_pointerable_type T, class D = cuda_deleter<T>> struct control_blo
         if (mRefCount.fetch_sub(1, std::memory_order_acq_rel) == 1) {
             std::atomic_thread_fence(std::memory_order_acquire);
             mDeleter(mDevPtr);
-            logger::info("Releasing mem_cuda::shared_ptr memory...");
+            logger::info("Releasing mem_cuda::shared_ptr memory...\n");
             release_weak_ref();
         }
     }
@@ -197,7 +197,7 @@ template <cuda_pointerable_type T, class D = cuda_deleter<T>> struct control_blo
     {
         if (mWeakRefCount.fetch_sub(1, std::memory_order_acq_rel) == 1) {
             std::atomic_thread_fence(std::memory_order_acquire);
-            logger::info("Deleting control block...");
+            logger::info("Deleting control block...\n");
             delete this;
         }
     }
@@ -261,7 +261,7 @@ public:
 
     ~shared_ptr()
     {
-        logger::info("Destroying cuda::shared_ptr...");
+        logger::info("Destroying cuda::shared_ptr...\n");
         _cleanup();
     }
 

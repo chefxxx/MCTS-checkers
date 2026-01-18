@@ -48,7 +48,7 @@ inline void helper(const std::string_view t_str)
     std::cout << "[" << t_str << "][" << std::put_time(&local_tm, "%H:%M:%S") << "] ";
 }
 
-inline void print_recursive(const std::string_view t_str) { std::cout << t_str << '\n'; }
+inline void print_recursive(const std::string_view t_str) { std::cout << t_str; }
 
 template <typename First, typename... Rest>
 void print_recursive(std::string_view t_str, First &&t_first, Rest &&...t_rest)
@@ -70,7 +70,7 @@ void print_recursive(std::string_view t_str, First &&t_first, Rest &&...t_rest)
 inline void info(const Format t_formatWrapper)
 {
     helpers::helper("INFO");
-    std::cout << t_formatWrapper.str << '\n';
+    std::cout << t_formatWrapper.str;
 }
 
 template <typename... Args> void info(const Format t_formatWrapper, Args &&...t_arguments)
@@ -82,7 +82,7 @@ template <typename... Args> void info(const Format t_formatWrapper, Args &&...t_
 inline void warn(const Format t_formatWrapper)
 {
     helpers::helper("WARN");
-    std::cout << t_formatWrapper.str << '\n';
+    std::cout << t_formatWrapper.str;
 }
 
 template <typename... Args> void warn(const Format t_formatWrapper, Args &&...t_arguments)
@@ -94,7 +94,7 @@ template <typename... Args> void warn(const Format t_formatWrapper, Args &&...t_
 inline void err(const Format t_formatWrapper)
 {
     helpers::helper("ERR");
-    std::cout << t_formatWrapper.str << '\n';
+    std::cout << t_formatWrapper.str;
 }
 
 template <typename... Args> void err(const Format t_formatWrapper, Args &&...t_arguments)
