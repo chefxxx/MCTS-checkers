@@ -109,13 +109,13 @@ struct MctsTree
     {
         root = std::make_unique<MctsNode>(nullptr, t_board, t_colour);
     }
-    [[nodiscard]] static MctsNode *selectNode(MctsNode *t_root);
-    [[nodiscard]] static Board     chooseBestMove(const MctsNode *t_root);
-    [[nodiscard]] static int       rollout();
-    static void                    expandNode(MctsNode *t_node);
-    static void                    backpropagate(MctsNode *t_leaf, double t_score);
-
 };
+
+[[nodiscard]] MctsNode *selectNode(MctsNode *t_root);
+[[nodiscard]] Board     chooseBestMove(const MctsNode *t_root);
+[[nodiscard]] int       rollout();
+void                    expandNode(MctsNode *t_node);
+void                    backpropagate(MctsNode *t_leaf, double t_score, Colour t_aiColour);
 
 
 #endif // MCTS_CHECKERS_MCTS_H

@@ -10,7 +10,7 @@
 #include "checkers_engine.h"
 #include "cpu_movegen.h"
 
-MctsNode *MctsTree::selectNode(MctsNode *t_root)
+MctsNode *selectNode(MctsNode *t_root)
 {
     if (t_root != nullptr && t_root->children.empty()) {
         return t_root;
@@ -31,34 +31,22 @@ MctsNode *MctsTree::selectNode(MctsNode *t_root)
 // Note:
 //
 // Currently a robust child is chosen.
-Board MctsTree::chooseBestMove(const MctsNode *t_root)
+Board chooseBestMove(const MctsNode *t_root)
 {
-    const MctsNode* robust_child = t_root->children[0].get();
-    int max_n = -1;
-    for (auto& child : t_root->children) {
+    if (t_root->children.empty()) return t_root->board;
+
+    const MctsNode *robust_child = t_root->children[0].get();
+    int             max_n        = -1;
+    for (auto &child : t_root->children) {
         if (child->number_of_visits > max_n) {
-            max_n = child->number_of_visits;
+            max_n        = child->number_of_visits;
             robust_child = child.get();
         }
     }
     return robust_child->board;
 }
 
-// TODO: somewhere here you have to check game state conditions etc.
-void MctsTree::expandNode(MctsNode *t_node)
-{
-    for (const auto  possible_moves = generateAllPossibleMoves(t_node->board, t_node->colour_of_player_to_move);
-         const auto &mv : possible_moves) {
-        const auto b  = applyMove(t_node->board, mv, t_node->colour_of_player_to_move);
-        assert(b.has_value());
-        const auto  lp = LightMovePath(mv.positions, mv.captures_mask > 0);
-        auto        new_child =
-            std::make_unique<MctsNode>(t_node, b.value(), lp, static_cast<Colour>(1 - t_node->colour_of_player_to_move));
-        t_node->children.push_back(std::move(new_child));
-    }
-}
-
-int MctsTree::rollout()
+int rollout()
 {
     // TODO: now i use dummy func
     std::random_device            rd;
@@ -67,11 +55,26 @@ int MctsTree::rollout()
     return distrib(gen);
 }
 
-void MctsTree::backpropagate(MctsNode *t_leaf, const double t_score)
+// TODO: somewhere here you have to check game state conditions etc.
+void expandNode(MctsNode *t_node)
+{
+    for (const auto  possible_moves = generateAllPossibleMoves(t_node->board, t_node->colour_of_player_to_move);
+         const auto &mv : possible_moves) {
+        const auto b = applyMove(t_node->board, mv, t_node->colour_of_player_to_move);
+        assert(b.has_value());
+        const auto lp        = LightMovePath(mv.positions, mv.captures_mask > 0);
+        auto       new_child = std::make_unique<MctsNode>(
+            t_node, b.value(), lp, static_cast<Colour>(1 - t_node->colour_of_player_to_move));
+        t_node->children.push_back(std::move(new_child));
+    }
+}
+
+void backpropagate(MctsNode *t_leaf, const double t_score, const Colour t_aiColour)
 {
     MctsNode *tmp = t_leaf;
     while (tmp != nullptr) {
-        tmp->current_score += t_score;
+        const double node_score = tmp->colour_of_player_to_move == t_aiColour ? t_score : 1.0 - t_score;
+        tmp->current_score+= node_score;
         tmp->number_of_visits++;
         tmp = tmp->parent;
     }
