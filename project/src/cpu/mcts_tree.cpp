@@ -43,40 +43,41 @@ MctsNode *findPlayerMove(const MctsNode *t_root, const Board &t_board, const Lig
     return nullptr;
 }
 
-MctsNode *selectNode(MctsNode *t_root)
+MctsNode *selectNode(MctsNode *t_node)
 {
-    if (t_root != nullptr && t_root->children.empty()) {
-        return t_root;
-    }
+    assert(t_node != nullptr);
 
     double    max       = std::numeric_limits<double>::min();
     MctsNode *best_node = nullptr;
-    for (const auto &child : t_root->children) {
+    for (const auto &child : t_node->children) {
         if (const auto curr = child->calculate_UCB(); curr > max) {
             max       = curr;
             best_node = child.get();
         }
     }
 
-    return selectNode(best_node);
+    return best_node ? selectNode(best_node) : t_node;
 }
 
 // Note:
 //
 // Currently a robust child is chosen.
-Board chooseBestMove(const MctsNode *t_root)
+Board chooseBestMove(MctsTree& t_tree)
 {
-    if (t_root->children.empty())
-        return t_root->board;
+    const auto root = t_tree.root.get();
+    if (root->children.empty())
+        return root->board;
 
-    const MctsNode *robust_child = t_root->children[0].get();
+    const MctsNode *robust_child = root->children[0].get();
     int             max_n        = -1;
-    for (auto &child : t_root->children) {
+    for (auto &child : root->children) {
         if (child->number_of_visits > max_n) {
             max_n        = child->number_of_visits;
             robust_child = child.get();
         }
     }
+    // update the tree state
+    t_tree.updateRoot(robust_child);
     return robust_child->board;
 }
 

@@ -16,7 +16,7 @@
 
 struct GameManager
 {
-    explicit GameManager(const Colour t_perspective, const double t_ai_time, std::string t_mode)
+    explicit GameManager(const Colour t_perspective, const double t_ai_time, const std::string& t_mode)
         : m_player_colour(t_perspective)
         , m_ai_colour(static_cast<Colour>(1 - t_perspective))
         , m_mode(t_mode)

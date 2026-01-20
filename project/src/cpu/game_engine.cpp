@@ -39,11 +39,13 @@ void GameManager::aiTurn(const LightMovePath t_move)
 {
     if (board != m_tree.root->board) {
         const auto new_root = findPlayerMove(m_tree.root.get(), board, t_move);
-        assert(new_root != nullptr);
         m_tree.updateRoot(new_root);
     }
     if (m_mode == "cpu") {
         board = runCPU_MCTS(m_tree, m_ai_time_per_turn);
+    }
+    else if (m_mode == "debug") {
+        board = run_DEBUG_MCTS(m_tree);
     }
     else {
         throw "Not implemented!\n";

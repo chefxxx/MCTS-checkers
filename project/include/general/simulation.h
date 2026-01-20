@@ -8,7 +8,8 @@
 #include "board_infra.h"
 #include "mcts_tree.h"
 
-Board runCPU_MCTS(const MctsTree &t_tree, double t_timeLimit);
-void  mctsIteration(const MctsTree &t_tree);
+Board runCPU_MCTS(MctsTree &t_tree, double t_timeLimit);
+Board run_DEBUG_MCTS(MctsTree &t_tree);
+void  mctsIteration(const MctsTree &t_tree, int i);
 
 #endif // MCTS_CHECKERS_CPU_SIMULATION_H

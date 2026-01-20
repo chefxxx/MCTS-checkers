@@ -14,8 +14,6 @@
 
 // class to manage mcts tree on the cpu
 
-constexpr double C = 2;
-
 struct MctsNode
 {
     explicit MctsNode(MctsNode *t_parent, const Board &t_board, const Colour t_colour)
@@ -108,13 +106,14 @@ struct MctsTree
     void initTree(const Board &t_board, const Colour t_colour)
     {
         root = std::make_unique<MctsNode>(nullptr, t_board, t_colour);
+        colour_of_ai = t_colour;
     }
     void updateRoot(const MctsNode *t_new_root);
 };
 
-[[nodiscard]] MctsNode *findPlayerMove(MctsNode *t_root, const Board &t_board, LightMovePath t_move);
-[[nodiscard]] MctsNode *selectNode(MctsNode *t_root);
-[[nodiscard]] Board     chooseBestMove(const MctsNode *t_root);
+[[nodiscard]] MctsNode *findPlayerMove(const MctsNode *t_root, const Board &t_board, LightMovePath t_move);
+[[nodiscard]] MctsNode *selectNode(MctsNode *t_node);
+[[nodiscard]] Board     chooseBestMove(MctsTree& t_tree);
 [[nodiscard]] int       rollout();
 void                    expandNode(MctsNode *t_node);
 void                    backpropagate(MctsNode *t_leaf, double t_score, Colour t_aiColour);
