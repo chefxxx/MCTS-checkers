@@ -10,6 +10,6 @@
 
 Board runCPU_MCTS(MctsTree &t_tree, double t_timeLimit);
 Board run_DEBUG_MCTS(MctsTree &t_tree);
-void  mctsIteration(const MctsTree &t_tree, int i);
+void  mctsIteration(const MctsTree &t_tree);
 
 #endif // MCTS_CHECKERS_CPU_SIMULATION_H

@@ -15,7 +15,7 @@ Board runCPU_MCTS(MctsTree &t_tree, const double t_timeLimit)
         std::chrono::microseconds(static_cast<long long>(t_timeLimit * 1e6 * TURN_TIME_MULTIPLICATOR));
     int iters = 0;
     while (elapsed < limit_micro_sec) {
-        mctsIteration(t_tree, 0);
+        mctsIteration(t_tree);
         iters++;
         if (iters % ITERATION_CHECK == 0) {
             auto now = std::chrono::high_resolution_clock::now();
@@ -31,33 +31,26 @@ Board runCPU_MCTS(MctsTree &t_tree, const double t_timeLimit)
 Board run_DEBUG_MCTS(MctsTree &t_tree)
 {
     for (int i = 0; i < 1000; ++i) {
-        mctsIteration(t_tree, i);
+        mctsIteration(t_tree);
     }
     return chooseBestMove(t_tree);
 }
 
 
-void mctsIteration(const MctsTree &t_tree, const int i)
+void mctsIteration(const MctsTree &t_tree)
 {
+    // 1. selection
+    auto selectedNode = selectNode(t_tree.root.get());
 
+    // 2. expansion
+    assert(!selectedNode->is_fully_expanded());
+    if (!selectedNode->is_terminal()) {
+        selectedNode = expandNode(selectedNode);
 
+        // 3. rollout
+        const auto score = rollout();
 
-
-    // 1. selection of the leaf node
-    // auto selectedNode = selectNode(t_tree.root.get());
-    // if (selectedNode->children.size() > 0) {
-    //     std::cout << i;
-    // }
-    // assert(selectedNode->children.empty());
-    //
-    // // 2. If the leaf node has been visited - expansion
-    // if (selectedNode->number_of_visits) {
-    //     // TODO: expand node must handle the no move cases
-    //     expandNode(selectedNode);
-    //     selectedNode = selectedNode->children[0].get();
-    // }
-    // // 3. rollout
-    // const auto t_score = rollout();
-    // // 4. backpropagation
-    // backpropagate(selectedNode, t_score, t_tree.colour_of_ai);
+        // 4. backpropagate
+        backpropagate(selectedNode, score, t_tree.colour_of_ai);
+    }
 }

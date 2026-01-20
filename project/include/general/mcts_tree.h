@@ -13,6 +13,8 @@
 #include "cpu_movegen.h"
 #include "move.h"
 
+enum class NodeStatus { SEARCHING, WIN, LOSS, DRAW };
+
 // class to manage mcts tree on the cpu
 
 struct MctsNode
@@ -52,6 +54,7 @@ struct MctsNode
     // from which player perspective
     // moves from this node's position are played
     Colour turn_colour;
+    NodeStatus status = NodeStatus::SEARCHING;
 
     // ---------------
     // Tree management
@@ -72,16 +75,17 @@ struct MctsNode
     double current_score;
     double number_of_visits;
 
-    [[nodiscard]] double parent_visits() const { return number_of_visits; }
-    [[nodiscard]] double calculate_UCB() const
+    [[nodiscard]] double parent_visits() const { return parent->number_of_visits; }
+    [[nodiscard]] double ucb_score() const
     {
         if (number_of_visits == 0) {
             return std::numeric_limits<double>::infinity();
         }
-        return current_score / number_of_visits + C * sqrt(log(parent_visits()) / number_of_visits);
+        return current_score / number_of_visits + C * std::sqrt(std::log(parent_visits()) / number_of_visits);
     }
-    [[nodiscard]] bool fully_expanded() const { return possible_moves.empty(); }
+    [[nodiscard]] bool is_fully_expanded() const { return possible_moves.empty(); }
     [[nodiscard]] size_t possible_count() const { return possible_moves.size(); }
+    [[nodiscard]] bool is_terminal() const { return possible_moves.empty() && children.empty(); }
 };
 
 
@@ -121,7 +125,7 @@ struct MctsTree
 [[nodiscard]] MctsNode *selectNode(MctsNode *t_node);
 [[nodiscard]] Board     chooseBestMove(MctsTree& t_tree);
 [[nodiscard]] int       rollout();
-void                    expandNode(MctsNode *t_node);
+[[nodiscard]] MctsNode *expandNode(MctsNode *t_node);
 void                    backpropagate(MctsNode *t_leaf, double t_score, Colour t_aiColour);
 
 

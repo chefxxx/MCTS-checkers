@@ -47,16 +47,18 @@ MctsNode *selectNode(MctsNode *t_node)
 {
     assert(t_node != nullptr);
 
-    double    max       = std::numeric_limits<double>::min();
-    MctsNode *best_node = nullptr;
+    if (t_node->is_terminal() || !t_node->is_fully_expanded())
+        return t_node;
+
+    auto curr_max = std::numeric_limits<double>::min();
+    MctsNode *best_node = t_node;
     for (const auto &child : t_node->children) {
-        if (const auto curr = child->calculate_UCB(); curr > max) {
-            max       = curr;
+        if (child->ucb_score() > curr_max) {
+            curr_max = child->ucb_score();
             best_node = child.get();
         }
     }
-
-    return best_node ? selectNode(best_node) : t_node;
+    return selectNode(best_node);
 }
 
 // Note:
@@ -98,15 +100,15 @@ int randomChild(const int t_size)
     return distrib(gen);
 }
 
-// TODO: somewhere here you have to check game state conditions etc.
-void expandNode(MctsNode *t_node)
+MctsNode* expandNode(MctsNode *t_node)
 {
-    assert(!t_node->fully_expanded());
+    assert(!t_node->is_fully_expanded());
 
     // access random child and erase it
     const auto idx = static_cast<size_t>(randomChild(t_node->possible_count()));
     const auto mv = t_node->possible_moves[idx];
-    t_node->possible_moves.erase(t_node->possible_moves.begin() + idx);
+    std::swap(t_node->possible_moves[idx], t_node->possible_moves.back());
+    t_node->possible_moves.pop_back();
 
     // create board
     const auto next_board_state = applyMove(t_node->current_board_state, mv, t_node->turn_colour);
@@ -118,13 +120,20 @@ void expandNode(MctsNode *t_node)
     // add new child
     auto new_child = std::make_unique<MctsNode>(t_node, next_board_state.value(), lp, static_cast<Colour>(1 - t_node->turn_colour));
     t_node->children.push_back(std::move(new_child));
+    return new_child.get();
 }
 
 void backpropagate(MctsNode *t_leaf, const double t_score, const Colour t_aiColour)
 {
     MctsNode *tmp = t_leaf;
     while (tmp != nullptr) {
-        const double node_score = tmp->turn_colour == t_aiColour ? t_score : 1.0 - t_score;
+        // If the turn_colour in the current node is the same
+        // as the aiColour it means that this position
+        // is created from opponent's move.
+        // E.g. if a node is black and ai_col is white it means that ai
+        // move led to this position - meaning that if we have a win form
+        // this position we score it as 1.0
+        const double node_score = tmp->turn_colour == t_aiColour ? 1.0 - t_score : t_score;
         tmp->current_score += node_score;
         tmp->number_of_visits++;
         tmp = tmp->parent;
