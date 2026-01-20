@@ -63,9 +63,8 @@ struct GameManager
         std::cout << columnsNamesRow;
     }
 
-    void                        playTheGame();
-    MctsNode                                      *aiTurn();
-    static std::optional<Move>  parsePlayerMove();
+    void playTheGame();
+    MctsNode *aiTurn();
     [[nodiscard]] std::tuple<LightMovePath, Board> playerTurn() const;
 
 private:
@@ -99,5 +98,6 @@ private:
 };
 
 Colour drawStartingColour();
-
+std::optional<Move> parsePlayerMove();
+std::optional<Move> processMoveString(const std::string& t_moveStr);
 #endif // MCTS_CHECKERS_GAME_ENGINE_H

@@ -30,7 +30,7 @@ MctsNode *GameManager::aiTurn()
 }
 
 
-std::optional<Move> GameManager::parsePlayerMove()
+std::optional<Move> parsePlayerMove()
 {
     logger::info("Please enter your move...\n");
     std::string moveStr;
@@ -39,32 +39,8 @@ std::optional<Move> GameManager::parsePlayerMove()
         logger::warn("Wrong move format, try again!\n");
         return std::nullopt;
     }
-    if (moveStr[2] == '-') {
-        // normal move case
-        const std::string from    = moveStr.substr(0, 2);
-        const std::string to      = moveStr.substr(3, 2);
-        const int         fromIdx = strToPos(from);
-        const int         toIdx   = strToPos(to);
-        return Move(fromIdx, toIdx);
-    }
 
-    std::vector<int> positions;
-    for (size_t i = 0; i < moveStr.size(); i += 3) {
-        if (i + 1 < moveStr.size() && std::isalpha(moveStr[i]) && std::isdigit(moveStr[i + 1])) {
-            if (i + 2 < moveStr.size() && moveStr[i + 2] != ':') {
-                logger::warn("Wrong move format, try again\n");
-                return std::nullopt;
-            }
-            const std::string strPos = moveStr.substr(i, i + 2);
-            const int         toIdx  = strToPos(strPos);
-            positions.push_back(toIdx);
-        }
-        else {
-            logger::warn("Wrong move format, try again\n");
-            return std::nullopt;
-        }
-    }
-    return Move(positions);
+    return processMoveString(moveStr);
 }
 
 std::tuple<LightMovePath, Board> GameManager::playerTurn() const
@@ -89,4 +65,43 @@ Colour drawStartingColour()
     std::mt19937                  gen(rd());
     std::uniform_int_distribution distrib(0, 1);
     return distrib(gen) == 0 ? black : white;
+}
+
+std::optional<Move> processMoveString(const std::string &t_moveStr)
+{
+    if (t_moveStr[2] == '-') {
+        // normal move case
+        const std::string from    = t_moveStr.substr(0, 2);
+        const std::string to      = t_moveStr.substr(3, 2);
+        const int         fromIdx = strToPos(from);
+        const int         toIdx   = strToPos(to);
+        return Move(fromIdx, toIdx);
+    }
+
+    std::vector<int> positions;
+    int visited = 0;
+    size_t captures = 0ULL;
+    for (size_t i = 0; i < t_moveStr.size(); i += 3) {
+        if (i + 1 < t_moveStr.size() && std::isalpha(t_moveStr[i]) && std::isdigit(t_moveStr[i + 1])) {
+            if (i + 2 < t_moveStr.size() && t_moveStr[i + 2] != ':') {
+                logger::warn("Wrong move format, try again\n");
+                return std::nullopt;
+            }
+            const std::string strPos = t_moveStr.substr(i, i + 2);
+            const int         toIdx  = strToPos(strPos);
+            positions.push_back(toIdx);
+            if (i > 0) {
+                const int diff = positions[visited + 1] - positions[visited];
+                const Direction dir = globalTables.diffToDir[diff];
+                const size_t captured = globalTables.NeighbourTable[positions[visited]][dir];
+                captures |= captured;
+                visited++;
+            }
+        }
+        else {
+            logger::warn("Wrong move format, try again\n");
+            return std::nullopt;
+        }
+    }
+    return Move(captures, positions);
 }

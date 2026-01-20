@@ -146,30 +146,32 @@ struct Move
     {
     }
 
-    /** @brief This constructor is strictly used in
-     * the plyer input move scenario.
-     *
-     * @param t_path
-     */
-    explicit Move(const std::vector<int>& t_path)
-        : from_mask(1ULL << t_path[0])
-        , to_mask(1ULL << t_path[t_path.size() - 1])
-        , path(t_path, t_path.size() > 2)
-    {
-        size_t captures = 0ULL;
-        for (size_t i = 1; i < t_path.size() - 1; i+=2) {
-            const int diff = t_path[i] - t_path[i - 1];
-            const Direction dir = globalTables.diffToDir[diff];
-            const int capturedPos = globalTables.NeighbourTable[dir][t_path[i]];
-            captures |= (1ULL << capturedPos);
-        }
-        captures_mask = captures;
-    }
+    // /** @brief This constructor is strictly used in
+    //  * the plyer input move scenario.
+    //  *
+    //  * @param t_path
+    //  */
+    // explicit Move(const std::vector<int>& t_path)
+    //     : from_mask(1ULL << t_path[0])
+    //     , to_mask(1ULL << t_path[t_path.size() - 1])
+    // {
+    //     size_t captures = 0ULL;
+    //     for (size_t i = 0; i < t_path.size() - 1; ++i) {
+    //         const int diff = t_path[i + 1] - t_path[i];
+    //         const Direction dir = globalTables.diffToDir[diff];
+    //         const size_t captured = globalTables.NeighbourTable[t_path[i]][dir];
+    //         captures |= captured;
+    //     }
+    //     captures_mask = captures;
+    //     path = LightMovePath(t_path, captures_mask > 0);
+    //     kind = captures_mask > 0 ? MoveKind::attack : MoveKind::quiet;
+    // }
+
     size_t        from_mask;
     size_t        to_mask;
     size_t        captures_mask;
     LightMovePath path;
-    MoveKind      kind = MoveKind::null;
+    MoveKind      kind;
 };
 
 #endif // MCTS_CHECKERS_MOVE_H
