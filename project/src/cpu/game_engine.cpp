@@ -37,7 +37,7 @@ void GameManager::playTheGame()
 
 void GameManager::aiTurn(const LightMovePath t_move)
 {
-    if (board != m_tree.root->board) {
+    if (board != m_tree.root->current_board_state) {
         const auto new_root = findPlayerMove(m_tree.root.get(), board, t_move);
         m_tree.updateRoot(new_root);
     }

@@ -55,9 +55,7 @@ inline std::string posToStr(const int t_pos)
     return {colChar, rowChar};
 }
 
-constexpr int MAX_MOVE_SEQUENCE = 8;
-
-enum class MoveKind { null = -1, quiet = 0, attack = 1 };
+enum class MoveKind : int8_t { null = -1, quiet = 0, attack = 1 };
 
 struct LightMovePath
 {
@@ -68,7 +66,7 @@ struct LightMovePath
         pack_path(t_positions, t_capture);
     }
 
-    explicit LightMovePath()
+    LightMovePath()
         : packed_path(None)
     {
     }
@@ -91,6 +89,40 @@ struct LightMovePath
         return packed_path == other.packed_path;
     }
 };
+
+struct PrintingMovePath
+{
+    explicit PrintingMovePath(const size_t t_packedPath) { unpack_path(t_packedPath); }
+
+    void unpack_path(const size_t t_packed)
+    {
+        const int count = t_packed & 0xF;
+        capture         = checkBitAtIdx(t_packed, 63);
+        for (int i = 0; i < count; ++i) {
+            positions.push_back((t_packed >> (4 + (i * 6))) & 0x3F);
+        }
+    }
+
+    std::vector<int> positions;
+    bool             capture;
+};
+
+inline std::ostream &operator<<(std::ostream &os, const PrintingMovePath &t_move)
+{
+    const char delim = t_move.capture ? ':' : '-';
+    os << posToStr(t_move.positions[0]);
+    for (size_t i = 1; i < t_move.positions.size(); ++i) {
+        os << delim << posToStr(t_move.positions[i]);
+    }
+    return os;
+}
+
+inline std::string stringMove(const PrintingMovePath &t_move)
+{
+    std::stringstream ss;
+    ss << t_move;
+    return ss.str();
+}
 
 // Note: move struct handles promotion conditions, so all player logic should be handled
 // by this struct.
@@ -135,41 +167,5 @@ struct Move
     LightMovePath path;
     MoveKind      kind = MoveKind::null;
 };
-
-
-
-struct PrintingMovePath
-{
-    explicit PrintingMovePath(const size_t t_packedPath) { unpack_path(t_packedPath); }
-
-    void unpack_path(const size_t t_packed)
-    {
-        const int count = t_packed & 0xF;
-        capture         = checkBitAtIdx(t_packed, 63);
-        for (int i = 0; i < count; ++i) {
-            positions.push_back((t_packed >> (4 + (i * 6))) & 0x3F);
-        }
-    }
-
-    std::vector<int> positions;
-    bool             capture;
-};
-
-inline std::ostream &operator<<(std::ostream &os, const PrintingMovePath &t_move)
-{
-    const char delim = t_move.capture ? ':' : '-';
-    os << posToStr(t_move.positions[0]);
-    for (size_t i = 1; i < t_move.positions.size(); ++i) {
-        os << delim << posToStr(t_move.positions[i]);
-    }
-    return os;
-}
-
-inline std::string stringMove(const PrintingMovePath &t_move)
-{
-    std::stringstream ss;
-    ss << t_move;
-    return ss.str();
-}
 
 #endif // MCTS_CHECKERS_MOVE_H

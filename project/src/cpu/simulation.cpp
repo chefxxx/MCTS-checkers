@@ -39,21 +39,25 @@ Board run_DEBUG_MCTS(MctsTree &t_tree)
 
 void mctsIteration(const MctsTree &t_tree, const int i)
 {
-    // 1. selection of the leaf node
-    auto selectedNode = selectNode(t_tree.root.get());
-    if (selectedNode->children.size() > 0) {
-        std::cout << i;
-    }
-    assert(selectedNode->children.empty());
 
-    // 2. If the leaf node has been visited - expansion
-    if (selectedNode->number_of_visits) {
-        // TODO: expand node must handle the no move cases
-        expandNode(selectedNode);
-        selectedNode = selectedNode->children[0].get();
-    }
-    // 3. rollout
-    const auto t_score = rollout();
-    // 4. backpropagation
-    backpropagate(selectedNode, t_score, t_tree.colour_of_ai);
+
+
+
+    // 1. selection of the leaf node
+    // auto selectedNode = selectNode(t_tree.root.get());
+    // if (selectedNode->children.size() > 0) {
+    //     std::cout << i;
+    // }
+    // assert(selectedNode->children.empty());
+    //
+    // // 2. If the leaf node has been visited - expansion
+    // if (selectedNode->number_of_visits) {
+    //     // TODO: expand node must handle the no move cases
+    //     expandNode(selectedNode);
+    //     selectedNode = selectedNode->children[0].get();
+    // }
+    // // 3. rollout
+    // const auto t_score = rollout();
+    // // 4. backpropagation
+    // backpropagate(selectedNode, t_score, t_tree.colour_of_ai);
 }

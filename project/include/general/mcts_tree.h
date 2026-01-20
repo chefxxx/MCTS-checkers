@@ -10,6 +10,7 @@
 #include <memory>
 
 #include "board_infra.h"
+#include "cpu_movegen.h"
 #include "move.h"
 
 // class to manage mcts tree on the cpu
@@ -17,22 +18,24 @@
 struct MctsNode
 {
     explicit MctsNode(MctsNode *t_parent, const Board &t_board, const Colour t_colour)
-        : colour_of_player_to_move(t_colour)
+        : turn_colour(t_colour)
         , parent(t_parent)
         , current_score(0)
         , number_of_visits(0)
     {
-        board = t_board;
+        current_board_state = t_board;
+        possible_moves = generateAllPossibleMoves(t_board, t_colour);
     }
 
     explicit MctsNode(MctsNode *t_parent, const Board &t_board, const LightMovePath &t_movePath, const Colour t_colour)
-        : move_packed_path(t_movePath)
-        , colour_of_player_to_move(t_colour)
+        : move_that_led_to_this_position(t_movePath)
+        , turn_colour(t_colour)
         , parent(t_parent)
         , current_score(0)
         , number_of_visits(0)
     {
-        board = t_board;
+        current_board_state = t_board;
+        possible_moves = generateAllPossibleMoves(t_board, t_colour);
     }
 
     ~MctsNode() = default;
@@ -42,10 +45,13 @@ struct MctsNode
     // -------------------
 
     // Move applied in this node
-    LightMovePath move_packed_path{};
-    std::vector<Move> moves;
+    Board current_board_state;
+    LightMovePath move_that_led_to_this_position;
+    std::vector<Move> possible_moves;
 
-    Colour colour_of_player_to_move;
+    // from which player perspective
+    // moves from this node's position are played
+    Colour turn_colour;
 
     // ---------------
     // Tree management
@@ -74,6 +80,8 @@ struct MctsNode
         }
         return current_score / number_of_visits + C * sqrt(log(parent_visits()) / number_of_visits);
     }
+    [[nodiscard]] bool fully_expanded() const { return possible_moves.empty(); }
+    [[nodiscard]] size_t possible_count() const { return possible_moves.size(); }
 };
 
 
