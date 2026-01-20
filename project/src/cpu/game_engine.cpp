@@ -13,44 +13,22 @@
 
 void GameManager::playTheGame()
 {
-    GameState state = CONTINUES;
-    Colour    turn  = white;
 
-    // Note:
-    // game state is perceived from the players perspective,
-    // meaning that is state == LOST, then player lost etc.
-    LightMovePath lastPlayerMove;
-    while (state == CONTINUES) {
-        printBoard();
-        if (turn == m_player_colour) {
-            lastPlayerMove = playerTurn();
-        }
-        else {
-            aiTurn(lastPlayerMove);
-        }
-        state = checkEndOfGameConditions(board, turn);
-        turn  = static_cast<Colour>(1 - turn);
-    }
-
-    std::cout << "You " << state << "!\n";
 }
 
-void GameManager::aiTurn(const LightMovePath t_move)
+MctsNode *GameManager::aiTurn()
 {
-    if (board != m_tree.root->current_board_state) {
-        const auto new_root = findPlayerMove(m_tree.root.get(), board, t_move);
-        m_tree.updateRoot(new_root);
-    }
+    MctsNode* bestNode = nullptr;
     if (m_mode == "cpu") {
-        board = runCPU_MCTS(m_tree, m_ai_time_per_turn);
-    }
-    else if (m_mode == "debug") {
-        board = run_DEBUG_MCTS(m_tree);
+        bestNode = runCPU_MCTS(m_tree, m_ai_time_per_turn);
     }
     else {
         throw "Not implemented!\n";
     }
+    assert(bestNode != nullptr);
+    return bestNode;
 }
+
 
 std::optional<Move> GameManager::parsePlayerMove()
 {
@@ -89,7 +67,7 @@ std::optional<Move> GameManager::parsePlayerMove()
     return Move(positions);
 }
 
-LightMovePath GameManager::playerTurn()
+std::tuple<LightMovePath, Board> GameManager::playerTurn() const
 {
     while (true) {
         const auto move = parsePlayerMove();
@@ -100,8 +78,8 @@ LightMovePath GameManager::playerTurn()
         if (n_board == std::nullopt) {
             continue;
         }
-        board = n_board.value();
 
+        return std::forward_as_tuple(move.value().path, n_board.value());
     }
 }
 

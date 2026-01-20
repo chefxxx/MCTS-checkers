@@ -8,7 +8,7 @@
 #include <random>
 
 #include "checkers_engine.h"
-#include "cpu_movegen.h"
+
 
 
 void MctsTree::updateRoot(const MctsNode *t_new_root)
@@ -34,7 +34,7 @@ void MctsTree::updateRoot(const MctsNode *t_new_root)
 
 MctsNode *findPlayerMove(const MctsNode *t_root, const Board &t_board, const LightMovePath t_move)
 {
-    if (!t_root) return nullptr;
+    assert(t_root != nullptr);
     for (const auto& child : t_root->children) {
         if (child->current_board_state == t_board && child->move_that_led_to_this_position == t_move) {
             return child.get();
@@ -64,23 +64,21 @@ MctsNode *selectNode(MctsNode *t_node)
 // Note:
 //
 // Currently a robust child is chosen.
-Board chooseBestMove(MctsTree& t_tree)
+MctsNode *chooseBestMove(const MctsTree& t_tree)
 {
     const auto root = t_tree.root.get();
     if (root->children.empty())
-        return root->current_board_state;
+        return root;
 
-    const MctsNode *robust_child = root->children[0].get();
-    int             max_n        = -1;
+    MctsNode *robust_child = root->children[0].get();
+    int max_n              = -1;
     for (auto &child : root->children) {
         if (child->number_of_visits > max_n) {
             max_n        = child->number_of_visits;
             robust_child = child.get();
         }
     }
-    // update the tree state
-    t_tree.updateRoot(robust_child);
-    return robust_child->current_board_state;
+    return robust_child;
 }
 
 int rollout()

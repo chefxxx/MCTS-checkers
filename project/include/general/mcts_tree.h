@@ -95,7 +95,7 @@ struct MctsTree
     // Creation of empty tree,
     // used at the beginning of the game
     // ---------------------------------
-    MctsTree() {}
+    MctsTree() = default;
     explicit MctsTree(const Board &t_board, const Colour t_colour)
         : colour_of_ai(t_colour)
     {
@@ -123,7 +123,7 @@ struct MctsTree
 
 [[nodiscard]] MctsNode *findPlayerMove(const MctsNode *t_root, const Board &t_board, LightMovePath t_move);
 [[nodiscard]] MctsNode *selectNode(MctsNode *t_node);
-[[nodiscard]] Board     chooseBestMove(MctsTree& t_tree);
+[[nodiscard]] MctsNode *chooseBestMove(const MctsTree& t_tree);
 [[nodiscard]] int       rollout();
 [[nodiscard]] MctsNode *expandNode(MctsNode *t_node);
 void                    backpropagate(MctsNode *t_leaf, double t_score, Colour t_aiColour);

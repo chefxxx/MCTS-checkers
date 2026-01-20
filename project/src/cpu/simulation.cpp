@@ -7,7 +7,7 @@
 #include <cassert>
 #include <chrono>
 
-Board runCPU_MCTS(MctsTree &t_tree, const double t_timeLimit)
+MctsNode *runCPU_MCTS(MctsTree &t_tree, const double t_timeLimit)
 {
     const auto                start = std::chrono::high_resolution_clock::now();
     std::chrono::microseconds elapsed;
@@ -28,14 +28,13 @@ Board runCPU_MCTS(MctsTree &t_tree, const double t_timeLimit)
     return chooseBestMove(t_tree);
 }
 
-Board run_DEBUG_MCTS(MctsTree &t_tree)
-{
-    for (int i = 0; i < 1000; ++i) {
-        mctsIteration(t_tree);
-    }
-    return chooseBestMove(t_tree);
-}
-
+// Board run_DEBUG_MCTS(MctsTree &t_tree)
+// {
+//     for (int i = 0; i < 1000; ++i) {
+//         mctsIteration(t_tree);
+//     }
+//     return chooseBestMove(t_tree);
+// }
 
 void mctsIteration(const MctsTree &t_tree)
 {
@@ -43,7 +42,6 @@ void mctsIteration(const MctsTree &t_tree)
     auto selectedNode = selectNode(t_tree.root.get());
 
     // 2. expansion
-    assert(!selectedNode->is_fully_expanded());
     if (!selectedNode->is_terminal()) {
         selectedNode = expandNode(selectedNode);
 

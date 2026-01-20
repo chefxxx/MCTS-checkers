@@ -24,7 +24,6 @@ struct GameManager
     {
         initPerspective();
         board.initStartingBoard();
-        m_tree.initTree(board, m_ai_colour);
     }
     Board board{};
 
@@ -65,9 +64,9 @@ struct GameManager
     }
 
     void                        playTheGame();
-    void                        aiTurn(LightMovePath t_move);
+    MctsNode                                      *aiTurn();
     static std::optional<Move>  parsePlayerMove();
-    [[nodiscard]] LightMovePath playerTurn();
+    [[nodiscard]] std::tuple<LightMovePath, Board> playerTurn() const;
 
 private:
     void initPerspective()
