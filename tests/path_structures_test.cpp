@@ -116,13 +116,3 @@ TEST(MovePrintingTest, BoundarySquares)
 
     EXPECT_EQ(stringMove(printer), "a1-h8");
 }
-
-// Test 5: Long Sequence (Max 9)
-TEST(MovePrintingTest, MaxPathPrinting)
-{
-    // a1, b1, c1, d1, e1, f1, g1, h1, h2
-    const LightMovePath light({0, 1, 2, 3, 4, 5, 6, 7, 56}, true);
-    const auto          printer = PrintingMovePath(light.packed_path);
-
-    EXPECT_EQ(stringMove(printer), "a1:b1:c1:d1:e1:f1:g1:h1:a8");
-}

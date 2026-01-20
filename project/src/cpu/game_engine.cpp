@@ -69,6 +69,7 @@ std::optional<Move> GameManager::parsePlayerMove()
         const int         toIdx   = strToPos(to);
         return Move(fromIdx, toIdx);
     }
+
     std::vector<int> positions;
     for (size_t i = 0; i < moveStr.size(); i += 3) {
         if (i + 1 < moveStr.size() && std::isalpha(moveStr[i]) && std::isdigit(moveStr[i + 1])) {
@@ -100,7 +101,7 @@ LightMovePath GameManager::playerTurn()
             continue;
         }
         board = n_board.value();
-        return LightMovePath(move.value().positions, move.value().captures_mask > 0);
+
     }
 }
 

@@ -10,6 +10,7 @@
 
 #include "bit_operations.h"
 #include "logger.h"
+#include "lookup_tables.h"
 
 // Program "sees" the board from this perspective
 // thus macros for cols are set here accordingly.
@@ -156,8 +157,11 @@ struct Move
         , path(t_path, t_path.size() > 2)
     {
         size_t captures = 0ULL;
-        for (size_t i = 1; i < t_path.size() - 1; i++) {
-            captures |= (1ULL << t_path[i]);
+        for (size_t i = 1; i < t_path.size() - 1; i+=2) {
+            const int diff = t_path[i] - t_path[i - 1];
+            const Direction dir = globalTables.diffToDir[diff];
+            const int capturedPos = globalTables.NeighbourTable[dir][t_path[i]];
+            captures |= (1ULL << capturedPos);
         }
         captures_mask = captures;
     }
