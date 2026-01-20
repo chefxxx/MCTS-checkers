@@ -59,52 +59,6 @@ constexpr int MAX_MOVE_SEQUENCE = 8;
 
 enum class MoveKind { null = -1, quiet = 0, attack = 1 };
 
-// Note: move struct handles promotion conditions, so all player logic should be handled
-// by this struct.
-struct Move
-{
-    explicit Move(const int t_fromIdx, const int t_toIdx)
-        : from_mask(1ULL << t_fromIdx)
-        , to_mask(1ULL << t_toIdx)
-        , captures_mask(0ull)
-        , positions({t_fromIdx, t_toIdx})
-        , kind(MoveKind::quiet)
-    {
-    }
-    explicit Move(const size_t t_captures, std::vector<int> t_path)
-        : from_mask(1ULL << t_path[0])
-        , to_mask(1ULL << t_path[t_path.size() - 1])
-        , captures_mask(t_captures)
-        , positions(std::move(t_path))
-        , kind(MoveKind::attack)
-    {
-    }
-
-    /** @brief This constructor is strictly used in
-     * the plyer input move scenario.
-     *
-     * @param t_path
-     */
-    explicit Move(std::vector<int> t_path)
-        : from_mask(1ULL << t_path[0])
-        , to_mask(1ULL << t_path[t_path.size() - 1])
-        , positions(std::move(t_path))
-    {
-        size_t captures = 0ULL;
-        for (size_t i = 1; i < t_path.size() - 1; i++) {
-            captures |= (1ULL << t_path[i]);
-        }
-        captures_mask = captures;
-    }
-    size_t from_mask;
-    size_t to_mask;
-    size_t captures_mask;
-    // TODO: add limitation to this vector's size to 9
-    // TODO: this is due to the bitpacking in LightMovePath
-    std::vector<int> positions;
-    MoveKind         kind = MoveKind::null;
-};
-
 struct LightMovePath
 {
     constexpr static int64_t None = -1;
@@ -137,6 +91,52 @@ struct LightMovePath
         return packed_path == other.packed_path;
     }
 };
+
+// Note: move struct handles promotion conditions, so all player logic should be handled
+// by this struct.
+struct Move
+{
+    explicit Move(const int t_fromIdx, const int t_toIdx)
+        : from_mask(1ULL << t_fromIdx)
+        , to_mask(1ULL << t_toIdx)
+        , captures_mask(0ull)
+        , path({t_fromIdx, t_toIdx}, false)
+        , kind(MoveKind::quiet)
+    {
+    }
+    explicit Move(const size_t t_captures, const std::vector<int>& t_path)
+        : from_mask(1ULL << t_path[0])
+        , to_mask(1ULL << t_path[t_path.size() - 1])
+        , captures_mask(t_captures)
+        , path(t_path, true)
+        , kind(MoveKind::attack)
+    {
+    }
+
+    /** @brief This constructor is strictly used in
+     * the plyer input move scenario.
+     *
+     * @param t_path
+     */
+    explicit Move(const std::vector<int>& t_path)
+        : from_mask(1ULL << t_path[0])
+        , to_mask(1ULL << t_path[t_path.size() - 1])
+        , path(t_path, t_path.size() > 2)
+    {
+        size_t captures = 0ULL;
+        for (size_t i = 1; i < t_path.size() - 1; i++) {
+            captures |= (1ULL << t_path[i]);
+        }
+        captures_mask = captures;
+    }
+    size_t        from_mask;
+    size_t        to_mask;
+    size_t        captures_mask;
+    LightMovePath path;
+    MoveKind      kind = MoveKind::null;
+};
+
+
 
 struct PrintingMovePath
 {

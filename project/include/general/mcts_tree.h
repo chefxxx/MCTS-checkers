@@ -43,10 +43,8 @@ struct MctsNode
 
     // Move applied in this node
     LightMovePath move_packed_path{};
+    std::vector<Move> moves;
 
-    // This board represents game state in this
-    // node after applying "move"
-    Board  board{};
     Colour colour_of_player_to_move;
 
     // ---------------
