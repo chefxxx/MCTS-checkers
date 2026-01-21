@@ -108,6 +108,9 @@ std::optional<Move> processMoveString(const std::string &t_moveStr, const Board 
 {
     const size_t opponent =  t_currBoard.pawns[1 - t_colour] | t_currBoard.kings[1 - t_colour];
     const size_t empty = ~(t_currBoard.pawns[t_colour] | t_currBoard.kings[t_colour] | opponent);
+    const auto check_moves = generateAllPossibleMoves(t_currBoard, t_colour);
+    Move result;
+
     if (t_moveStr[2] == '-') {
         // normal move case
         const std::string from    = t_moveStr.substr(0, 2);
@@ -122,60 +125,71 @@ std::optional<Move> processMoveString(const std::string &t_moveStr, const Board 
             logger::warn("Wrong move quiet 'to' position, try again..\n");
             return std::nullopt;
         }
-        return Move(fromIdx, toIdx);
+        result = Move(fromIdx, toIdx);
     }
-
-    std::vector<int> positions;
-    size_t captures = 0ULL;
-    for (size_t i = 0; i < t_moveStr.size(); i += 3) {
-        if (i + 1 < t_moveStr.size() && std::isalpha(t_moveStr[i]) && std::isdigit(t_moveStr[i + 1])) {
-            if (i + 2 < t_moveStr.size() && t_moveStr[i + 2] != ':') {
+    else {
+        std::vector<int> positions;
+        size_t captures = 0ULL;
+        for (size_t i = 0; i < t_moveStr.size(); i += 3) {
+            if (i + 1 < t_moveStr.size() && std::isalpha(t_moveStr[i]) && std::isdigit(t_moveStr[i + 1])) {
+                if (i + 2 < t_moveStr.size() && t_moveStr[i + 2] != ':') {
+                    logger::warn("Wrong move format, try again\n");
+                    return std::nullopt;
+                }
+                const std::string strPos = t_moveStr.substr(i, i + 2);
+                const int         idx  = strToPos(strPos);
+                positions.push_back(idx);
+            }
+            else {
                 logger::warn("Wrong move format, try again\n");
                 return std::nullopt;
             }
-            const std::string strPos = t_moveStr.substr(i, i + 2);
-            const int         idx  = strToPos(strPos);
-            positions.push_back(idx);
+        }
+
+        if (checkBitAtIdx(t_currBoard.pawns[t_colour],positions[0])) {
+            // pawn takes
+            for (size_t i = 1; i < positions.size(); ++i) {
+                const int diff = positions[i] - positions[i - 1];
+                const Direction dir = globalTables.diffToDir[64 + diff];
+                if (const size_t mask = globalTables.NeighbourTable[positions[i - 1]][dir]; mask & opponent) {
+                    captures |= mask;
+                }
+                else {
+                    logger::warn("Wrong piece to attack position, try again..\n");
+                    return std::nullopt;
+                }
+            }
+        }
+        else if (checkBitAtIdx(t_currBoard.kings[t_colour],positions[0])) {
+            // king takes
+            for (size_t i = 1; i < positions.size(); ++i) {
+                const int diff = positions[i] - positions[i - 1];
+                const Direction dir = globalTables.diffToDir[64 + diff];
+                const size_t mask = bothDiagonalsKingMask(~empty, positions[i - 1])
+                                      & globalTables.rayMasks[positions[i - 1]][dir] & opponent;
+                if (mask > 0 && (1ULL << positions[i] & empty) > 0) {
+                    captures |= mask;
+                }
+                else {
+                    logger::warn("Something wrong for king move..\n");
+                    return std::nullopt;
+                }
+            }
         }
         else {
-            logger::warn("Wrong move format, try again\n");
+            logger::warn("Wrong attack move 'from' position, try again..\n");
             return std::nullopt;
         }
+        result = Move(captures, positions);
     }
-
-    if (checkBitAtIdx(t_currBoard.pawns[t_colour],positions[0])) {
-        // pawn takes
-        for (size_t i = 1; i < positions.size(); ++i) {
-            const int diff = positions[i] - positions[i - 1];
-            const Direction dir = globalTables.diffToDir[64 + diff];
-            if (const size_t mask = globalTables.NeighbourTable[positions[i - 1]][dir]; mask & opponent) {
-                captures |= mask;
-            }
-            else {
-                logger::warn("Wrong piece to attack position, try again..\n");
-                return std::nullopt;
-            }
-        }
-    }
-    else if (checkBitAtIdx(t_currBoard.kings[t_colour],positions[0])) {
-        // king takes
-        for (size_t i = 1; i < positions.size(); ++i) {
-            const int diff = positions[i] - positions[i - 1];
-            const Direction dir = globalTables.diffToDir[64 + diff];
-            const size_t mask = bothDiagonalsKingMask(~empty, positions[i - 1])
-                                  & globalTables.rayMasks[positions[i - 1]][dir] & opponent;
-            if (mask > 0 && (1ULL << positions[i] & empty) > 0) {
-                captures |= mask;
-            }
-            else {
-                logger::warn("Something wrong for king move..\n");
-                return std::nullopt;
-            }
-        }
-    }
-    else {
-        logger::warn("Wrong attack move 'from' position, try again..\n");
+    const auto it = std::ranges::find_if(
+    check_moves,
+    [result](const Move& mv) {
+        return mv == result;
+    });
+    if (it == check_moves.end()) {
+        logger::warn("Not allowed move, try again..\n");
         return std::nullopt;
     }
-    return Move(captures, positions);
+    return result;
 }

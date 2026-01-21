@@ -129,6 +129,7 @@ inline std::string stringMove(const PrintingMovePath &t_move)
 // by this struct.
 struct Move
 {
+    Move() = default;
     explicit Move(const int t_fromIdx, const int t_toIdx)
         : from_mask(1ULL << t_fromIdx)
         , to_mask(1ULL << t_toIdx)
@@ -154,6 +155,11 @@ struct Move
     LightMovePath packed_positions;
     MoveKind      kind;
     std::vector<int> positions;
+
+    bool operator==(const Move& t_other) const
+    {
+        return from_mask == t_other.from_mask && to_mask == t_other.to_mask && packed_positions == t_other.packed_positions;
+    }
 };
 
 #endif // MCTS_CHECKERS_MOVE_H
