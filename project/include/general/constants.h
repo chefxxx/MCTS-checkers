@@ -11,7 +11,7 @@ constexpr double C = 2;
 
 constexpr int    DRAW_LIMIT              = 30;
 constexpr double TURN_TIME_MULTIPLICATOR = 0.97;
-constexpr int    ITERATION_CHECK         = 128;
+constexpr int    ITERATION_CHECK         = 1024;
 
 constexpr size_t NOT_FILE_A = 0xFEFEFEFEFEFEFEFEULL;
 constexpr size_t NOT_FILE_H = 0x7F7F7F7F7F7F7F7FULL;

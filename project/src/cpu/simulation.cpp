@@ -7,20 +7,19 @@
 #include <cassert>
 #include <chrono>
 
-MctsNode *runCPU_MCTS(MctsTree &t_tree, const double t_timeLimit)
+MctsNode *runCPU_MCTS(const MctsTree &t_tree, const double t_timeLimit)
 {
-    const auto                start = std::chrono::high_resolution_clock::now();
-    std::chrono::microseconds elapsed;
-    const auto                limit_micro_sec =
-        std::chrono::microseconds(static_cast<long long>(t_timeLimit * 1e6 * TURN_TIME_MULTIPLICATOR));
+    assert(static_cast<long long>(t_timeLimit * 1e6 * TURN_TIME_MULTIPLICATOR) > 0);
+    const auto limit_micro_sec = std::chrono::microseconds(static_cast<long long>(t_timeLimit * 1e6 * TURN_TIME_MULTIPLICATOR));
     int iters = 0;
-    while (elapsed < limit_micro_sec) {
+    const auto start = std::chrono::high_resolution_clock::now();
+    while (true) {
         mctsIteration(t_tree);
         iters++;
         if (iters % ITERATION_CHECK == 0) {
             auto now = std::chrono::high_resolution_clock::now();
-            elapsed  = std::chrono::duration_cast<std::chrono::microseconds>(now - start);
-            if (elapsed > limit_micro_sec) {
+            if (const auto elapsed = std::chrono::duration_cast<std::chrono::microseconds>(now - start);
+                elapsed > limit_micro_sec) {
                 break;
             }
         }

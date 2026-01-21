@@ -8,7 +8,7 @@
 #include "board_infra.h"
 #include "mcts_tree.h"
 
-MctsNode *runCPU_MCTS(MctsTree &t_tree, double t_timeLimit);
+MctsNode *runCPU_MCTS(const MctsTree &t_tree, double t_timeLimit);
 MctsNode *run_DEBUG_MCTS(const MctsTree &t_tree);
 void  mctsIteration(const MctsTree &t_tree);
 

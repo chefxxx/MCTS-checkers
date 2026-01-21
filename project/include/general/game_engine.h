@@ -32,9 +32,11 @@ struct GameManager
 
     void printGameHist() const
     {
+        std::cout << "****** GAME HISTORY ******\n";
         for (const auto &entry : game_hist) {
             std::cout << entry << '\n';
         }
+        std::cout << "****** GAME HISTORY ******\n";
     }
 
     void printBoard() const

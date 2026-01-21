@@ -41,13 +41,15 @@ void GameManager::playTheGame()
         state = checkEndOfGameConditions(board, turn);
         turn = static_cast<Colour>(1 - turn);
     }
+
+    std::cout << "You " << state << "!\n";
 }
 
 void GameManager::aiTurn()
 {
     MctsNode* bestNode = nullptr;
     if (m_mode == "cpu") {
-        bestNode = run_DEBUG_MCTS(mcts_tree);
+        bestNode = runCPU_MCTS(mcts_tree, m_ai_time_per_turn);
     }
     else {
         throw "Not implemented!\n";
