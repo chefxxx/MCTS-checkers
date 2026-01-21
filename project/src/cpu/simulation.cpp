@@ -28,13 +28,13 @@ MctsNode *runCPU_MCTS(MctsTree &t_tree, const double t_timeLimit)
     return chooseBestMove(t_tree);
 }
 
-// Board run_DEBUG_MCTS(MctsTree &t_tree)
-// {
-//     for (int i = 0; i < 1000; ++i) {
-//         mctsIteration(t_tree);
-//     }
-//     return chooseBestMove(t_tree);
-// }
+MctsNode *run_DEBUG_MCTS(const MctsTree &t_tree)
+{
+    for (int i = 0; i < 1000; ++i) {
+        mctsIteration(t_tree);
+    }
+    return chooseBestMove(t_tree);
+}
 
 void mctsIteration(const MctsTree &t_tree)
 {

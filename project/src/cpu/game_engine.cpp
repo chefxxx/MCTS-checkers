@@ -6,6 +6,7 @@
 
 #include <cassert>
 #include <random>
+#include <sys/stat.h>
 
 #include "checkers_engine.h"
 #include "logger.h"
@@ -13,22 +14,49 @@
 
 void GameManager::playTheGame()
 {
+    Colour turn = white;
+    GameState state = CONTINUES;
 
+    if (m_player_colour == white) {
+        printBoard();
+        playerTurn(false);
+        turn = black;
+    }
+
+    mcts_tree.initTree(board, m_ai_colour);
+
+    while (state == CONTINUES) {
+        printGameHist();
+        printBoard();
+
+        if (turn == m_player_colour) {
+            // player
+            playerTurn();
+        }
+        else {
+            // mcts
+            aiTurn();
+        }
+
+        state = checkEndOfGameConditions(board, turn);
+        turn = static_cast<Colour>(1 - turn);
+    }
 }
 
-MctsNode *GameManager::aiTurn()
+void GameManager::aiTurn()
 {
     MctsNode* bestNode = nullptr;
     if (m_mode == "cpu") {
-        bestNode = runCPU_MCTS(mcts_tree, m_ai_time_per_turn);
+        bestNode = run_DEBUG_MCTS(mcts_tree);
     }
     else {
         throw "Not implemented!\n";
     }
     assert(bestNode != nullptr);
-    return bestNode;
+    board = bestNode->current_board_state;
+    mcts_tree.updateRoot(bestNode);
+    game_hist.emplace_back(bestNode->packed_positions_transition.packed_data);
 }
-
 
 std::optional<Move> parsePlayerMove(const Board &t_board, const Colour t_colour)
 {
@@ -43,7 +71,7 @@ std::optional<Move> parsePlayerMove(const Board &t_board, const Colour t_colour)
     return processMoveString(moveStr, t_board, t_colour);
 }
 
-std::tuple<LightMovePath, Board> GameManager::playerTurn() const
+void GameManager::playerTurn(const bool t_midGame)
 {
     while (true) {
         const auto move = parsePlayerMove(board, m_player_colour);
@@ -55,7 +83,14 @@ std::tuple<LightMovePath, Board> GameManager::playerTurn() const
             continue;
         }
 
-        return std::forward_as_tuple(move.value().path, n_board.value());
+        board = n_board.value();
+        game_hist.emplace_back(move->packed_positions.packed_data);
+        if (t_midGame) {
+            const auto node = findPlayerMove(mcts_tree.root.get(), board, move->packed_positions);
+            assert(node != nullptr);
+            mcts_tree.updateRoot(node);
+        }
+        return;
     }
 }
 

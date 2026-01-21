@@ -25,7 +25,17 @@ struct GameManager
         initPerspective();
         board.initStartingBoard();
     }
-    Board board{};
+
+    MctsTree mcts_tree;
+    Board board;
+    std::vector<PrintingMovePath> game_hist;
+
+    void printGameHist() const
+    {
+        for (const auto &entry : game_hist) {
+            std::cout << entry << '\n';
+        }
+    }
 
     void printBoard() const
     {
@@ -70,11 +80,8 @@ struct GameManager
     }
 
     void playTheGame();
-    MctsNode *aiTurn();
-    [[nodiscard]] std::tuple<LightMovePath, Board> playerTurn() const;
-
-    //
-    MctsTree mcts_tree;
+    void aiTurn();
+    void playerTurn(bool t_midGame = true);
 
 private:
     void initPerspective()

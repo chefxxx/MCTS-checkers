@@ -36,7 +36,7 @@ MctsNode *findPlayerMove(const MctsNode *t_root, const Board &t_board, const Lig
 {
     assert(t_root != nullptr);
     for (const auto& child : t_root->children) {
-        if (child->current_board_state == t_board && child->move_that_led_to_this_position == t_move) {
+        if (child->current_board_state == t_board && child->packed_positions_transition == t_move) {
             return child.get();
         }
     }
@@ -67,6 +67,7 @@ MctsNode *selectNode(MctsNode *t_node)
 MctsNode *chooseBestMove(const MctsTree& t_tree)
 {
     const auto root = t_tree.root.get();
+    assert(root->children.size() > 0);
     if (root->children.empty())
         return root;
 
@@ -78,6 +79,7 @@ MctsNode *chooseBestMove(const MctsTree& t_tree)
             robust_child = child.get();
         }
     }
+    assert(robust_child != nullptr);
     return robust_child;
 }
 
@@ -113,12 +115,14 @@ MctsNode* expandNode(MctsNode *t_node)
     assert(next_board_state.has_value());
 
     // create path encoding
-    const auto lp = mv.path;
+    const auto lp = mv.packed_positions;
 
     // add new child
     auto new_child = std::make_unique<MctsNode>(t_node, next_board_state.value(), lp, static_cast<Colour>(1 - t_node->turn_colour));
+    const auto retPtr = new_child.get();
     t_node->children.push_back(std::move(new_child));
-    return new_child.get();
+    assert(retPtr != nullptr);
+    return retPtr;
 }
 
 void backpropagate(MctsNode *t_leaf, const double t_score, const Colour t_aiColour)

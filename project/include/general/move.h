@@ -68,26 +68,26 @@ struct LightMovePath
     }
 
     LightMovePath()
-        : packed_path(None)
+        : packed_data(None)
     {
     }
 
     void pack_path(const std::vector<int> &positions, const bool t_capture)
     {
         // Store the number of squares in the first 4 bits (max 15)
-        packed_path |= positions.size() & 0xF;
-        packed_path |= (t_capture & 1ULL) << 63;
+        packed_data |= positions.size() & 0xF;
+        packed_data |= (t_capture & 1ULL) << 63;
         for (size_t i = 0; i < positions.size() && i < 10; ++i) {
             const size_t square = positions[i] & 0x3F; // 6 bits for 0-63
-            packed_path |= (square << (4 + (i * 6)));
+            packed_data |= (square << (4 + (i * 6)));
         }
     }
 
-    int64_t packed_path = 0ULL;
+    int64_t packed_data = 0ULL;
 
     bool operator==(const LightMovePath &other) const
     {
-        return packed_path == other.packed_path;
+        return packed_data == other.packed_data;
     }
 };
 
@@ -133,7 +133,7 @@ struct Move
         : from_mask(1ULL << t_fromIdx)
         , to_mask(1ULL << t_toIdx)
         , captures_mask(0ull)
-        , path({t_fromIdx, t_toIdx}, false)
+        , packed_positions({t_fromIdx, t_toIdx}, false)
         , kind(MoveKind::quiet)
         , positions({t_fromIdx, t_toIdx})
     {
@@ -142,7 +142,7 @@ struct Move
         : from_mask(1ULL << t_path[0])
         , to_mask(1ULL << t_path[t_path.size() - 1])
         , captures_mask(t_captures)
-        , path(t_path, true)
+        , packed_positions(t_path, true)
         , kind(MoveKind::attack)
         , positions(t_path)
     {
@@ -151,7 +151,7 @@ struct Move
     size_t        from_mask;
     size_t        to_mask;
     size_t        captures_mask;
-    LightMovePath path;
+    LightMovePath packed_positions;
     MoveKind      kind;
     std::vector<int> positions;
 };

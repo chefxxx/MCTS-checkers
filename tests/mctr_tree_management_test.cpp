@@ -36,7 +36,7 @@ TEST(MctsTreeBasicTests, expandNodeTests)
     for (const std::vector moves = {mv0, mv1, mv2, mv3, mv4, mv5, mv6}; const auto &move : moves) {
         const auto newBoard  = applyMove(board, move.value(), white);
         ASSERT_TRUE(newBoard.has_value());
-        const auto foundNode = findPlayerMove(mcts_tree.root.get(), newBoard.value(), move->path);
+        const auto foundNode = findPlayerMove(mcts_tree.root.get(), newBoard.value(), move->packed_positions);
         ASSERT_TRUE(foundNode != nullptr);
     }
 }
@@ -66,7 +66,7 @@ TEST(MctsTreeBasicTests, aiStartsAsBlackInitialization)
     for (const std::vector moves = {mv0, mv1, mv2, mv3, mv4, mv5, mv6}; const auto &move : moves) {
         const auto newBoard  = applyMove(board, move.value(), black);
         ASSERT_TRUE(newBoard.has_value());
-        const auto foundNode = findPlayerMove(mcts_tree.root.get(), newBoard.value(), move->path);
+        const auto foundNode = findPlayerMove(mcts_tree.root.get(), newBoard.value(), move->packed_positions);
         ASSERT_TRUE(foundNode != nullptr) << "At iteration" << i << '\n';
         i++;
     }
@@ -83,7 +83,7 @@ TEST(MctsTreeBasicTests, updateRootTestWhiteStarts)
     }
     const auto move = processMoveString("e3-d4", board, white);
     const auto newBoard  = applyMove(board, move.value(), white).value();
-    const auto node      = findPlayerMove(mcts_tree.root.get(), newBoard, move->path);
+    const auto node      = findPlayerMove(mcts_tree.root.get(), newBoard, move->packed_positions);
     ASSERT_TRUE(node != nullptr);
     mcts_tree.updateRoot(node);
     ASSERT_TRUE(mcts_tree.root.get() != nullptr);
@@ -163,7 +163,7 @@ TEST(MctsTreeBasicTests, gameSimulationTest)
         std::cout << std::to_string(turn) << " plays " << moveStr <<'\n';
         const auto move = processMoveString(moveStr, manager.board, turn);
         manager.board             = applyMove(manager.board, move.value(), turn).value();
-        const auto node           = findPlayerMove(manager.mcts_tree.root.get(), manager.board, move->path);
+        const auto node           = findPlayerMove(manager.mcts_tree.root.get(), manager.board, move->packed_positions);
         ASSERT_TRUE(node != nullptr) << message;
         manager.mcts_tree.updateRoot(node);
         ASSERT_TRUE(manager.mcts_tree.root.get() != nullptr);

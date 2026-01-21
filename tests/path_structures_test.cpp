@@ -18,7 +18,7 @@ TEST(MovePathTest, SimpleMoveNoCapture)
 {
     const std::vector<int> path = {10, 18};
     const LightMovePath    light(path, false);
-    const PrintingMovePath printer(light.packed_path);
+    const PrintingMovePath printer(light.packed_data);
 
     EXPECT_FALSE(printer.capture);
     ExpectVectorsEqual(printer.positions, path);
@@ -29,7 +29,7 @@ TEST(MovePathTest, SingleJumpCapture)
 {
     const std::vector<int> path = {10, 28}; // e.g., jumping over a piece
     const LightMovePath    light(path, true);
-    const PrintingMovePath printer(light.packed_path);
+    const PrintingMovePath printer(light.packed_data);
 
     EXPECT_TRUE(printer.capture);
     ExpectVectorsEqual(printer.positions, path);
@@ -40,7 +40,7 @@ TEST(MovePathTest, MultiJumpSequence)
 {
     const std::vector<int> path = {1, 10, 19, 28, 37};
     const LightMovePath    light(path, true);
-    const PrintingMovePath printer(light.packed_path);
+    const PrintingMovePath printer(light.packed_data);
 
     EXPECT_TRUE(printer.capture);
     ExpectVectorsEqual(printer.positions, path);
@@ -51,7 +51,7 @@ TEST(MovePathTest, BoundaryIndices)
 {
     const std::vector<int> path = {0, 63};
     const LightMovePath    light(path, false);
-    const PrintingMovePath printer(light.packed_path);
+    const PrintingMovePath printer(light.packed_data);
 
     EXPECT_EQ(printer.positions[0], 0);
     EXPECT_EQ(printer.positions[1], 63);
@@ -62,7 +62,7 @@ TEST(MovePathTest, MaxPathLength)
 {
     const std::vector<int> path = {0, 1, 2, 3, 4, 5, 6, 7, 8};
     const LightMovePath    light(path, true);
-    const PrintingMovePath printer(light.packed_path);
+    const PrintingMovePath printer(light.packed_data);
 
     EXPECT_EQ(printer.positions.size(), 9);
     ExpectVectorsEqual(printer.positions, path);
@@ -73,7 +73,7 @@ TEST(MovePathTest, EmptyPath)
 {
     constexpr std::vector<int> path = {};
     const LightMovePath        light(path, false);
-    const PrintingMovePath     printer(light.packed_path);
+    const PrintingMovePath     printer(light.packed_data);
 
     EXPECT_EQ(printer.positions.size(), 0);
     EXPECT_FALSE(printer.capture);
@@ -83,7 +83,7 @@ TEST(MovePrintingTest, SimpleMoveFormat)
 {
     // a1 (0) to b2 (9)
     const LightMovePath light({0, 9}, false);
-    const auto          printer = PrintingMovePath(light.packed_path);
+    const auto          printer = PrintingMovePath(light.packed_data);
 
     EXPECT_EQ(stringMove(printer), "a1-b2");
 }
@@ -93,7 +93,7 @@ TEST(MovePrintingTest, SimpleCaptureFormat)
 {
     // c3 (18) to e5 (36)
     const LightMovePath light({18, 36}, true);
-    const auto          printer = PrintingMovePath(light.packed_path);
+    const auto          printer = PrintingMovePath(light.packed_data);
 
     EXPECT_EQ(stringMove(printer), "c3:e5");
 }
@@ -103,7 +103,7 @@ TEST(MovePrintingTest, MultiJumpFormat)
 {
     // a1 (0) -> c3 (18) -> e5 (36)
     const LightMovePath light({0, 18, 36}, true);
-    const auto          printer = PrintingMovePath(light.packed_path);
+    const auto          printer = PrintingMovePath(light.packed_data);
 
     EXPECT_EQ(stringMove(printer), "a1:c3:e5");
 }
@@ -112,7 +112,7 @@ TEST(MovePrintingTest, MultiJumpFormat)
 TEST(MovePrintingTest, BoundarySquares)
 {
     const LightMovePath light({0, 63}, false);
-    const auto          printer = PrintingMovePath(light.packed_path);
+    const auto          printer = PrintingMovePath(light.packed_data);
 
     EXPECT_EQ(stringMove(printer), "a1-h8");
 }

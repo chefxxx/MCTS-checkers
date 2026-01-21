@@ -30,7 +30,7 @@ struct MctsNode
     }
 
     explicit MctsNode(MctsNode *t_parent, const Board &t_board, const LightMovePath &t_movePath, const Colour t_colour)
-        : move_that_led_to_this_position(t_movePath)
+        : packed_positions_transition(t_movePath)
         , turn_colour(t_colour)
         , parent(t_parent)
         , current_score(0)
@@ -48,7 +48,7 @@ struct MctsNode
 
     // Move applied in this node
     Board current_board_state;
-    LightMovePath move_that_led_to_this_position;
+    LightMovePath packed_positions_transition;
     std::vector<Move> possible_moves;
 
     // from which player perspective

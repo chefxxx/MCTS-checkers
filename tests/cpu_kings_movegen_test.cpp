@@ -151,7 +151,7 @@ TEST(KingsQuietMovesTest, CenterEmptyBoard)
     EXPECT_EQ(moves.size(), 13);
     for (size_t i = 0; i < moves.size(); ++i) {
         constexpr std::array results = {0, 6, 9, 13, 18, 20, 34, 36, 41, 45, 48, 54, 63};
-        auto mv = PrintingMovePath(moves[i].path.packed_path);
+        auto mv = PrintingMovePath(moves[i].packed_positions.packed_data);
         EXPECT_EQ(moves[i].from_mask, 1ULL << kingSq);
         EXPECT_EQ(moves[i].to_mask, 1ULL << results[i]);
         EXPECT_EQ(mv.positions[0], kingSq);
@@ -178,7 +178,7 @@ TEST(KingsQuietMovesTest, BlockedByFriendly)
         constexpr std::array expectedResults = {0, 6, 9, 13, 18, 20, 34, 41, 48};
         EXPECT_EQ(moves[i].from_mask, 1ULL << kingSq);
         EXPECT_EQ(moves[i].to_mask, 1ULL << expectedResults[i]);
-        auto mv = PrintingMovePath(moves[i].path.packed_path);
+        auto mv = PrintingMovePath(moves[i].packed_positions.packed_data);
         EXPECT_EQ(mv.positions[0], kingSq);
         EXPECT_EQ(mv.positions[1], expectedResults[i]);
     }
@@ -231,7 +231,7 @@ TEST(KingsQuietMovesTest, BlockedByOpponent)
     for (size_t i = 0; i < moves.size(); ++i) {
         EXPECT_EQ(moves[i].from_mask, 1ULL << kingSq);
         EXPECT_EQ(moves[i].to_mask, 1ULL << results[i]);
-        auto mv = PrintingMovePath(moves[i].path.packed_path);
+        auto mv = PrintingMovePath(moves[i].packed_positions.packed_data);
         EXPECT_EQ(mv.positions[0], kingSq);
         EXPECT_EQ(mv.positions[1], results[i]);
     }
@@ -258,7 +258,7 @@ TEST(KingsQuietMovesTest, MultipleKingsCorner)
     for (size_t i = 0; i < 6; ++i) {
         EXPECT_EQ(moves[i].from_mask, 1ULL << k1);
         EXPECT_EQ(moves[i].to_mask, 1ULL << resultsK1[i]);
-        auto mv = PrintingMovePath(moves[i].path.packed_path);
+        auto mv = PrintingMovePath(moves[i].packed_positions.packed_data);
         EXPECT_EQ(mv.positions[0], k1);
     }
 
@@ -266,7 +266,7 @@ TEST(KingsQuietMovesTest, MultipleKingsCorner)
         const size_t moveIdx = i + 6;
         EXPECT_EQ(moves[moveIdx].from_mask, 1ULL << k2);
         EXPECT_EQ(moves[moveIdx].to_mask, 1ULL << resultsK1[i]);
-        auto mv = PrintingMovePath(moves[moveIdx].path.packed_path);
+        auto mv = PrintingMovePath(moves[moveIdx].packed_positions.packed_data);
         EXPECT_EQ(mv.positions[0], k2);
     }
 }
@@ -326,7 +326,7 @@ TEST(KingsAttackTest, MandatoryDoubleJump)
         constexpr std::array expectedLandings{54, 63, 54, 63};
         EXPECT_EQ(moves[i].to_mask, 1ULL << expectedLandings[i]);
         EXPECT_EQ(moves[i].from_mask, 1ULL << kingSq);
-        auto mv = PrintingMovePath(moves[i].path.packed_path);
+        auto mv = PrintingMovePath(moves[i].packed_positions.packed_data);
         EXPECT_EQ(mv.positions[0], kingSq);
         EXPECT_EQ(mv.positions[1], expectedMidPoints[i]);
         EXPECT_EQ(mv.positions[2], expectedLandings[i]);
@@ -348,9 +348,9 @@ TEST(KingsAttackTest, MultipleChoicesAndGhostPieceBlocker)
     path.push_back(kingSq);
 
     recursiveCreateAllKingsAttacks(moves, path, kingSq, board, opponents, kings, 0);
-    const auto mv0 = PrintingMovePath(moves[0].path.packed_path);
-    const auto mv1 = PrintingMovePath(moves[1].path.packed_path);
-    const auto mv2 = PrintingMovePath(moves[2].path.packed_path);
+    const auto mv0 = PrintingMovePath(moves[0].packed_positions.packed_data);
+    const auto mv1 = PrintingMovePath(moves[1].packed_positions.packed_data);
+    const auto mv2 = PrintingMovePath(moves[2].packed_positions.packed_data);
     EXPECT_EQ(moves.size(), 3);
     for (int i = 0; i < 3; ++i) {
         constexpr std::array expectedMove1{2, 29, 57};
@@ -397,7 +397,7 @@ TEST(KingsAttackTest, FourWayBranchingAndCompletion)
         constexpr std::array expectedTakes{18, 18, 20, 20, 34, 34, 36, 36, 36};
         constexpr std::array expectedTo{0, 9, 6, 13, 41, 48, 45, 54, 63};
         EXPECT_EQ(moves[i].to_mask, 1ULL << expectedTo[i]);
-        const auto mv = PrintingMovePath(moves[i].path.packed_path);
+        const auto mv = PrintingMovePath(moves[i].packed_positions.packed_data);
         EXPECT_EQ(mv.positions[1], expectedTo[i]);
         EXPECT_EQ(moves[i].captures_mask, 1ULL << expectedTakes[i]);
     }
