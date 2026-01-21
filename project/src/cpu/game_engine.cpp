@@ -125,12 +125,13 @@ std::optional<Move> processMoveString(const std::string &t_moveStr, const Board 
         for (size_t i = 1; i < positions.size(); ++i) {
             const int diff = positions[i] - positions[i - 1];
             const Direction dir = globalTables.diffToDir[64 + diff];
-            if (const size_t mask = bothDiagonalsKingMask(~empty, positions[i - 1])
-                                  & globalTables.rayMasks[positions[i - 1]][dir] & opponent) {
+            const size_t mask = bothDiagonalsKingMask(~empty, positions[i - 1])
+                                  & globalTables.rayMasks[positions[i - 1]][dir] & opponent;
+            if (mask > 0 && (1ULL << positions[i] & empty) > 0) {
                 captures |= mask;
             }
             else {
-                logger::warn("Something wrong..\n");
+                logger::warn("Something wrong for king move..\n");
                 return std::nullopt;
             }
         }
