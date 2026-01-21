@@ -47,7 +47,7 @@ MctsNode *selectNode(MctsNode *t_node)
 {
     assert(t_node != nullptr);
 
-    if (t_node->is_terminal() || !t_node->is_fully_expanded())
+    if (!t_node->is_fully_expanded())
         return t_node;
 
     auto curr_max = std::numeric_limits<double>::min();
@@ -83,16 +83,7 @@ MctsNode *chooseBestMove(const MctsTree& t_tree)
     return robust_child;
 }
 
-int rollout()
-{
-    // TODO: now i use dummy func
-    std::random_device            rd;
-    std::mt19937                  gen(rd());
-    std::uniform_int_distribution distrib(0, 1);
-    return distrib(gen);
-}
-
-int randomChild(const int t_size)
+int randomIdx(const int t_size)
 {
     std::random_device            rd;
     std::mt19937                  gen(rd());
@@ -100,12 +91,38 @@ int randomChild(const int t_size)
     return distrib(gen);
 }
 
+double rollout(const MctsNode *t_node)
+{
+    auto tmp_board = t_node->current_board_state;
+    Colour turn = t_node->turn_colour;
+    const auto parent_colour = static_cast<Colour>(1 - turn);
+    GameState nodeResult;
+    assert(t_node->possible_count() > 0);
+
+    while (true) {
+        const auto moves = generateAllPossibleMoves(tmp_board, turn);
+        const auto rand_mv = moves[randomIdx(moves.size())];
+        const auto opt = applyMove(tmp_board, rand_mv, turn);
+        assert(opt.has_value());
+        tmp_board = opt.value();
+        nodeResult = checkEndOfGameConditions(tmp_board, turn);
+        if (nodeResult != CONTINUES) {
+            break;
+        }
+        turn = static_cast<Colour>(1 - turn);
+    }
+    if (nodeResult == DRAW) {
+        return 0.5;
+    }
+    return turn == parent_colour ? 1.0 : 0.0;
+}
+
 MctsNode* expandNode(MctsNode *t_node)
 {
     assert(!t_node->is_fully_expanded());
 
     // access random child and erase it
-    const auto idx = static_cast<size_t>(randomChild(static_cast<int>(t_node->possible_count())));
+    const auto idx = static_cast<size_t>(randomIdx(static_cast<int>(t_node->possible_count())));
     const auto mv = t_node->possible_moves[idx];
     std::swap(t_node->possible_moves[idx], t_node->possible_moves.back());
     t_node->possible_moves.pop_back();
@@ -125,18 +142,13 @@ MctsNode* expandNode(MctsNode *t_node)
     return retPtr;
 }
 
-void backpropagate(MctsNode *t_leaf, const double t_score, const Colour t_aiColour)
+void backpropagate(MctsNode *t_leaf, const double t_score)
 {
     MctsNode *tmp = t_leaf;
+    double running_score = t_score;
     while (tmp != nullptr) {
-        // If the turn_colour in the current node is the same
-        // as the aiColour it means that this position
-        // is created from opponent's move.
-        // E.g. if a node is black and ai_col is white it means that ai
-        // move led to this position - meaning that if we have a win form
-        // this position we score it as 1.0
-        const double node_score = tmp->turn_colour == t_aiColour ? 1.0 - t_score : t_score;
-        tmp->current_score += node_score;
+        tmp->current_score += running_score;
+        running_score = 1.0 - running_score;
         tmp->number_of_visits++;
         tmp = tmp->parent;
     }

@@ -85,7 +85,7 @@ struct MctsNode
     }
     [[nodiscard]] bool is_fully_expanded() const { return possible_moves.empty(); }
     [[nodiscard]] size_t possible_count() const { return possible_moves.size(); }
-    [[nodiscard]] bool is_terminal() const { return possible_moves.empty() && children.empty(); }
+    //[[nodiscard]] bool is_terminal() const { return possible_moves.empty() && children.empty(); }
 };
 
 
@@ -124,9 +124,9 @@ struct MctsTree
 [[nodiscard]] MctsNode *findPlayerMove(const MctsNode *t_root, const Board &t_board, LightMovePath t_move);
 [[nodiscard]] MctsNode *selectNode(MctsNode *t_node);
 [[nodiscard]] MctsNode *chooseBestMove(const MctsTree& t_tree);
-[[nodiscard]] int       rollout();
+[[nodiscard]] double    rollout(const MctsNode *t_node);
 [[nodiscard]] MctsNode *expandNode(MctsNode *t_node);
-void                    backpropagate(MctsNode *t_leaf, double t_score, Colour t_aiColour);
+void                    backpropagate(MctsNode *t_leaf, double t_score);
 
 
 #endif // MCTS_CHECKERS_MCTS_H

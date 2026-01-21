@@ -41,13 +41,16 @@ void mctsIteration(const MctsTree &t_tree)
     auto selectedNode = selectNode(t_tree.root.get());
 
     // 2. expansion
-    if (!selectedNode->is_terminal()) {
+    if (!selectedNode->is_fully_expanded()) {
         selectedNode = expandNode(selectedNode);
 
         // 3. rollout
-        const auto score = rollout();
+        const auto score = rollout(selectedNode);
 
         // 4. backpropagate
-        backpropagate(selectedNode, score, t_tree.colour_of_ai);
+        backpropagate(selectedNode, score);
+    }
+    else {
+        assert(1 == 0);
     }
 }
