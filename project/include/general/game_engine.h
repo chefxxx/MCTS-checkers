@@ -52,6 +52,12 @@ struct GameManager
                 else if (checkBitAtIdx(board.pawns[black], bitIdx)) {
                     std::cout << "| b ";
                 }
+                else if (checkBitAtIdx(board.kings[white], bitIdx)) {
+                    std::cout << "| W ";
+                }
+                else if (checkBitAtIdx(board.kings[black], bitIdx)) {
+                    std::cout << "| B ";
+                }
                 else {
                     std::cout << "|   ";
                 }
@@ -66,6 +72,9 @@ struct GameManager
     void playTheGame();
     MctsNode *aiTurn();
     [[nodiscard]] std::tuple<LightMovePath, Board> playerTurn() const;
+
+    //
+    MctsTree mcts_tree;
 
 private:
     void initPerspective()
@@ -93,11 +102,9 @@ private:
     std::string m_mode;
     double      m_ai_time_per_turn;
 
-    //
-    MctsTree m_tree;
 };
 
 Colour drawStartingColour();
-std::optional<Move> parsePlayerMove();
-std::optional<Move> processMoveString(const std::string& t_moveStr);
+std::optional<Move> parsePlayerMove(const Board &t_board, Colour t_colour);
+std::optional<Move> processMoveString(const std::string& t_moveStr, const Board &t_currBoard, Colour t_colour);
 #endif // MCTS_CHECKERS_GAME_ENGINE_H

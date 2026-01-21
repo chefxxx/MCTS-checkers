@@ -71,8 +71,8 @@ MctsNode *chooseBestMove(const MctsTree& t_tree)
         return root;
 
     MctsNode *robust_child = root->children[0].get();
-    int max_n              = -1;
-    for (auto &child : root->children) {
+    double max_n           = -1;
+    for (auto const &child : root->children) {
         if (child->number_of_visits > max_n) {
             max_n        = child->number_of_visits;
             robust_child = child.get();
@@ -103,7 +103,7 @@ MctsNode* expandNode(MctsNode *t_node)
     assert(!t_node->is_fully_expanded());
 
     // access random child and erase it
-    const auto idx = static_cast<size_t>(randomChild(t_node->possible_count()));
+    const auto idx = static_cast<size_t>(randomChild(static_cast<int>(t_node->possible_count())));
     const auto mv = t_node->possible_moves[idx];
     std::swap(t_node->possible_moves[idx], t_node->possible_moves.back());
     t_node->possible_moves.pop_back();
