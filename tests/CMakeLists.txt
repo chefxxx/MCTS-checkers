@@ -5,7 +5,6 @@ message(STATUS "Loading tests target...")
 # ------------------------------------------------------------------------------ #
 
 file(GLOB TEST_SOURCES
-        "${CMAKE_CURRENT_SOURCE_DIR}/*.cu"
         "${CMAKE_CURRENT_SOURCE_DIR}/*.cpp"
 )
 
@@ -20,7 +19,7 @@ add_executable(${TEST} ${TEST_SOURCES})
 # ------------------------------------------------------------------------------ #
 
 target_link_libraries(${TEST} PRIVATE
-        ${CUDA_LIB}
+        ${LIB}
         GTest::gtest_main
 )
 
