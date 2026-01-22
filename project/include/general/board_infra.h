@@ -17,15 +17,15 @@ struct Board
     std::array<size_t, 2> pawns{};
     std::array<size_t, 2> kings{};
 
-    uint16_t kings_quiet_moves;
+    uint16_t kings_quiet_moves = 0;
 
     void initStartingBoard()
     {
         constexpr size_t firstRowMask  = 85;
         constexpr size_t secondRowMask = 170;
 
-        pawns[white]      = 0ull;
-        pawns[black]      = 0ull;
+        pawns[white]      = 0ULL;
+        pawns[black]      = 0ULL;
         kings_quiet_moves = 0;
         kings[white]      = 0ULL;
         kings[black]      = 0ULL;
