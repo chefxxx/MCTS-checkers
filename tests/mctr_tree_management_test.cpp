@@ -172,3 +172,51 @@ TEST(MctsTreeBasicTests, gameSimulationTest)
     }
     manager.printBoard();
 }
+
+TEST(MctsTreeBasicTests, anotherGameSimulationTest)
+{
+    GameManager manager{white, 1, "cpu"};
+    manager.mcts_tree.initTree(manager.board, white);
+
+    std::vector<std::string> whiteMoves = {
+        "c3-b4", "e3-f4", "d2:b4", "b4-a5", "g3-h4",
+        "h4:f6:d8", "f2-g3", "a3-b4", "f4:d2", "d8:h4",
+        "b4:d6", "b2-c3", "h4-f6", "f6:d4:a7", "a7-e3",
+        "e3-f4", "f4:b8", "g3-h4", "b8:g3", "g3-e5"
+    };
+
+    std::vector<std::string> blackMoves = {
+        "b6-a5", "a5:c3", "c7-b6", "d8-c7", "f6-g5",
+        "d6-c5", "c5-d4", "d4-e3", "f8-e7", "b6-c5",
+        "c7:e5", "b8-c7", "a7-b6", "g7-f6", "h8-g7",
+        "f6-g5", "g7-f6", "g5-f4", "h6-g5"
+    };
+
+    const std::array plays = {blackMoves, whiteMoves};
+    std::array counters = {0, 0};
+    const size_t each_moves = whiteMoves.size() + blackMoves.size();
+    Colour turn = white;
+    for (size_t i = 0; i < each_moves; ++i) {
+        // manager.printBoard();
+        // expand the tree
+        while (!manager.mcts_tree.root->is_fully_expanded()) {
+            [[maybe_unused]] const auto node = expandNode(manager.mcts_tree.root.get());
+        }
+        const auto idx = counters[turn];
+        const std::string message = "At iteration " + std::to_string(i) + ", turn " + std::to_string(turn);
+        counters[turn]++;
+        const auto moveStr  = plays[turn][idx];
+        std::cout << std::to_string(turn) << " plays " << moveStr <<'\n';
+        const auto move = processMoveString(moveStr, manager.board, turn);
+        manager.board             = applyMove(manager.board, move.value(), turn).value();
+        const auto node           = findPlayerMove(manager.mcts_tree.root.get(), manager.board, move->packed_positions);
+        ASSERT_TRUE(node != nullptr) << message;
+        manager.mcts_tree.updateRoot(node);
+        ASSERT_TRUE(manager.mcts_tree.root.get() != nullptr);
+        ASSERT_TRUE(manager.mcts_tree.root.get() == node);
+        turn = static_cast<Colour>(1- turn);
+    }
+    manager.printBoard();
+    const auto moves = generateAllPossibleMoves(manager.board, black);
+    ASSERT_TRUE(!moves.empty());
+}

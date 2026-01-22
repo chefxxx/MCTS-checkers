@@ -34,12 +34,6 @@ inline std::ostream &operator<<(std::ostream &os, const Colour &t_colour)
     return os << colStr;
 }
 
-inline std::ostream &operator<<(std::ostream &os, const GameState &t_game_state)
-{
-    const std::string colStr = t_game_state == WON ? "won" : "lost";
-    return os << colStr;
-}
-
 // An array to perform branchless
 // sliding move generation.
 //

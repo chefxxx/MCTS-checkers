@@ -47,17 +47,33 @@ MctsNode *selectNode(MctsNode *t_node)
 {
     assert(t_node != nullptr);
 
-    if (!t_node->is_fully_expanded())
+    if (t_node->is_solved() || !t_node->is_fully_expanded())
         return t_node;
 
     auto curr_max = std::numeric_limits<double>::min();
-    MctsNode *best_node = t_node;
+    MctsNode *best_node = nullptr;
     for (const auto &child : t_node->children) {
+        // if child is a win, avoid it
+        if (child->status == NodeStatus::WIN) continue;
+
         if (child->ucb_score() > curr_max) {
             curr_max = child->ucb_score();
             best_node = child.get();
         }
     }
+
+    // if all children are forced losses
+    if (best_node == nullptr) {
+        curr_max = -std::numeric_limits<double>::infinity();
+        for (const auto &child : t_node->children) {
+            if (child->ucb_score() > curr_max) {
+                curr_max = child->ucb_score();
+                best_node = child.get();
+            }
+        }
+    }
+
+    assert(best_node != nullptr);
     return selectNode(best_node);
 }
 
@@ -71,6 +87,18 @@ MctsNode *chooseBestMove(const MctsTree& t_tree)
     if (root->children.empty())
         return root;
 
+    // If found a winning path, choose it
+    for (const auto& child : root->children) {
+        if (child->status == NodeStatus::LOSS) return child.get();
+    }
+
+    // if a win cannot be found look for a draw
+    if (root->status == NodeStatus::DRAW) {
+        for (const auto& child : root->children) {
+            if (child->status == NodeStatus::DRAW) return child.get();
+        }
+    }
+
     MctsNode *robust_child = root->children[0].get();
     double max_n           = -1;
     for (auto const &child : root->children) {
@@ -79,6 +107,7 @@ MctsNode *chooseBestMove(const MctsTree& t_tree)
             robust_child = child.get();
         }
     }
+
     assert(robust_child != nullptr);
     return robust_child;
 }
@@ -144,7 +173,7 @@ void MctsNode::checkNodeStatus()
         status = NodeStatus::LOSS;
         return;
     }
-    if (possible_moves.size() == 0) {
+    if (possible_moves.empty()) {
         status = NodeStatus::LOSS;
         return;
     }
@@ -163,11 +192,11 @@ double rollout(const MctsNode *t_node)
     Colour turn = t_node->turn_colour;
     const auto parent_colour = static_cast<Colour>(1 - turn);
     GameState nodeResult;
-    assert(t_node->possible_moves.size() > 0);
+    assert(!t_node->possible_moves.empty());
 
     while (true) {
         const auto moves = generateAllPossibleMoves(tmp_board, turn);
-        const auto rand_mv = moves[randomIdx(moves.size())];
+        const auto &rand_mv = moves[randomIdx(static_cast<int>(moves.size()))];
         const auto opt = applyMove(tmp_board, rand_mv, turn);
         assert(opt.has_value());
         tmp_board = opt.value();
@@ -188,7 +217,7 @@ MctsNode* expandNode(MctsNode *t_node)
     assert(!t_node->is_fully_expanded());
 
     // access random child and erase it
-    const auto idx = static_cast<size_t>(randomIdx(static_cast<int>(t_node->possible_count())));
+    const auto idx = static_cast<size_t>(randomIdx(static_cast<int>(t_node->possible_moves.size())));
     const auto mv = t_node->possible_moves[idx];
     std::swap(t_node->possible_moves[idx], t_node->possible_moves.back());
     t_node->possible_moves.pop_back();
@@ -215,6 +244,7 @@ void backpropagate(MctsNode *t_leaf, const double t_score)
     while (tmp != nullptr) {
         tmp->current_score += running_score;
         running_score = 1.0 - running_score;
+        updateNodeStatus(tmp);
         tmp->number_of_visits++;
         tmp = tmp->parent;
     }

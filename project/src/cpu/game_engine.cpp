@@ -42,7 +42,13 @@ void GameManager::playTheGame()
         turn = static_cast<Colour>(1 - turn);
     }
 
-    std::cout << "You " << state << "!\n";
+    std::string mess = "Maybe next time, you lost!\n";
+    if (state == DRAW)
+        mess = "Game ended in a draw!\n";
+    if (turn == m_player_colour) {
+        mess = "Congratulations, You won!\n";
+    }
+    std::cout << mess;
 }
 
 void GameManager::aiTurn()
