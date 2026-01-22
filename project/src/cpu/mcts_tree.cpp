@@ -91,8 +91,31 @@ int randomIdx(const int t_size)
     return distrib(gen);
 }
 
+void MctsNode::checkNodeStatus()
+{
+    if (current_board_state.kings_quiet_moves == DRAW_LIMIT) {
+        status = NodeStatus::DRAW;
+        return;
+    }
+    if (!(current_board_state.pawns[turn_colour] | current_board_state.kings[turn_colour])) {
+        status = NodeStatus::LOSS;
+        return;
+    }
+    if (possible_count() == 0) {
+        status = NodeStatus::LOSS;
+        return;
+    }
+    status = NodeStatus::SEARCHING;
+}
+
 double rollout(const MctsNode *t_node)
 {
+    // Note:
+    //
+    // This rollout function returns the result
+    // in the perspective of the node that is the
+    // parent of the t_node.
+    //
     auto tmp_board = t_node->current_board_state;
     Colour turn = t_node->turn_colour;
     const auto parent_colour = static_cast<Colour>(1 - turn);

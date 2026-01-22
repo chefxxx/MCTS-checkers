@@ -6,6 +6,7 @@
 
 #include <cassert>
 #include <chrono>
+#include <random>
 
 MctsNode *runCPU_MCTS(const MctsTree &t_tree, const double t_timeLimit)
 {

@@ -13,8 +13,6 @@
 #include "cpu_movegen.h"
 #include "move.h"
 
-enum class NodeStatus { SEARCHING, WIN, LOSS, DRAW };
-
 // class to manage mcts tree on the cpu
 
 struct MctsNode
@@ -37,7 +35,8 @@ struct MctsNode
         , number_of_visits(0)
     {
         current_board_state = t_board;
-        possible_moves = generateAllPossibleMoves(t_board, t_colour);
+        possible_moves = generateAllPossibleMoves(current_board_state, turn_colour);
+        checkNodeStatus();
     }
 
     ~MctsNode() = default;
@@ -54,7 +53,7 @@ struct MctsNode
     // from which player perspective
     // moves from this node's position are played
     Colour turn_colour;
-    NodeStatus status = NodeStatus::SEARCHING;
+    NodeStatus status;
 
     // ---------------
     // Tree management
@@ -85,6 +84,7 @@ struct MctsNode
     }
     [[nodiscard]] bool is_fully_expanded() const { return possible_moves.empty(); }
     [[nodiscard]] size_t possible_count() const { return possible_moves.size(); }
+    void                 checkNodeStatus();
     //[[nodiscard]] bool is_terminal() const { return possible_moves.empty() && children.empty(); }
 };
 
@@ -127,6 +127,7 @@ struct MctsTree
 [[nodiscard]] double    rollout(const MctsNode *t_node);
 [[nodiscard]] MctsNode *expandNode(MctsNode *t_node);
 void                    backpropagate(MctsNode *t_leaf, double t_score);
+int                     randomIdx(int t_size);
 
 
 #endif // MCTS_CHECKERS_MCTS_H

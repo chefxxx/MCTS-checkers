@@ -23,10 +23,9 @@ constexpr size_t PROMOTION_WHITE = 0xFF00000000000000ULL;
 
 constexpr size_t promotion[2]{PROMOTION_BLACK, PROMOTION_WHITE};
 
+enum class NodeStatus { SEARCHING, WIN, LOSS, DRAW };
 enum Direction { UP_RIGHT = 0, UP_LEFT = 1, DOWN_RIGHT = 2, DOWN_LEFT = 3 };
-
 enum GameState { LOST = 0, DRAW = 1, WON = 2, CONTINUES = 3 };
-
 enum Colour { black = 0, white = 1, none = 2 };
 
 inline std::ostream &operator<<(std::ostream &os, const Colour &t_colour)

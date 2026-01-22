@@ -15,7 +15,7 @@ int main(const int argc, const char **argv)
     const double time = std::stoi(argv[2]);
 
     logger::info("Welcome to checkers.mcts!\n");
-    logger::info("Press any key to draw a colour and start the game...");
+    logger::info("Press enter to draw a colour and start the game...");
     std::cin.get();
     const auto playerColour = drawStartingColour();
     logger::info("You are {}!\n\n", playerColour);
