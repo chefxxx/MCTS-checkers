@@ -91,6 +91,49 @@ int randomIdx(const int t_size)
     return distrib(gen);
 }
 
+void updateNodeStatus(MctsNode *t_node)
+{
+    if (t_node->is_solved())
+        return;
+
+    // Here we know that the node is fully expanded
+    // and that it is not solved.
+
+    // If one of the children is a loss - this is a win
+    auto it =  std::ranges::find_if(t_node->children, [](const std::unique_ptr<MctsNode>& child) {
+        return child->status == NodeStatus::LOSS;
+    });
+    if (it != t_node->children.end()) {
+        t_node->status = NodeStatus::WIN;
+        return;
+    }
+
+    // To prove a win we only need to find one winning path
+    if (!t_node->is_fully_expanded()) return;
+
+    // If we are at this point we know that there is no child marked as a LOSS
+    // only options are WIN, DRAW, SEARCHING.
+
+    // Check if all children are solved nodes
+    const bool all_solved = std::ranges::all_of(t_node->children, [](const auto& child) {
+        return child->is_solved();
+    });
+    if (!all_solved) return;
+
+    // Here we know that the children nodes are only DRAW or WIN,
+    // if we find any DRAW node, this node is forced draw
+    it = std::ranges::find_if(t_node->children, [](const std::unique_ptr<MctsNode>& child) {
+    return child->status == NodeStatus::DRAW;
+    });
+
+    if (it != t_node->children.end()) {
+        t_node->status = NodeStatus::DRAW;
+    } else {
+        // Every single child is a WIN for the opponent.
+        t_node->status = NodeStatus::LOSS;
+    }
+}
+
 void MctsNode::checkNodeStatus()
 {
     if (current_board_state.kings_quiet_moves == DRAW_LIMIT) {
@@ -101,7 +144,7 @@ void MctsNode::checkNodeStatus()
         status = NodeStatus::LOSS;
         return;
     }
-    if (possible_count() == 0) {
+    if (possible_moves.size() == 0) {
         status = NodeStatus::LOSS;
         return;
     }
@@ -120,7 +163,7 @@ double rollout(const MctsNode *t_node)
     Colour turn = t_node->turn_colour;
     const auto parent_colour = static_cast<Colour>(1 - turn);
     GameState nodeResult;
-    assert(t_node->possible_count() > 0);
+    assert(t_node->possible_moves.size() > 0);
 
     while (true) {
         const auto moves = generateAllPossibleMoves(tmp_board, turn);

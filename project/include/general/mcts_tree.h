@@ -92,7 +92,7 @@ struct MctsNode
         return current_score / number_of_visits + C * std::sqrt(std::log(parent_visits()) / number_of_visits);
     }
     [[nodiscard]] bool is_fully_expanded() const { return possible_moves.empty(); }
-    [[nodiscard]] size_t possible_count() const { return possible_moves.size(); }
+    //[[nodiscard]] size_t possible_count() const { return possible_moves.size(); }
     [[nodiscard]] bool is_solved() const { return status != NodeStatus::SEARCHING; }
     void          checkNodeStatus();
 };
@@ -137,6 +137,6 @@ struct MctsTree
 [[nodiscard]] MctsNode *expandNode(MctsNode *t_node);
 void                    backpropagate(MctsNode *t_leaf, double t_score);
 int                     randomIdx(int t_size);
-
+void                    updateNodeStatus(MctsNode *t_node);
 
 #endif // MCTS_CHECKERS_MCTS_H
