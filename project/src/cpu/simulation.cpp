@@ -42,16 +42,20 @@ void mctsIteration(const MctsTree &t_tree)
     auto selectedNode = selectNode(t_tree.root.get());
 
     // 2. expansion
-    if (!selectedNode->is_fully_expanded()) {
+    if (!selectedNode->is_solved() && !selectedNode->is_fully_expanded())
         selectedNode = expandNode(selectedNode);
 
-        // 3. rollout
-        const auto score = rollout(selectedNode);
-
-        // 4. backpropagate
-        backpropagate(selectedNode, score);
+    // 3. rollout or score
+    double score = 0.5;
+    if (selectedNode->is_solved()) {
+        if (selectedNode->status == NodeStatus::WIN)       score = 1.0;
+        else if (selectedNode->status == NodeStatus::LOSS) score = 0.0;
+        else                                               score = 0.5;
     }
     else {
-        assert(1 == 0);
+        score = rollout(selectedNode);
     }
+
+    // 4. backpropagate
+    backpropagate(selectedNode, score);
 }

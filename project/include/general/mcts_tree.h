@@ -17,6 +17,14 @@
 
 struct MctsNode
 {
+
+    /**
+     * @brief This is a root constructor.
+     *
+     * @param t_parent
+     * @param t_board
+     * @param t_colour
+     */
     explicit MctsNode(MctsNode *t_parent, const Board &t_board, const Colour t_colour)
         : turn_colour(t_colour)
         , parent(t_parent)
@@ -25,6 +33,7 @@ struct MctsNode
     {
         current_board_state = t_board;
         possible_moves = generateAllPossibleMoves(t_board, t_colour);
+        status = NodeStatus::SEARCHING;
     }
 
     explicit MctsNode(MctsNode *t_parent, const Board &t_board, const LightMovePath &t_movePath, const Colour t_colour)
@@ -84,8 +93,8 @@ struct MctsNode
     }
     [[nodiscard]] bool is_fully_expanded() const { return possible_moves.empty(); }
     [[nodiscard]] size_t possible_count() const { return possible_moves.size(); }
-    void                 checkNodeStatus();
-    //[[nodiscard]] bool is_terminal() const { return possible_moves.empty() && children.empty(); }
+    [[nodiscard]] bool is_solved() const { return status != NodeStatus::SEARCHING; }
+    void          checkNodeStatus();
 };
 
 
