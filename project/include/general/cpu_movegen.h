@@ -12,9 +12,13 @@
 #include "constants.h"
 #include "move.h"
 
-#if WIN32
+#if __WIN32__
 #include <stdlib.h>
 inline size_t byte_swap64(const size_t x) { return _byteswap_uint64(x); }
+#elif __APPLE__
+inline size_t byte_swap64(const size_t x) {
+  return __builtin_bswap64(x);
+}
 #else
 #include <byteswap.h>
 inline size_t byte_swap64(const size_t x) { return __bswap_64(x); }
