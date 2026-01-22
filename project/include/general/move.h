@@ -135,8 +135,10 @@ struct Move
         , to_mask(1ULL << t_toIdx)
         , captures_mask(0ull)
         , packed_positions({t_fromIdx, t_toIdx}, false)
+#ifndef NDEBUG
         , kind(MoveKind::quiet)
         , positions({t_fromIdx, t_toIdx})
+#endif
     {
     }
     explicit Move(const size_t t_captures, const std::vector<int>& t_path)
@@ -144,8 +146,10 @@ struct Move
         , to_mask(1ULL << t_path[t_path.size() - 1])
         , captures_mask(t_captures)
         , packed_positions(t_path, true)
+#ifndef NDEBUG
         , kind(MoveKind::attack)
         , positions(t_path)
+#endif
     {
     }
 
@@ -153,9 +157,10 @@ struct Move
     size_t        to_mask;
     size_t        captures_mask;
     LightMovePath packed_positions;
+#ifndef NDEBUG
     MoveKind      kind;
     std::vector<int> positions;
-
+#endif
     bool operator==(const Move& t_other) const
     {
         return from_mask == t_other.from_mask && to_mask == t_other.to_mask && packed_positions == t_other.packed_positions;

@@ -71,6 +71,10 @@ std::optional<Move> parsePlayerMove(const Board &t_board, const Colour t_colour)
     logger::info("Please enter your move...\n");
     std::string moveStr;
     std::getline(std::cin, moveStr);
+    if (moveStr == "resign") {
+        std::cout << "I guess the bot is too strong, but you can try again!\n";
+        exit(EXIT_SUCCESS);
+    }
     if (moveStr.size() < 5) {
         logger::warn("Wrong move format, try again!\n");
         return std::nullopt;
