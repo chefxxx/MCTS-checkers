@@ -54,8 +54,8 @@ void mctsIteration(const MctsTree &t_tree)
     // 3. rollout or score
     double score;
     if (selectedNode->is_solved()) {
-        if (selectedNode->status == NodeStatus::WIN)       score = 1.0;
-        else if (selectedNode->status == NodeStatus::LOSS) score = 0.0;
+        if (selectedNode->status == NodeStatus::WIN)       score = 0.0;
+        else if (selectedNode->status == NodeStatus::LOSS) score = 1.0;
         else                                               score = 0.5;
     }
     else {
