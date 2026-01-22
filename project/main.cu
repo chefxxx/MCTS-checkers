@@ -14,7 +14,7 @@ int main(const int argc, const char **argv)
     const std::string mode = argv[1];
     const double time = std::stoi(argv[2]);
 
-    std::cout << "******************************************** RULESET ******************************************\n";
+    std::cout << "******************************************* RULESET *******************************************\n";
     std::cout << "* 0. Welcome to checkers.mcts!                                                                *\n";
     std::cout << "* 1. Quiet moves are marked as (from)-(to).                                                   *\n";
     std::cout << "* 2. Attack moves are marked as (from):(mid):(to).                                            *\n";
@@ -24,7 +24,7 @@ int main(const int argc, const char **argv)
     std::cout << "* 6. There is no limit of taking opponents pieces in one attack move.                         *\n";
     std::cout << "* 7. At any point of the game you can resign, by writing 'resign'.                            *\n";
     std::cout << "* 8. Have fun!                                                                                *\n";
-    std::cout << "******************************************** RULESET ******************************************\n\n";
+    std::cout << "******************************************* RULESET *******************************************\n\n";
     logger::info("Press enter to draw a colour and start the game...");
     std::cin.get();
     const auto playerColour = drawStartingColour();
