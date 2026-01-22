@@ -41,11 +41,11 @@ void GameManager::playTheGame()
         state = checkEndOfGameConditions(board, turn);
         turn = static_cast<Colour>(1 - turn);
     }
-
+    printBoard();
     std::string mess = "Maybe next time, you lost!\n";
     if (state == DRAW)
         mess = "Game ended in a draw!\n";
-    if (turn == m_player_colour) {
+    if (turn == m_ai_colour) {
         mess = "Congratulations, You won!\n";
     }
     std::cout << mess;
