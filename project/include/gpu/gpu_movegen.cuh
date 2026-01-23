@@ -128,10 +128,11 @@ __device__ __forceinline__ GPU_Move make_pawn_attack(curandState *t_state, const
     return GPU_Move(1ULL, 1ULL, 1ULL);
 }
 
-__device__ __forceinline__ GPU_Move make_king_quiet(curandState *t_state, const int t_idx)
+__device__ __forceinline__ GPU_Move make_king_quiet(curandState *t_state, const int t_idx, const size_t t_boardState)
 {
-    // TODO: implement this func
-    return GPU_Move(1ULL, 1ULL, 1ULL);
+    const size_t move_mask  = both_diagonals_king_mask_gpu(t_boardState, t_idx) & ~t_boardState; // & with empty
+    const int to = pick_random_bit(move_mask, t_state);
+    return GPU_Move(1ULL << t_idx, 1ULL << to, 0ULL);
 }
 
 __device__ __forceinline__ GPU_Move make_pawn_quiet(curandState *t_state,
