@@ -23,10 +23,6 @@ inline size_t byte_swap64(const size_t x) { return __bswap_64(x); }
 
 std::vector<Move> generateAllPossibleMoves(const Board &t_board, Colour t_color);
 
-// Pawns move and attack mask creation functions
-size_t pawns_attack_mask_gpu(size_t t_attackerPawns, size_t t_opponentPieces, size_t t_emptyFiles);
-size_t getPawnsQuietMovesMask(size_t t_moversPawns, size_t t_emptyFiles, Colour t_moversColour);
-
 // Kings move and attack mask creation functions
 size_t diagonalKingMask(size_t t_boardState, int t_kingSquare);
 size_t antiDiagonalKingMask(size_t t_boardState, int t_kingSquare);
