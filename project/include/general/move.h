@@ -85,10 +85,7 @@ struct LightMovePath
 
     int64_t packed_data = 0ULL;
 
-    bool operator==(const LightMovePath &other) const
-    {
-        return packed_data == other.packed_data;
-    }
+    bool operator==(const LightMovePath &other) const { return packed_data == other.packed_data; }
 };
 
 struct PrintingMovePath
@@ -141,7 +138,7 @@ struct Move
 #endif
     {
     }
-    explicit Move(const size_t t_captures, const std::vector<int>& t_path)
+    explicit Move(const size_t t_captures, const std::vector<int> &t_path)
         : from_mask(1ULL << t_path[0])
         , to_mask(1ULL << t_path[t_path.size() - 1])
         , captures_mask(t_captures)
@@ -158,12 +155,13 @@ struct Move
     size_t        captures_mask;
     LightMovePath packed_positions;
 #ifndef NDEBUG
-    MoveKind      kind;
+    MoveKind         kind;
     std::vector<int> positions;
 #endif
-    bool operator==(const Move& t_other) const
+    bool operator==(const Move &t_other) const
     {
-        return from_mask == t_other.from_mask && to_mask == t_other.to_mask && packed_positions == t_other.packed_positions;
+        return from_mask == t_other.from_mask && to_mask == t_other.to_mask
+            && packed_positions == t_other.packed_positions;
     }
 };
 

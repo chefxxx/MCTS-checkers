@@ -43,5 +43,9 @@ constexpr int canMove[2][4] = {
     {1, 1, 0, 0}  // this represents white
 };
 
+// CUDA parts
+
+#define CUDA_CHECK_KERNEL() getLastCudaError("Kernel failed...")
+#define CUDA_SYNC_CHECK()   checkCudaErrors(cudaDeviceSynchronize())
 
 #endif // MCTS_CHECKERS_CONSTANTS_H

@@ -10,6 +10,6 @@
 
 MctsNode *runCPU_MCTS(const MctsTree &t_tree, double t_timeLimit);
 MctsNode *run_DEBUG_MCTS(const MctsTree &t_tree);
-void  mctsIteration(const MctsTree &t_tree);
+void      mctsIteration(const MctsTree &t_tree);
 
 #endif // MCTS_CHECKERS_CPU_SIMULATION_H

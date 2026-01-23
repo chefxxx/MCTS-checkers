@@ -151,7 +151,7 @@ TEST(KingsQuietMovesTest, CenterEmptyBoard)
     EXPECT_EQ(moves.size(), 13);
     for (size_t i = 0; i < moves.size(); ++i) {
         constexpr std::array results = {0, 6, 9, 13, 18, 20, 34, 36, 41, 45, 48, 54, 63};
-        auto mv = PrintingMovePath(moves[i].packed_positions.packed_data);
+        auto                 mv      = PrintingMovePath(moves[i].packed_positions.packed_data);
         EXPECT_EQ(moves[i].from_mask, 1ULL << kingSq);
         EXPECT_EQ(moves[i].to_mask, 1ULL << results[i]);
         EXPECT_EQ(mv.positions[0], kingSq);

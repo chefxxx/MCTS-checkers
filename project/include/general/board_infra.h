@@ -43,14 +43,12 @@ struct Board
 
     bool operator==(const Board &other) const
     {
-        return pawns[white] == other.pawns[white] && pawns[black] == other.pawns[black] &&
-               kings[white] == other.kings[white] && kings[black] == other.kings[black] &&
-                   kings_quiet_moves == other.kings_quiet_moves;
-
+        return pawns[white] == other.pawns[white] && pawns[black] == other.pawns[black]
+            && kings[white] == other.kings[white] && kings[black] == other.kings[black]
+            && kings_quiet_moves == other.kings_quiet_moves;
     }
     bool operator!=(const Board &other) const { return !(*this == other); }
 };
-
 
 
 #endif

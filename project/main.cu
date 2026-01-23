@@ -12,7 +12,7 @@ int main(const int argc, const char **argv)
         usage();
     }
     const std::string mode = argv[1];
-    const double time = std::stoi(argv[2]);
+    const double      time = std::stoi(argv[2]);
 
     std::cout << "******************************************* RULESET *******************************************\n";
     std::cout << "* 0. Welcome to checkers.mcts!                                                                *\n";

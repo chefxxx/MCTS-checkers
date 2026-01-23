@@ -14,8 +14,9 @@ MctsNode *runCPU_MCTS(const MctsTree &t_tree, const double t_timeLimit)
         return chooseBestMove(t_tree);
     }
     assert(static_cast<long long>(t_timeLimit * 1e6 * TURN_TIME_MULTIPLICATOR) > 0);
-    const auto limit_micro_sec = std::chrono::microseconds(static_cast<long long>(t_timeLimit * 1e6 * TURN_TIME_MULTIPLICATOR));
-    int iters = 0;
+    const auto limit_micro_sec =
+        std::chrono::microseconds(static_cast<long long>(t_timeLimit * 1e6 * TURN_TIME_MULTIPLICATOR));
+    int        iters = 0;
     const auto start = std::chrono::high_resolution_clock::now();
     while (true) {
         mctsIteration(t_tree);
@@ -54,9 +55,12 @@ void mctsIteration(const MctsTree &t_tree)
     // 3. rollout or score
     double score;
     if (selectedNode->is_solved()) {
-        if (selectedNode->status == NodeStatus::WIN)       score = 0.0;
-        else if (selectedNode->status == NodeStatus::LOSS) score = 1.0;
-        else                                               score = 0.5;
+        if (selectedNode->status == NodeStatus::WIN)
+            score = 0.0;
+        else if (selectedNode->status == NodeStatus::LOSS)
+            score = 1.0;
+        else
+            score = 0.5;
     }
     else {
         score = rollout(selectedNode);

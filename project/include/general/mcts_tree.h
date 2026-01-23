@@ -32,8 +32,8 @@ struct MctsNode
         , number_of_visits(0)
     {
         current_board_state = t_board;
-        possible_moves = generateAllPossibleMoves(t_board, t_colour);
-        status = NodeStatus::SEARCHING;
+        possible_moves      = generateAllPossibleMoves(t_board, t_colour);
+        status              = NodeStatus::SEARCHING;
     }
 
     explicit MctsNode(MctsNode *t_parent, const Board &t_board, const LightMovePath &t_movePath, const Colour t_colour)
@@ -44,7 +44,8 @@ struct MctsNode
         , number_of_visits(0)
     {
         current_board_state = t_board;
-        possible_moves = generateAllPossibleMoves(current_board_state, turn_colour);
+        possible_moves      = generateAllPossibleMoves(current_board_state, turn_colour);
+        status              = NodeStatus::SEARCHING;
         checkNodeStatus();
     }
 
@@ -55,13 +56,13 @@ struct MctsNode
     // -------------------
 
     // Move applied in this node
-    Board current_board_state;
-    LightMovePath packed_positions_transition;
+    Board             current_board_state;
+    LightMovePath     packed_positions_transition;
     std::vector<Move> possible_moves;
 
     // from which player perspective
     // moves from this node's position are played
-    Colour turn_colour;
+    Colour     turn_colour;
     NodeStatus status;
 
     // ---------------
@@ -94,7 +95,7 @@ struct MctsNode
     [[nodiscard]] bool is_fully_expanded() const { return possible_moves.empty(); }
     //[[nodiscard]] size_t possible_count() const { return possible_moves.size(); }
     [[nodiscard]] bool is_solved() const { return status != NodeStatus::SEARCHING; }
-    void          checkNodeStatus();
+    void               checkNodeStatus();
 };
 
 
@@ -124,7 +125,7 @@ struct MctsTree
 
     void initTree(const Board &t_board, const Colour t_colour)
     {
-        root = std::make_unique<MctsNode>(nullptr, t_board, t_colour);
+        root         = std::make_unique<MctsNode>(nullptr, t_board, t_colour);
         colour_of_ai = t_colour;
     }
     void updateRoot(const MctsNode *t_new_root);
@@ -132,7 +133,7 @@ struct MctsTree
 
 [[nodiscard]] MctsNode *findPlayerMove(const MctsNode *t_root, const Board &t_board, LightMovePath t_move);
 [[nodiscard]] MctsNode *selectNode(MctsNode *t_node);
-[[nodiscard]] MctsNode *chooseBestMove(const MctsTree& t_tree);
+[[nodiscard]] MctsNode *chooseBestMove(const MctsTree &t_tree);
 [[nodiscard]] double    rollout(const MctsNode *t_node);
 [[nodiscard]] MctsNode *expandNode(MctsNode *t_node);
 void                    backpropagate(MctsNode *t_leaf, double t_score);

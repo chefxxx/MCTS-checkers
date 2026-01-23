@@ -6,6 +6,4 @@
 
 #include "game_engine.h"
 
-TEST(GameTest, whiteTest) {
-    ASSERT_TRUE(true);
-}
+TEST(GameTest, whiteTest) { ASSERT_TRUE(true); }

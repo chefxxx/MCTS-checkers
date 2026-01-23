@@ -16,7 +16,7 @@
 
 struct GameManager
 {
-    explicit GameManager(const Colour t_perspective, const double t_ai_time, const std::string& t_mode)
+    explicit GameManager(const Colour t_perspective, const double t_ai_time, const std::string &t_mode)
         : m_player_colour(t_perspective)
         , m_ai_colour(static_cast<Colour>(1 - t_perspective))
         , m_mode(t_mode)
@@ -26,8 +26,8 @@ struct GameManager
         board.initStartingBoard();
     }
 
-    MctsTree mcts_tree;
-    Board board;
+    MctsTree                      mcts_tree;
+    Board                         board;
     std::vector<PrintingMovePath> game_hist;
 
     void printGameHist() const
@@ -110,10 +110,9 @@ private:
     Colour      m_ai_colour;
     std::string m_mode;
     double      m_ai_time_per_turn;
-
 };
 
-Colour drawStartingColour();
+Colour              drawStartingColour();
 std::optional<Move> parsePlayerMove(const Board &t_board, Colour t_colour);
-std::optional<Move> processMoveString(const std::string& t_moveStr, const Board &t_currBoard, Colour t_colour);
+std::optional<Move> processMoveString(const std::string &t_moveStr, const Board &t_currBoard, Colour t_colour);
 #endif // MCTS_CHECKERS_GAME_ENGINE_H
