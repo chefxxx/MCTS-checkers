@@ -8,15 +8,15 @@
 #include <atomic>
 #include <cassert>
 #include <cuda_runtime_api.h>
-#include <iostream>
 #include <memory>
 #include <type_traits>
+#include <vector>
 
 #include "helper_cuda.h"
 #include "logger.h"
 
-namespace cuda {
-template <class T> concept cuda_pointerable_type = std::is_array_v<T> == !std::is_array_v<T> && !std::is_pointer_v<T>;
+namespace mem_cuda {
+template <class T> concept cuda_pointerable_type = !std::is_array_v<T> && !std::is_pointer_v<T>;
 
 template <cuda_pointerable_type U> struct cuda_deleter
 {
@@ -361,6 +361,36 @@ template <cuda_pointerable_type T> shared_ptr<T> make_shared(const size_t count 
     checkCudaErrors(cudaMalloc(reinterpret_cast<void **>(&devPtr), sizeof(T) * count));
     return shared_ptr<T>(devPtr);
 }
+
+// ---------------------
+// Metaprogramming utils
+// ---------------------
+
+template <typename Type>
+__host__ std::tuple<unique_ptr<Type>, unique_ptr<Type>> allocateGPU_Pair(const size_t t_count)
+{
+    auto d_A = mem_cuda::make_unique<Type>(t_count);
+    auto d_B = mem_cuda::make_unique<Type>(t_count);
+    return std::make_tuple(std::move(d_A), std::move(d_B));
+}
+
+template <typename... Types>
+__host__ std::tuple<unique_ptr<Types>...> allocateGPU_AnySameSize(const size_t t_count)
+{
+    return std::tuple<unique_ptr<Types>...>(mem_cuda::make_unique<Types>(t_count)...);
+}
+
+template <typename Type> __host__ unique_ptr<Type> allocateAndCopyGPU_FromHostVector(std::vector<Type> t_host)
+{
+    auto d_ptr = mem_cuda::make_unique<Type>(t_host.size());
+    checkCudaErrors(cudaMemcpy(d_ptr.get(), t_host.data(), sizeof(Type) * t_host.size(), cudaMemcpyHostToDevice));
+    return d_ptr;
+}
+
 } // namespace cuda
+
+
+
+
 
 #endif
