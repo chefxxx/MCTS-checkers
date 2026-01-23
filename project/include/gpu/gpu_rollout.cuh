@@ -5,8 +5,9 @@
 #ifndef GPU_ROLLOUT_CUH
 #define GPU_ROLLOUT_CUH
 
-#include "../cpu/mcts_tree.h"
+#include "mcts_tree.h"
 
 double rollout_gpu(const MctsNode *t_node);
+
 
 #endif

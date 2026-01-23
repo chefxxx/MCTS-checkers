@@ -4,6 +4,7 @@
 
 #include <gtest/gtest.h>
 
+#include "common.cuh"
 #include "cpu_movegen.h"
 
 // white: 10, 14, 34

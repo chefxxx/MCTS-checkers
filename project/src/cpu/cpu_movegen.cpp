@@ -7,6 +7,7 @@
 #include <cassert>
 
 #include "bit_operations.cuh"
+#include "common.cuh"
 #include "lookup_tables.h"
 
 std::vector<Move> generateAllPossibleMoves(const Board &t_board, const Colour t_color)
@@ -226,7 +227,7 @@ void recursiveCreatePawnsAttacks(std::vector<Move> &t_allMoves,
             // update masks
             foundJump = true;
 
-            const auto new_empty       = (t_emptyFiles | 1ULL << t_idx) & ~jump_mask;
+            const auto new_empty          = (t_emptyFiles | 1ULL << t_idx) & ~jump_mask;
             const auto new_currentVictims = t_currentVictimsMask | victim_mask;
 
             const auto new_idx = popLsb(jump_mask);

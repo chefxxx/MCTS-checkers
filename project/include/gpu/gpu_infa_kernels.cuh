@@ -14,7 +14,6 @@
 // -------------------------------------
 // Constant memory variables definitions
 // -------------------------------------
-
 __constant__ inline GPU_Board d_initBoard;
 
 __global__ void rollout_kernel(curandState *t_stateBuff, const Colour t_startingTurn)

@@ -4,12 +4,14 @@
 
 #include <gtest/gtest.h>
 
-#include "../project/include/gpu/gpu_rollout.cuh"
+#include "gpu_movegen.cuh"
+#include "gpu_rollout.cuh"
 
 TEST(GpuRolloutTests, firstTest)
 {
     Board board;
     board.initStartingBoard();
     const MctsNode node{nullptr, board, white};
-    const auto     result = rollout_gpu(&node);
+    prepare_gpu_const_mem();
+    const auto result = rollout_gpu(&node);
 }

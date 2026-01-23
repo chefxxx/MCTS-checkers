@@ -7,7 +7,6 @@
 
 #include <vector>
 
-#include "../gpu/common.cuh"
 #include "bit_operations.cuh"
 #include "board_infra.h"
 #include "constants.h"
