@@ -21,6 +21,7 @@ __constant__ inline size_t    d_JumpTable[64][4];
 __constant__ inline size_t    d_diagonalMaskEx[64];
 __constant__ inline size_t    d_anitDiagonalMaskEx[64];
 __constant__ inline int       d_canMove[2][4];
+__constant__ inline size_t    d_rayMask[64][4];
 
 __device__ __forceinline__ size_t get_pawns_quiet_gpu(const size_t t_moversPawns,
                                                       const size_t t_emptyFiles,
@@ -117,13 +118,43 @@ __device__ __forceinline__ int pick_random_bit(size_t t_mask, curandState *t_sta
     return getLsb(t_mask);
 }
 
-__device__ __forceinline__ GPU_Move make_king_attack(curandState *t_state, const int t_idx)
+__device__ __forceinline__ GPU_Move make_king_attack(curandState *t_state, const int t_idx, size_t t_boardState, const size_t t_opponentPieces)
 {
-    // TODO: implement this func
-    return GPU_Move(1ULL, 1ULL, 1ULL);
+    size_t current_victims = 0ULL;
+    int curr_pos = t_idx;
+    while (true) {
+        size_t real_victims = 0ULL;
+        size_t blockers = both_diagonals_king_mask_gpu(t_boardState, curr_pos) & t_opponentPieces & ~current_victims;
+        while (blockers) {
+            const int v_idx     = popLsb(blockers);
+            const int diff      = v_idx - curr_pos;
+            const Direction dir = d_diffToDir[diff + 64];
+            real_victims |= d_NeighbourTable[v_idx][dir] & ~t_boardState ? 1ULL << v_idx : 0ULL;
+        }
+        if (real_victims == 0)
+            break;
+        const int chosen_victim = pick_random_bit(real_victims, t_state);
+        const int diff = chosen_victim - curr_pos;
+        const Direction dir = d_diffToDir[diff + 64];
+        size_t landing_mask = d_rayMask[chosen_victim][dir] & both_diagonals_king_mask_gpu(t_boardState, chosen_victim) & ~t_boardState;
+        size_t attacks_possibilities_after_landing = kings_attack_mask_gpu(landing_mask, t_boardState, t_opponentPieces & ~(1ULL << chosen_victim));
+        landing_mask = attacks_possibilities_after_landing ? attacks_possibilities_after_landing : landing_mask;
+
+        // reset the bit that kings has gone from
+        t_boardState = t_boardState & ~(1ULL << curr_pos);
+        curr_pos = pick_random_bit(landing_mask, t_state);
+
+        // update the new position of the king
+        t_boardState |= 1ULL << curr_pos;
+
+        // update victims mask
+        current_victims |= 1ULL << chosen_victim;
+    }
+
+    return GPU_Move{1ULL << t_idx, 1ULL << curr_pos, current_victims};
 }
 
-__device__ __forceinline__ GPU_Move make_pawn_attack(curandState *t_state, const int t_idx, const size_t t_opponentPieces, const size_t t_empty)
+__device__ __forceinline__ GPU_Move make_pawn_attack(curandState *t_state, const int t_idx, const size_t t_opponentPieces, size_t t_empty)
 {
     size_t current_victims = 0ULL;
     int curr_pos = t_idx;
@@ -143,9 +174,11 @@ __device__ __forceinline__ GPU_Move make_pawn_attack(curandState *t_state, const
         const int diff = dest - curr_pos;
         const Direction dir = d_diffToDir[diff + 64];
         current_victims |= d_NeighbourTable[t_idx][dir];
+        t_empty |= 1ULL << curr_pos;
         curr_pos = dest;
+        t_empty &= ~(1ULL << curr_pos);
     }
-    return GPU_Move(1ULL << t_idx, 1ULL << curr_pos, current_victims);
+    return GPU_Move{1ULL << t_idx, 1ULL << curr_pos, current_victims};
 }
 
 __device__ __forceinline__ GPU_Move make_king_quiet(curandState *t_state, const int t_idx, const size_t t_boardState, const size_t t_empty)
@@ -153,7 +186,7 @@ __device__ __forceinline__ GPU_Move make_king_quiet(curandState *t_state, const 
     const size_t move_mask  = both_diagonals_king_mask_gpu(t_boardState, t_idx) & t_empty; // & with empty
     assert(move_mask != 0);
     const int to = pick_random_bit(move_mask, t_state);
-    return GPU_Move(1ULL << t_idx, 1ULL << to, 0ULL);
+    return GPU_Move{1ULL << t_idx, 1ULL << to, 0ULL};
 }
 
 __device__ __forceinline__ GPU_Move make_pawn_quiet(curandState *t_state,
@@ -168,7 +201,7 @@ __device__ __forceinline__ GPU_Move make_pawn_quiet(curandState *t_state,
     }
     assert(move_mask != 0);
     const int to = pick_random_bit(move_mask, t_state);
-    return GPU_Move(1ULL << t_idx, 1ULL << to, 0ULL);
+    return GPU_Move{1ULL << t_idx, 1ULL << to, 0ULL};
 }
 
 __device__ __forceinline__ GPU_Move generate_random_move(curandState     *t_state,
@@ -190,10 +223,8 @@ __device__ __forceinline__ GPU_Move generate_random_move(curandState     *t_stat
     // attacks
     if (const size_t possible_attack_mask = possible_pawns_mask | possible_kings_mask) {
         const int found_idx = pick_random_bit(possible_attack_mask, t_state);
-        if (const bool is_king = 1ULL << found_idx & kings) {
-            return make_king_attack(t_state, found_idx);
-        }
-        return make_pawn_attack(t_state, found_idx);
+        const bool is_king = 1ULL << found_idx & kings;
+        return is_king ? make_king_attack(t_state, found_idx, all_board_pieces, opponent_pieces) : make_pawn_attack(t_state, found_idx, opponent_pieces, empty);
     }
 
     // moves
@@ -202,11 +233,8 @@ __device__ __forceinline__ GPU_Move generate_random_move(curandState     *t_stat
     const size_t possible_quiet_mask  = possible_kings_quiet | possible_pawns_quiet;
 
     const int found_idx = pick_random_bit(possible_quiet_mask, t_state);
-    if (const bool is_king = 1ULL << found_idx & kings) {
-        return make_king_quiet(t_state, found_idx, all_board_pieces, empty);
-    }
-    return make_pawn_quiet(t_state, found_idx, t_colour, empty);
+    const bool is_king = 1ULL << found_idx & kings;
+    return is_king ? make_king_quiet(t_state, found_idx, all_board_pieces, empty) : make_pawn_quiet(t_state, found_idx, t_colour, empty);
 }
-
 
 #endif

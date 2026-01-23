@@ -402,3 +402,25 @@ TEST(KingsAttackTest, FourWayBranchingAndCompletion)
         EXPECT_EQ(moves[i].captures_mask, 1ULL << expectedTakes[i]);
     }
 }
+
+TEST(KingsCPU_MovegenTest, diamondCase)
+{
+    // SETUP
+    constexpr int    start_idx        = 11;
+    constexpr size_t white_start_mask = (1ULL << start_idx);
+
+    constexpr size_t victim1 = (1ULL << 20);
+    constexpr size_t victim2 = (1ULL << 36);
+    constexpr size_t victim3 = (1ULL << 34);
+    constexpr size_t victim4 = (1ULL << 18);
+
+    constexpr size_t opponent_pieces = victim1 | victim2 | victim3 | victim4;
+    constexpr size_t empty_files     = ~(white_start_mask | opponent_pieces);
+
+    std::vector<Move> result_moves;
+    std::vector       path{start_idx};
+    // EXECUTE
+    recursiveCreateAllKingsAttacks(result_moves, path, start_idx, ~empty_files, opponent_pieces, white_start_mask, 0);
+
+    ASSERT_EQ(result_moves.size(), 2);
+}

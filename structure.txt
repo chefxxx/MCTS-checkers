@@ -1,9 +1,0 @@
-CMake.txt
-/project
-    /include
-        /general
-            bit_operations.cuh
-            game_engine.h
-    /src
-        /cpu
-            game_engine.cpp
