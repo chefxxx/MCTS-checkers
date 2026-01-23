@@ -83,7 +83,11 @@ __device__ __forceinline__ int pick_random_bit(size_t t_mask, curandState* t_sta
     return getLsb(t_mask);
 }
 
-__device__ __forceinline__ GPU_Move make_king_attack() {}
+__device__ __forceinline__ GPU_Move make_king_attack()
+{
+    // TODO: implement this func
+    return GPU_Move(1ULL, 1ULL, 1ULL);
+}
 
 __device__ __forceinline__ GPU_Move generate_random_move(curandState     *t_state,
                                                          const GPU_Board &t_board,
@@ -115,8 +119,8 @@ __device__ __forceinline__ GPU_Move generate_random_move(curandState     *t_stat
     }
 
 
-
-    return 1ULL;
+    // TODO: return normal value
+    return GPU_Move(1ULL, 1ULL, 1ULL);
 }
 
 
