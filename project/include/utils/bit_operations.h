@@ -48,7 +48,7 @@ __device__ __host__ __forceinline__ int popCount(const size_t a)
 __device__ __host__ __forceinline__ int getLsb(const size_t a)
 {
 #if defined(__CUDA_ARCH__)
-    return __ffs(a) - 1; //__ffs() is 1-based, so - 1
+    return __ffsll(a) - 1; //__ffsll() is 1-based, so - 1
 #else
     return std::countr_zero(a);
 #endif

@@ -5,8 +5,11 @@
 #ifndef GPU_MOVE_GEN_CUH
 #define GPU_MOVE_GEN_CUH
 
-#include "gpu_board.cuh"
+#include <cassert>
+
+#include "bit_operations.h"
 #include "common.cuh"
+#include "gpu_board.cuh"
 
 // -------------------------------------
 // Constant memory variables definitions
@@ -66,9 +69,20 @@ __device__ __forceinline__ size_t kings_attack_mask(size_t t_kingsMask, const si
     return result_kings;
 }
 
-__device__ __forceinline__
+__device__ __forceinline__ int pick_random_bit(size_t t_mask, curandState* t_state)
+{
+    const int count = popCount(t_mask);
+    assert(count != 0);
 
-__device__ __forceinline__ size_t generate_random_move(const GPU_Board &t_board, const Colour t_colour)
+    const int target = curand(t_state) % count;
+    for (int i = 0; i < target; ++i) {
+        t_mask &= t_mask - 1;
+    }
+
+    return getLsb(t_mask);
+}
+
+__device__ __forceinline__ size_t generate_random_move(curandState* t_state, const GPU_Board &t_board, const Colour t_colour)
 {
     const size_t pawns            = t_board.pawns[t_colour];
     const size_t kings            = t_board.kings[t_colour];
@@ -81,8 +95,9 @@ __device__ __forceinline__ size_t generate_random_move(const GPU_Board &t_board,
 
     const size_t possible_pawns_mask = getPawnsAttackMask(pawns, opponent_pieces, empty);
     const size_t possible_kings_mask = kings_attack_mask(kings, all_board_pieces, opponent_pieces);
-
-    return possible_pawns_mask | possible_kings_mask;
+    const size_t possible_mask = possible_pawns_mask | possible_kings_mask;
+    const int found_idx = pick_random_bit(possible_mask, t_state);
+    return found_idx;
 }
 
 
