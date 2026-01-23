@@ -13,7 +13,7 @@
 #include "cpu_movegen.h"
 #include "move.h"
 
-// class to manage mcts tree on the cpu
+// class to manage mcts tree on the gpu
 
 struct MctsNode
 {

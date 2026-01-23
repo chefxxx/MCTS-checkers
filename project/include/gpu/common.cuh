@@ -5,8 +5,8 @@
 #ifndef GPU_COMMON_CUH
 #define GPU_COMMON_CUH
 
+#include <cuda_runtime_api.h>
 #include "constants.h"
-
 
 __device__ __host__ __forceinline__ size_t getPawnsAttackMask(const size_t t_attackerPawns, const size_t t_opponentPieces, const size_t t_emptyFiles)
 {

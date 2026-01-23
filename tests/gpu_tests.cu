@@ -4,7 +4,7 @@
 
 #include <gtest/gtest.h>
 
-#include "gpu_rollout.cuh"
+#include "../project/include/gpu/gpu_rollout.cuh"
 
 TEST(GpuRolloutTests, firstTest)
 {

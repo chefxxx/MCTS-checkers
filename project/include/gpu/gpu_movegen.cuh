@@ -7,9 +7,10 @@
 
 #include <cassert>
 
-#include "bit_operations.h"
+#include "bit_operations.cuh"
 #include "common.cuh"
 #include "gpu_board.cuh"
+#include "gpu_move.cuh"
 
 // -------------------------------------
 // Constant memory variables definitions
@@ -82,7 +83,11 @@ __device__ __forceinline__ int pick_random_bit(size_t t_mask, curandState* t_sta
     return getLsb(t_mask);
 }
 
-__device__ __forceinline__ size_t generate_random_move(curandState* t_state, const GPU_Board &t_board, const Colour t_colour)
+__device__ __forceinline__ GPU_Move make_king_attack() {}
+
+__device__ __forceinline__ GPU_Move generate_random_move(curandState     *t_state,
+                                                         const GPU_Board &t_board,
+                                                         const Colour     t_colour)
 {
     const size_t pawns            = t_board.pawns[t_colour];
     const size_t kings            = t_board.kings[t_colour];
@@ -95,9 +100,23 @@ __device__ __forceinline__ size_t generate_random_move(curandState* t_state, con
 
     const size_t possible_pawns_mask = getPawnsAttackMask(pawns, opponent_pieces, empty);
     const size_t possible_kings_mask = kings_attack_mask(kings, all_board_pieces, opponent_pieces);
-    const size_t possible_mask = possible_pawns_mask | possible_kings_mask;
-    const int found_idx = pick_random_bit(possible_mask, t_state);
-    return found_idx;
+    if (const size_t possible_mask = possible_pawns_mask | possible_kings_mask) {
+        const int found_idx = pick_random_bit(possible_mask, t_state);
+        if (const bool is_king = 1ULL << found_idx & kings) {
+
+        }
+        else {
+
+        }
+    }
+    else {
+        // moves
+
+    }
+
+
+
+    return 1ULL;
 }
 
 

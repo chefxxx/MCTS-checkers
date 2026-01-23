@@ -7,9 +7,9 @@
 
 #include <curand_kernel.h>
 
-#include "gpu_board.cuh"
 #include "constants.h"
 #include "gpu_movegen.cuh"
+#include "gpu_board.cuh"
 
 // -------------------------------------
 // Constant memory variables definitions
@@ -25,7 +25,7 @@ __global__ void rollout_kernel(curandState* t_stateBuff, const Colour t_starting
     curandState local = t_stateBuff[tid];
 
     // perform a random game
-    const size_t mask = generate_random_move(&local, tmp_board, t_startingTurn);
+    const auto move = generate_random_move(&local, tmp_board, t_startingTurn);
 
     // save results
     t_stateBuff[tid] = local;

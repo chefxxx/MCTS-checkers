@@ -8,7 +8,7 @@
 #include <optional>
 #include <string>
 
-#include "bit_operations.h"
+#include "bit_operations.cuh"
 #include "board_infra.h"
 #include "constants.h"
 #include "mcts_tree.h"

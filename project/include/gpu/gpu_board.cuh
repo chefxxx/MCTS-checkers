@@ -5,8 +5,8 @@
 #ifndef GPU_BOARD_CUH
 #define GPU_BOARD_CUH
 
-#include "board_infra.h"
-#include "constants.h"
+#include "../cpu/board_infra.h"
+#include "../cpu/constants.h"
 
 struct GPU_Board
 {

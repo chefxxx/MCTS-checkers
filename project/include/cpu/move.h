@@ -8,7 +8,7 @@
 #include <array>
 #include <vector>
 
-#include "bit_operations.h"
+#include "bit_operations.cuh"
 #include "logger.h"
 #include "lookup_tables.h"
 

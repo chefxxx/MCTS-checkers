@@ -6,9 +6,8 @@
 
 #include <cassert>
 
-#include "bit_operations.h"
+#include "bit_operations.cuh"
 #include "lookup_tables.h"
-
 
 std::vector<Move> generateAllPossibleMoves(const Board &t_board, const Colour t_color)
 {

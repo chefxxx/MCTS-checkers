@@ -92,7 +92,7 @@ TEST(MctsTreeBasicTests, updateRootTestWhiteStarts)
 
 TEST(MctsTreeBasicTests, gameSimulationTest)
 {
-    GameManager manager{white, 1, "cpu"};
+    GameManager manager{white, 1, "gpu"};
     manager.mcts_tree.initTree(manager.board, white);
 
     const std::vector<std::string> whiteMoves = {"c3-d4", "a3-b4", "g3-h4", "e3:g5",    "b2-a3",       "h4:f6",
@@ -133,7 +133,7 @@ TEST(MctsTreeBasicTests, gameSimulationTest)
 
 TEST(MctsTreeBasicTests, anotherGameSimulationTest)
 {
-    GameManager manager{white, 1, "cpu"};
+    GameManager manager{white, 1, "gpu"};
     manager.mcts_tree.initTree(manager.board, white);
 
     std::vector<std::string> whiteMoves = {"c3-b4", "e3-f4", "d2:b4", "b4-a5", "g3-h4", "h4:f6:d8", "f2-g3",

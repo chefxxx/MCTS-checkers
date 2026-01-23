@@ -3,9 +3,9 @@
 
 #include <helper_cuda.h>
 
-#include "gpu_board.cuh"
+#include "../../include/gpu/gpu_board.cuh"
+#include "../../include/gpu/gpu_rollout.cuh"
 #include "gpu_infa_kernels.cuh"
-#include "gpu_rollout.cuh"
 #include "memory_cuda.cuh"
 
 constexpr int BLOCKS_PER_GRID = 1;

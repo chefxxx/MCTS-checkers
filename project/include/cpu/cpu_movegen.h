@@ -7,11 +7,11 @@
 
 #include <vector>
 
-#include "bit_operations.h"
+#include "../gpu/common.cuh"
+#include "bit_operations.cuh"
 #include "board_infra.h"
 #include "constants.h"
 #include "move.h"
-#include "common.cuh"
 
 #if WIN32
 #include <stdlib.h>

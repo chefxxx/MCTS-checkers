@@ -54,7 +54,7 @@ void GameManager::playTheGame()
 void GameManager::aiTurn()
 {
     MctsNode *bestNode = nullptr;
-    if (m_mode == "cpu") {
+    if (m_mode == "gpu") {
         bestNode = runCPU_MCTS(mcts_tree, m_ai_time_per_turn);
     }
     else {

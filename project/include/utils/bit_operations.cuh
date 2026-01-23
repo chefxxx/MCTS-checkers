@@ -7,14 +7,7 @@
 
 #include <bit>
 #include <cstddef>
-
-// --- Make this compile with .cpp files ---
-#ifndef __CUDACC__
-#define __device__
-#define __host__
-#define __forceinline__ inline
-#endif
-// -----------------------------------------
+#include <cuda_runtime_api.h>
 
 constexpr size_t MIN_LSB = 1ULL;
 
