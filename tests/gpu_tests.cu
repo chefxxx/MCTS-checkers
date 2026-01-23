@@ -11,6 +11,5 @@ TEST(GpuRolloutTests, firstTest)
     Board board;
     board.initStartingBoard();
     const MctsNode node{nullptr, board, white};
-    const auto result = rollout_gpu(&node);
+    const auto     result = rollout_gpu(&node);
 }
-

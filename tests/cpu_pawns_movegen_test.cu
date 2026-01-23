@@ -85,7 +85,7 @@ TEST(PawnsCPU_MovegenTest, getPawnsMovesMask_withBlockedWhitePawn)
     constexpr uint64_t black_mask  = 0ULL;
     constexpr uint64_t result_mask = (1ULL << 26) | (1ULL << 28);
     constexpr auto     empty_mask  = ~(white_mask | black_mask);
-    const auto         test_case   = getPawnsQuietMovesMask(white_mask, empty_mask, white);
+    const auto         test_case   = getPawnsQuietMask(white_mask, empty_mask, white);
     ASSERT_EQ(test_case, result_mask);
 }
 
@@ -98,7 +98,7 @@ TEST(PawnsCPU_MovegenTest, getPawnsMovesMask_blackMovesDown)
     constexpr uint64_t white_mask  = 0ULL;
     constexpr uint64_t result_mask = (1ULL << 35);
     constexpr auto     empty_mask  = ~(white_mask | black_mask);
-    const auto         test_case   = getPawnsQuietMovesMask(black_mask, empty_mask, black);
+    const auto         test_case   = getPawnsQuietMask(black_mask, empty_mask, black);
     ASSERT_EQ(test_case, result_mask);
 }
 
@@ -114,7 +114,7 @@ TEST(PawnsCPU_MovegenTest, getPawnsMovesMask_preventWrapFileH)
 
     // We check if it correctly identifies 15 as a not mover
     // without allowing it to "teleport" across the board.
-    const auto test_case = getPawnsQuietMovesMask(white_mask, empty_mask, white);
+    const auto test_case = getPawnsQuietMask(white_mask, empty_mask, white);
     ASSERT_EQ(test_case, result_mask);
 }
 
@@ -126,7 +126,7 @@ TEST(PawnsCPU_MovegenTest, getPawnsMovesMask_fULLyBlocked)
     constexpr uint64_t white_mask  = 0ULL;
     constexpr uint64_t result_mask = (1ULL << 35) | (1ULL << 37);
     constexpr auto     empty_mask  = ~(white_mask | black_mask);
-    const auto         test_case   = getPawnsQuietMovesMask(black_mask, empty_mask, black);
+    const auto         test_case   = getPawnsQuietMask(black_mask, empty_mask, black);
     ASSERT_EQ(test_case, result_mask);
 }
 

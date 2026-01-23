@@ -366,16 +366,14 @@ template <cuda_pointerable_type T> shared_ptr<T> make_shared(const size_t count 
 // Metaprogramming utils
 // ---------------------
 
-template <typename Type>
-__host__ std::tuple<unique_ptr<Type>, unique_ptr<Type>> allocateGPU_Pair(const size_t t_count)
+template <typename Type> __host__ std::tuple<unique_ptr<Type>, unique_ptr<Type>> allocateGPU_Pair(const size_t t_count)
 {
     auto d_A = mem_cuda::make_unique<Type>(t_count);
     auto d_B = mem_cuda::make_unique<Type>(t_count);
     return std::make_tuple(std::move(d_A), std::move(d_B));
 }
 
-template <typename... Types>
-__host__ std::tuple<unique_ptr<Types>...> allocateGPU_AnySameSize(const size_t t_count)
+template <typename... Types> __host__ std::tuple<unique_ptr<Types>...> allocateGPU_AnySameSize(const size_t t_count)
 {
     return std::tuple<unique_ptr<Types>...>(mem_cuda::make_unique<Types>(t_count)...);
 }
@@ -387,10 +385,7 @@ template <typename Type> __host__ unique_ptr<Type> allocateAndCopyGPU_FromHostVe
     return d_ptr;
 }
 
-} // namespace cuda
-
-
-
+} // namespace mem_cuda
 
 
 #endif

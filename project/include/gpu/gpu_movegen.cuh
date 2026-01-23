@@ -16,9 +16,29 @@
 // Constant memory variables definitions
 // -------------------------------------
 __constant__ inline Direction d_diffToDir[128];
-__constant__ inline size_t d_NeighbourTable[64][4];
-__constant__ inline size_t d_diagonalMaskEx[64];
-__constant__ inline size_t d_anitDiagonalMaskEx[64];
+__constant__ inline size_t    d_NeighbourTable[64][4];
+__constant__ inline size_t    d_diagonalMaskEx[64];
+__constant__ inline size_t    d_anitDiagonalMaskEx[64];
+__constant__ inline int       d_canMove[2][4];
+
+__device__ __forceinline__ size_t get_pawns_quiet_gpu(const size_t t_moversPawns,
+                                                      const size_t t_emptyFiles,
+                                                      const Colour t_moversColour)
+{
+    // It is assumed that program "sees" the board from white perspective
+    // so for white pawns only "up" slides are permitted, meaning
+    // that for black only "down" slides are permitted.
+
+    const size_t move_upRight =
+        d_canMove[t_moversColour][UP_RIGHT] * ((t_moversPawns & NOT_FILE_H) << 9 & t_emptyFiles) >> 9;
+    const size_t move_upLeft =
+        d_canMove[t_moversColour][UP_LEFT] * ((t_moversPawns & NOT_FILE_A) << 7 & t_emptyFiles) >> 7;
+    const size_t move_downRight =
+        d_canMove[t_moversColour][DOWN_RIGHT] * ((t_moversPawns & NOT_FILE_H) >> 7 & t_emptyFiles) << 7;
+    const size_t move_downLeft =
+        d_canMove[t_moversColour][DOWN_LEFT] * ((t_moversPawns & NOT_FILE_A) >> 9 & t_emptyFiles) << 9;
+    return move_upRight | move_upLeft | move_downRight | move_downLeft;
+}
 
 // https://www.chessprogramming.org/Hyperbola_Quintessence
 __device__ __forceinline__ size_t diagonal_king_mask_gpu(const size_t t_boardState, const int t_kingSquare)
@@ -49,7 +69,9 @@ __device__ __forceinline__ size_t both_diagonals_king_mask_gpu(const size_t t_bo
     return diagonal_king_mask_gpu(t_boardState, t_kingSquare) | anti_diagonal_king_mask_gpu(t_boardState, t_kingSquare);
 }
 
-__device__ __forceinline__ size_t kings_attack_mask_gpu(size_t t_kingsMask, const size_t t_boardState, const size_t t_opponentsPieces)
+__device__ __forceinline__ size_t kings_attack_mask_gpu(size_t       t_kingsMask,
+                                                        const size_t t_boardState,
+                                                        const size_t t_opponentsPieces)
 {
     const size_t empty        = ~t_boardState;
     size_t       result_kings = 0ULL;
@@ -60,11 +82,10 @@ __device__ __forceinline__ size_t kings_attack_mask_gpu(size_t t_kingsMask, cons
         while (possible_victims) {
             const int v_idx = popLsb(possible_victims);
             const int diff  = v_idx - k_idx;
-            if (const Direction dir = d_diffToDir[diff + 64];
-                d_NeighbourTable[v_idx][dir] & empty) {
+            if (const Direction dir = d_diffToDir[diff + 64]; d_NeighbourTable[v_idx][dir] & empty) {
                 result_kings |= 1ULL << k_idx;
                 break;
-                }
+            }
         }
     }
     return result_kings;
@@ -74,7 +95,7 @@ __device__ __forceinline__ size_t kings_quiet_mask_gpu(size_t t_kingsMask, const
 {
     size_t result_kings = 0ULL;
     while (t_kingsMask) {
-        const int k_idx   = popLsb(t_kingsMask);
+        const int k_idx = popLsb(t_kingsMask);
         if (size_t moves_mask = both_diagonals_king_mask_gpu(t_boardState, k_idx) & ~t_boardState) {
             result_kings |= 1ULL << k_idx;
         }
@@ -82,7 +103,7 @@ __device__ __forceinline__ size_t kings_quiet_mask_gpu(size_t t_kingsMask, const
     return result_kings;
 }
 
-__device__ __forceinline__ int pick_random_bit(size_t t_mask, curandState* t_state)
+__device__ __forceinline__ int pick_random_bit(size_t t_mask, curandState *t_state)
 {
     const int count = popCount(t_mask);
     assert(count != 0);
@@ -95,28 +116,37 @@ __device__ __forceinline__ int pick_random_bit(size_t t_mask, curandState* t_sta
     return getLsb(t_mask);
 }
 
-__device__ __forceinline__ GPU_Move make_king_attack(curandState* t_state, const size_t t_startKingMask)
+__device__ __forceinline__ GPU_Move make_king_attack(curandState *t_state, const int t_idx)
 {
     // TODO: implement this func
     return GPU_Move(1ULL, 1ULL, 1ULL);
 }
 
-__device__ __forceinline__ GPU_Move make_pawn_attack(curandState* t_state, const size_t t_startPawnMask)
+__device__ __forceinline__ GPU_Move make_pawn_attack(curandState *t_state, const int t_idx)
 {
     // TODO: implement this func
     return GPU_Move(1ULL, 1ULL, 1ULL);
 }
 
-__device__ __forceinline__ GPU_Move make_king_quiet(curandState* t_state, const size_t t_startKingMask)
+__device__ __forceinline__ GPU_Move make_king_quiet(curandState *t_state, const int t_idx)
 {
     // TODO: implement this func
     return GPU_Move(1ULL, 1ULL, 1ULL);
 }
 
-__device__ __forceinline__ GPU_Move make_pawn_quiet(curandState* t_state, const size_t t_startPawnMask)
+__device__ __forceinline__ GPU_Move make_pawn_quiet(curandState *t_state,
+                                                    const int    t_idx,
+                                                    const Colour t_colour,
+                                                    const size_t t_empty)
 {
-    // TODO: implement this func
-    return GPU_Move(1ULL, 1ULL, 1ULL);
+    size_t move_mask = 0ULL;
+#pragma unroll
+    for (const int dir : {UP_LEFT, UP_RIGHT, DOWN_LEFT, DOWN_RIGHT}) {
+        move_mask |= d_canMove[t_colour][dir] * d_NeighbourTable[t_idx][dir] & t_empty;
+    }
+    assert(move_mask != 0);
+    const int to = pick_random_bit(move_mask, t_state);
+    return GPU_Move(1ULL << t_idx, 1ULL << to, 0ULL);
 }
 
 __device__ __forceinline__ GPU_Move generate_random_move(curandState     *t_state,
@@ -134,29 +164,27 @@ __device__ __forceinline__ GPU_Move generate_random_move(curandState     *t_stat
 
     const size_t possible_pawns_mask = getPawnsAttackMask(pawns, opponent_pieces, empty);
     const size_t possible_kings_mask = kings_attack_mask_gpu(kings, all_board_pieces, opponent_pieces);
+
+    // attacks
     if (const size_t possible_attack_mask = possible_pawns_mask | possible_kings_mask) {
         const int found_idx = pick_random_bit(possible_attack_mask, t_state);
-        const size_t start_mask = 1ULL << found_idx;
-        if (const bool is_king = start_mask & kings) {
-            return make_king_attack(t_state, start_mask);
+        if (const bool is_king = 1ULL << found_idx & kings) {
+            return make_king_attack(t_state, found_idx);
         }
-        return make_pawn_attack(t_state, start_mask);
+        return make_pawn_attack(t_state, found_idx);
     }
 
     // moves
-    const size_t possible_pawns_quiet = getPawnsQuietMovesMask(pawns, empty, t_colour);
+    const size_t possible_pawns_quiet = get_pawns_quiet_gpu(pawns, empty, t_colour);
     const size_t possible_kings_quiet = kings_quiet_mask_gpu(kings, all_board_pieces);
     const size_t possible_quiet_mask  = possible_kings_quiet | possible_pawns_quiet;
 
     const int found_idx = pick_random_bit(possible_quiet_mask, t_state);
-    const size_t start_mask = 1ULL << found_idx;
-    if (const bool is_king = start_mask & kings) {
-        return make_king_quiet(t_state, start_mask);
+    if (const bool is_king = 1ULL << found_idx & kings) {
+        return make_king_quiet(t_state, found_idx);
     }
-    return make_pawn_quiet(t_state, start_mask);
+    return make_pawn_quiet(t_state, found_idx, t_colour, empty);
 }
-
-
 
 
 #endif

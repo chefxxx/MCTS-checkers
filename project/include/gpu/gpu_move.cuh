@@ -7,11 +7,15 @@
 
 struct GPU_Move
 {
-    __device__ GPU_Move(const size_t t_from, const size_t t_to, const size_t t_captures) : from_mask(t_from), to_mask(t_to), captures_mask(t_captures) {}
+    __device__ GPU_Move(const size_t t_from, const size_t t_to, const size_t t_captures)
+        : from_mask(t_from)
+        , to_mask(t_to)
+        , captures_mask(t_captures)
+    {
+    }
     size_t from_mask;
     size_t to_mask;
     size_t captures_mask;
 };
 
 #endif
-
