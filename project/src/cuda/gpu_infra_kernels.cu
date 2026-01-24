@@ -91,3 +91,8 @@ __global__ void test_kernel(const curandState *t_stateBuff, const GPU_Board *tes
     const auto move = generate_random_move(&local_state, *testBoard, t_startingTurn);
     *t_resultMove = move;
 }
+
+void reset_score(double *t_globalScore)
+{
+    *t_globalScore = 0.0;
+}

@@ -7,6 +7,8 @@
 
 #include "mcts_tree.h"
 
-double rollout_gpu(const MctsNode *t_node, const mem_cuda::unique_ptr<curandState> &d_states);
+double rollout_gpu(const MctsNode                          *t_node,
+                   const mem_cuda::unique_ptr<curandState> &t_states,
+                   const mem_cuda::unique_ptr<double>      &t_globalScore);
 
 #endif
