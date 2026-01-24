@@ -244,6 +244,7 @@ __device__ GPU_Move generate_random_move(curandState *t_state, const GPU_Board &
     const size_t possible_pawns_quiet = get_pawns_quiet_gpu(pawns, empty, t_colour);
     const size_t possible_kings_quiet = kings_quiet_mask_gpu(kings, all_board_pieces);
     const size_t possible_quiet_mask  = possible_kings_quiet | possible_pawns_quiet;
+    assert(possible_quiet_mask != 0);
     const int  found_idx = pick_random_bit(possible_quiet_mask, t_state);
     const bool is_king   = 1ULL << found_idx & kings;
     return is_king ? make_king_quiet(t_state, found_idx, all_board_pieces, empty)

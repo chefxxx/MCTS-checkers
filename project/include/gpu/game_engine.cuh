@@ -31,7 +31,7 @@ struct GameManager
         if (m_mode == "gpu") {
             init_promotion_const_mem();
             init_gpu_movegen_const_mem();
-            d_globalScore = mem_cuda::unique_ptr<double>();
+            d_globalScore = mem_cuda::make_unique<double>();
             d_states      = init_random_states();
         }
     }

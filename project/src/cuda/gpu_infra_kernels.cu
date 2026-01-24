@@ -51,7 +51,7 @@ __global__ void rollout_kernel(curandState *t_stateBuff, const Colour t_starting
 
     // perform a random game
     while (true) {
-        const auto move = generate_random_move(&local, tmp_board, t_startingTurn);
+        const auto move = generate_random_move(&local, tmp_board, turn);
         apply_move_gpu(tmp_board, move, turn);
         state = check_end_of_game_conditions(tmp_board, turn);
         if (state != CONTINUES)
