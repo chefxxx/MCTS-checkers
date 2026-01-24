@@ -48,6 +48,19 @@ void GameManager::playTheGame()
         mess = "Congratulations, You won!\n";
     }
     std::cout << mess;
+
+    auto now = std::chrono::system_clock::now();
+    std::time_t now_time = std::chrono::system_clock::to_time_t(now);
+
+    std::ostringstream filename;
+    filename << "../../games/game_history_"
+             << std::put_time(std::localtime(&now_time), "%Y-%m-%d_%H-%M-%S")
+             << ".txt";
+    if (std::ofstream outFile(filename.str()); outFile.is_open()) {
+        printGameHist(outFile);
+        outFile.close();
+        std::cout << "History saved to: " << filename.str() << std::endl;
+    }
 }
 
 void GameManager::aiTurn()

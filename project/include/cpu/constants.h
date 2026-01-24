@@ -12,7 +12,7 @@ constexpr double C = 2;
 constexpr int    DRAW_LIMIT                  = 30;
 constexpr double TURN_TIME_MULTIPLICATOR     = 0.97;
 constexpr int    CPU_ITERATION_CHECK         = 1024;
-constexpr int    GPU_ITERATION_CHECK         = 32;
+constexpr int    GPU_ITERATION_CHECK         = 128;
 
 constexpr size_t NOT_FILE_A = 0xFEFEFEFEFEFEFEFEULL;
 constexpr size_t NOT_FILE_H = 0x7F7F7F7F7F7F7F7FULL;
@@ -46,7 +46,7 @@ constexpr int canMove[2][4] = {
 
 // CUDA parts
 
-constexpr int BLOCKS_PER_GRID  = 8;
+constexpr int BLOCKS_PER_GRID  = 16;
 constexpr int THREAD_PER_BLOCK = 8;
 
 #define CUDA_CHECK_KERNEL() getLastCudaError("Kernel failed...")
