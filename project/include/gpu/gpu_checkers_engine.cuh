@@ -37,7 +37,7 @@ __device__ __forceinline__ void apply_move_gpu(GPU_Board &t_board, const GPU_Mov
     t_board.pawns[1 - t_colour] &= ~t_move.captures_mask;
 }
 
-__device__ __forceinline__ GameState check_of_game_conditions(const GPU_Board &t_board, const Colour t_playerWhoJustMoved)
+__device__ __forceinline__ GameState check_end_of_game_conditions(const GPU_Board &t_board, const Colour t_playerWhoJustMoved)
 {
     if (t_board.kings_quiet_moves == DRAW_LIMIT) {
         return DRAW;

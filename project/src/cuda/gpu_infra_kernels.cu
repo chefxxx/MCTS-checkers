@@ -2,6 +2,7 @@
 // Constant memory variables definitions
 // -------------------------------------
 
+#include "gpu_checkers_engine.cuh"
 #include "gpu_infa_kernels.cuh"
 #include "helper_cuda.h"
 
@@ -26,15 +27,45 @@ mem_cuda::unique_ptr<curandState> init_random_states()
     return d_states;
 }
 
-__global__ void rollout_kernel(curandState *t_stateBuff, const Colour t_startingTurn)
+void summarize_warp(double t_score, double *t_globalScore)
+{
+    for (int offset = 16; offset > 0; offset >>= 1) {
+        constexpr unsigned int mask = 0xFFFFFFFFU;
+        t_score += __shfl_down_sync(mask, t_score, offset);
+    }
+
+    if (threadIdx.x % 32 == 0) {
+        atomicAdd(t_globalScore, t_score);
+    }
+}
+
+__global__ void rollout_kernel(curandState *t_stateBuff, const Colour t_startingTurn, double *t_globalScore)
 {
     // Initialize the kernel's variables
     const size_t    tid       = threadIdx.x + blockIdx.x * blockDim.x;
-    const GPU_Board tmp_board = d_initBoard;
+    GPU_Board tmp_board       = d_initBoard;
     curandState     local     = t_stateBuff[tid];
+    GameState state           = CONTINUES;
+    const auto parent_colour  = static_cast<Colour>(1 - t_startingTurn);
+    auto turn           = t_startingTurn;
 
     // perform a random game
-    const auto move = generate_random_move(&local, tmp_board, t_startingTurn);
+    while (true) {
+        const auto move = generate_random_move(&local, tmp_board, t_startingTurn);
+        apply_move_gpu(tmp_board, move, turn);
+        state = check_end_of_game_conditions(tmp_board, turn);
+        if (state != CONTINUES)
+            break;
+        turn = static_cast<Colour>(1 - turn);
+    }
+
+    double score = -1.0;
+    if (state == DRAW)
+        score = 0.5;
+    else
+        score = turn == parent_colour ? 1.0 : 0.0;
+
+    summarize_warp(score, t_globalScore);
 
     // save results
     t_stateBuff[tid] = local;

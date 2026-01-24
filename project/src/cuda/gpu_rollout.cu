@@ -26,7 +26,7 @@ double rollout_gpu(const MctsNode *t_node, const mem_cuda::unique_ptr<curandStat
     // init random seeds
     // -----------------
 
-    rollout_kernel<<<BLOCKS_PER_GRID, THREAD_PER_BLOCK>>>(d_states.get(), t_node->turn_colour);
+    rollout_kernel<<<BLOCKS_PER_GRID, THREAD_PER_BLOCK>>>(d_states.get(), t_node->turn_colour, TODO);
     CUDA_CHECK_KERNEL();
     CUDA_SYNC_CHECK();
     return 1.0;
