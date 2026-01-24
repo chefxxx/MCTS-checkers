@@ -229,11 +229,11 @@ __device__ GPU_Move generate_random_move(curandState *t_state, const GPU_Board &
     const size_t all_board_pieces = pieces | opponent_pieces;
     const size_t empty            = ~all_board_pieces;
 
-    const size_t possible_pawns_mask = getPawnsAttackMask(pawns, opponent_pieces, empty);
-    const size_t possible_kings_mask = kings_attack_mask_gpu(kings, all_board_pieces, opponent_pieces);
+    const size_t possible_pawns_attack = getPawnsAttackMask(pawns, opponent_pieces, empty);
+    const size_t possible_kings_attack = kings_attack_mask_gpu(kings, all_board_pieces, opponent_pieces);
 
     // attacks
-    if (const size_t possible_attack_mask = possible_pawns_mask | possible_kings_mask) {
+    if (const size_t possible_attack_mask = possible_pawns_attack | possible_kings_attack) {
         const int  found_idx = pick_random_bit(possible_attack_mask, t_state);
         const bool is_king   = 1ULL << found_idx & kings;
         return is_king ? make_king_attack(t_state, found_idx, all_board_pieces, opponent_pieces)

@@ -21,7 +21,6 @@
  */
 std::optional<Board> applyMove(const Board &t_board, const Move &t_move, const Colour t_colour)
 {
-    // TODO: add move validation
     Board board_copy = t_board;
 
     // Pawn moved

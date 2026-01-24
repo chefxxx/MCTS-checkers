@@ -12,9 +12,10 @@
  * @brief Entry point of the rollout kernels.
  *
  * @param t_node
+ * @param d_states
  * @return
  */
-double rollout_gpu(const MctsNode *t_node)
+double rollout_gpu(const MctsNode *t_node, const mem_cuda::unique_ptr<curandState> &d_states)
 {
     // -------------
     // Prepare board
@@ -24,10 +25,8 @@ double rollout_gpu(const MctsNode *t_node)
     // -----------------
     // init random seeds
     // -----------------
-    // TODO: move this to GameManager class definition
-    const auto d_states = mem_cuda::make_unique<curandState>(BLOCKS_PER_GRID * THREAD_PER_BLOCK);
 
-    rollout_kernel<<<1, 1>>>(d_states.get(), t_node->turn_colour);
+    rollout_kernel<<<BLOCKS_PER_GRID, THREAD_PER_BLOCK>>>(d_states.get(), t_node->turn_colour);
     CUDA_CHECK_KERNEL();
     CUDA_SYNC_CHECK();
     return 1.0;
