@@ -187,7 +187,7 @@ __device__ GPU_Move make_pawn_attack(curandState *t_state,
         const int       dest = pick_random_bit(attacks_destinations, t_state);
         const int       diff = dest - curr_pos;
         const Direction dir  = d_diffToDir[diff + 64];
-        current_victims |= d_NeighbourTable[t_idx][dir];
+        current_victims |= d_NeighbourTable[curr_pos][dir];
         t_empty |= 1ULL << curr_pos;
         curr_pos = dest;
         t_empty &= ~(1ULL << curr_pos);
