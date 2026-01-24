@@ -12,7 +12,7 @@
 #include "gpu_move.cuh"
 
 
-__host__ void prepare_gpu_const_mem();
+__host__ void init_gpu_movegen_const_mem();
 
 __device__ size_t get_pawns_quiet_gpu(size_t t_moversPawns, size_t t_emptyFiles, Colour t_moversColour);
 

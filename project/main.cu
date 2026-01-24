@@ -1,4 +1,4 @@
-#include "game_engine.h"
+#include "include/gpu/game_engine.cuh"
 
 void usage()
 {

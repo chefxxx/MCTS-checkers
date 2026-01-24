@@ -2,15 +2,14 @@
 // Created by chefxx on 10.01.2026.
 //
 
-#include "game_engine.h"
-
 #include <cassert>
 #include <random>
 #include <sys/stat.h>
 
+#include "game_engine.cuh"
 #include "checkers_engine.h"
+#include "gpu_rollout.cuh"
 #include "logger.h"
-#include "simulation.h"
 
 void GameManager::playTheGame()
 {
@@ -54,12 +53,7 @@ void GameManager::playTheGame()
 void GameManager::aiTurn()
 {
     MctsNode *bestNode = nullptr;
-    if (m_mode == "gpu") {
-        bestNode = runCPU_MCTS(mcts_tree, m_ai_time_per_turn);
-    }
-    else {
-        throw "Not implemented!\n";
-    }
+    bestNode = runMctsSimulation(mcts_tree, m_timePerTurn, m_mode, d_states,  d_globalScore);
     assert(bestNode != nullptr);
     board = bestNode->current_board_state;
     mcts_tree.updateRoot(bestNode);
@@ -199,4 +193,75 @@ std::optional<Move> processMoveString(const std::string &t_moveStr, const Board 
         return std::nullopt;
     }
     return result;
+}
+
+MctsNode *runMctsSimulation(const MctsTree                          &t_tree,
+                            const double                             t_timeLimit,
+                            const std::string                       &t_mode,
+                            const mem_cuda::unique_ptr<curandState> &t_states,
+                            const mem_cuda::unique_ptr<double>      &t_globalScore)
+{
+    if (t_tree.root->is_solved()) {
+        return chooseBestMove(t_tree);
+    }
+    int CHECK = -1;
+    if (t_mode == "cpu") {
+        CHECK = CPU_ITERATION_CHECK;
+    }
+    else {
+        CHECK = GPU_ITERATION_CHECK;
+    }
+    assert(static_cast<long long>(t_timeLimit * 1e6 * TURN_TIME_MULTIPLICATOR) > 0);
+    const auto limit_micro_sec =
+        std::chrono::microseconds(static_cast<long long>(t_timeLimit * 1e6 * TURN_TIME_MULTIPLICATOR));
+    int        iters = 0;
+    const auto start = std::chrono::high_resolution_clock::now();
+    while (true) {
+        mctsIteration(t_tree, t_mode, t_states, t_globalScore);
+        iters++;
+        if (iters % CHECK == 0) {
+            if (t_tree.root->is_solved()) {
+                return chooseBestMove(t_tree);
+            }
+            auto now = std::chrono::high_resolution_clock::now();
+            if (const auto elapsed = std::chrono::duration_cast<std::chrono::microseconds>(now - start);
+                elapsed > limit_micro_sec) {
+                break;
+            }
+        }
+    }
+    return chooseBestMove(t_tree);
+}
+
+void mctsIteration(const MctsTree                                           &t_tree,
+                   const std::string                                        &t_mode,
+                   [[maybe_unused]] const mem_cuda::unique_ptr<curandState> &t_states,
+                   [[maybe_unused]] const mem_cuda::unique_ptr<double>      &t_globalScore)
+{
+    // 1. selection
+    auto selectedNode = selectNode(t_tree.root.get());
+
+    // 2. expansion
+    if (!selectedNode->is_solved() && !selectedNode->is_fully_expanded())
+        selectedNode = expandNode(selectedNode);
+
+    // 3. rollout or score
+    double score;
+    if (selectedNode->is_solved()) {
+        if (selectedNode->status == NodeStatus::WIN)
+            score = 0.0;
+        else if (selectedNode->status == NodeStatus::LOSS)
+            score = 1.0;
+        else
+            score = 0.5;
+    }
+    else {
+        if (t_mode == "cpu")
+            score = rollout(selectedNode);
+        else
+            score = rollout_gpu(selectedNode, t_states, t_globalScore);
+    }
+
+    // 4. backpropagate
+    backpropagate(selectedNode, score);
 }

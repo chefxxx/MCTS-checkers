@@ -4,8 +4,8 @@
 
 #include <gtest/gtest.h>
 
+#include "game_engine.cuh"
 #include "checkers_engine.h"
-#include "game_engine.h"
 #include "mcts_tree.h"
 
 TEST(MctsTreeBasicTests, creationTest)

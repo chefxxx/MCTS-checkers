@@ -17,7 +17,7 @@ class GpuPawnsMovegenTests : public ::testing::Test
 {
     void SetUp() override
     {
-        prepare_gpu_const_mem();
+        init_gpu_movegen_const_mem();
     }
 };
 

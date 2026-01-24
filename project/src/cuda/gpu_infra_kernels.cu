@@ -27,7 +27,7 @@ mem_cuda::unique_ptr<curandState> init_random_states()
     return d_states;
 }
 
-void summarize_warp(double t_score, double *t_globalScore)
+__device__ void summarize_warp(double t_score, double *t_globalScore)
 {
     for (int offset = 16; offset > 0; offset >>= 1) {
         constexpr unsigned int mask = 0xFFFFFFFFU;
@@ -92,7 +92,7 @@ __global__ void test_kernel(const curandState *t_stateBuff, const GPU_Board *tes
     *t_resultMove = move;
 }
 
-void reset_score(double *t_globalScore)
+__global__ void reset_score(double *t_globalScore)
 {
     *t_globalScore = 0.0;
 }

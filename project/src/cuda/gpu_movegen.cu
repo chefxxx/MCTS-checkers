@@ -21,7 +21,7 @@ __constant__ size_t    d_anitDiagonalMaskEx[64];
 __constant__ int       d_canMove[2][4];
 __constant__ size_t    d_rayMask[64][4];
 
-__host__ void prepare_gpu_const_mem()
+__host__ void init_gpu_movegen_const_mem()
 {
     checkCudaErrors(cudaMemcpyToSymbol(d_diffToDir, globalTables.diffToDir, 128 * sizeof(Direction)));
     checkCudaErrors(cudaMemcpyToSymbol(d_NeighbourTable, globalTables.NeighbourTable, 256 * sizeof(size_t)));

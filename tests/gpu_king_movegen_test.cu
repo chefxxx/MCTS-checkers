@@ -10,14 +10,11 @@
 #include "gpu_rollout.cuh"
 #include "memory_cuda.cuh"
 
-constexpr int TEST_BLOCKS = 1;
-constexpr int TEST_THREADS = 1;
-
 class GpuKingsMovegenTests : public ::testing::Test
 {
     void SetUp() override
     {
-        prepare_gpu_const_mem();
+        init_gpu_movegen_const_mem();
     }
 };
 
