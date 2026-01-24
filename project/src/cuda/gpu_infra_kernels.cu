@@ -13,6 +13,19 @@ void init_gpu_const_board(const Board &t_board)
     checkCudaErrors(cudaMemcpyToSymbol(d_initBoard, &d_board, sizeof(GPU_Board)));
 }
 
+mem_cuda::unique_ptr<curandState> init_random_states()
+{
+    // Allocate the buffer on the GPU
+    auto d_states = mem_cuda::make_unique<curandState>(BLOCKS_PER_GRID * THREAD_PER_BLOCK);
+
+    // Launch the setup once
+    setup_curand_kernel<<<BLOCKS_PER_GRID, THREAD_PER_BLOCK>>>(d_states.get(), time(nullptr));
+    CUDA_CHECK_KERNEL();
+    CUDA_SYNC_CHECK();
+
+    return d_states;
+}
+
 __global__ void rollout_kernel(curandState *t_stateBuff, const Colour t_startingTurn)
 {
     // Initialize the kernel's variables
@@ -39,18 +52,6 @@ __global__ void setup_curand_kernel(curandState *state, const unsigned long seed
     */
     curand_init(seed, tid, 0, &state[tid]);
 }
-
-// // 1. Calculate total threads (matches your rollout grid)
-// const size_t total_threads = BLOCKS_PER_GRID * THREAD_PER_BLOCK;
-//
-// // 2. Allocate the buffer on the GPU
-// auto d_states = mem_cuda::make_unique<curandState>(total_threads);
-//
-// // 3. Launch the setup once
-// setup_curand_kernel<<<BLOCKS_PER_GRID, THREAD_PER_BLOCK>>>(d_states.get(), time(0));
-//
-// // Wait for it to finish before rollouts begin
-// cudaDeviceSynchronize();
 
 __global__ void test_kernel(const curandState *t_stateBuff, const GPU_Board *testBoard, const Colour t_startingTurn, GPU_Move *t_resultMove)
 {

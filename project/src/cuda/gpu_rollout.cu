@@ -8,9 +8,6 @@
 #include "gpu_rollout.cuh"
 #include "memory_cuda.cuh"
 
-constexpr int BLOCKS_PER_GRID  = 1;
-constexpr int THREAD_PER_BLOCK = 1;
-
 /**
  * @brief Entry point of the rollout kernels.
  *

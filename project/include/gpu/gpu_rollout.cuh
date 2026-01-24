@@ -9,5 +9,4 @@
 
 double rollout_gpu(const MctsNode *t_node);
 
-
 #endif

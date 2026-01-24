@@ -45,6 +45,9 @@ constexpr int canMove[2][4] = {
 
 // CUDA parts
 
+constexpr int BLOCKS_PER_GRID  = 1;
+constexpr int THREAD_PER_BLOCK = 1;
+
 #define CUDA_CHECK_KERNEL() getLastCudaError("Kernel failed...")
 #define CUDA_SYNC_CHECK()   checkCudaErrors(cudaDeviceSynchronize())
 
