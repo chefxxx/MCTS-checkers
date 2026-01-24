@@ -385,6 +385,13 @@ template <typename Type> __host__ unique_ptr<Type> allocateAndCopyGPU_FromHostVe
     return d_ptr;
 }
 
+template <typename Type> __host__ unique_ptr<Type> allocateAndCopyGPU_FromHostObject(const Type &t_obj)
+{
+    auto d_ptr = mem_cuda::make_unique<Type>();
+    checkCudaErrors(cudaMemcpy(d_ptr.get(), &t_obj, sizeof(Type), cudaMemcpyHostToDevice));
+    return d_ptr;
+}
+
 } // namespace mem_cuda
 
 

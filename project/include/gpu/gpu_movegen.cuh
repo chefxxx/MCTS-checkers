@@ -29,7 +29,7 @@ __device__ int      pick_random_bit(size_t t_mask, curandState *t_state);
 __device__ GPU_Move make_king_attack(curandState *t_state, int t_idx, size_t t_boardState, size_t t_opponentPieces);
 __device__ GPU_Move make_pawn_attack(curandState *t_state, int t_idx, size_t t_opponentPieces, size_t t_empty);
 __device__ GPU_Move make_king_quiet(curandState *t_state, int t_idx, size_t t_boardState, size_t t_empty);
-__device__ GPU_Move make_pawn_quiet(curandState *t_state, int _idx, Colour t_colour, size_t t_empty);
+__device__ GPU_Move make_pawn_quiet(curandState *t_state, int t_idx, Colour t_colour, size_t t_empty);
 __device__ GPU_Move generate_random_move(curandState *t_state, const GPU_Board &t_board, Colour t_colour);
 
 

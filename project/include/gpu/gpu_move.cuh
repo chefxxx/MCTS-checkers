@@ -7,6 +7,7 @@
 
 struct GPU_Move
 {
+    __host__ __device__ GPU_Move() = default;
     __device__ GPU_Move(const size_t t_from, const size_t t_to, const size_t t_captures)
         : from_mask(t_from)
         , to_mask(t_to)

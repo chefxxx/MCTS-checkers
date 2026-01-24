@@ -39,7 +39,6 @@ __device__ size_t get_pawns_quiet_gpu(const size_t t_moversPawns,
     // It is assumed that program "sees" the board from white perspective
     // so for white pawns only "up" slides are permitted, meaning
     // that for black only "down" slides are permitted.
-
     const size_t move_upRight =
         d_canMove[t_moversColour][UP_RIGHT] * ((t_moversPawns & NOT_FILE_H) << 9 & t_emptyFiles) >> 9;
     const size_t move_upLeft =
@@ -245,7 +244,6 @@ __device__ GPU_Move generate_random_move(curandState *t_state, const GPU_Board &
     const size_t possible_pawns_quiet = get_pawns_quiet_gpu(pawns, empty, t_colour);
     const size_t possible_kings_quiet = kings_quiet_mask_gpu(kings, all_board_pieces);
     const size_t possible_quiet_mask  = possible_kings_quiet | possible_pawns_quiet;
-
     const int  found_idx = pick_random_bit(possible_quiet_mask, t_state);
     const bool is_king   = 1ULL << found_idx & kings;
     return is_king ? make_king_quiet(t_state, found_idx, all_board_pieces, empty)

@@ -30,7 +30,7 @@ __device__ __host__ __forceinline__ void resetBitAtIdx(size_t &a, const size_t i
 __device__ __host__ __forceinline__ int popCount(const size_t a)
 {
 #if defined(__CUDA_ARCH__)
-    return __popc(a);
+    return __popcll(a);
 #else
     return std::popcount(a);
 #endif
