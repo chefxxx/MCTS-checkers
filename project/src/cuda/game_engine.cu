@@ -105,6 +105,7 @@ void GameManager::playerTurn(const bool t_midGame)
         board = n_board.value();
         game_hist.emplace_back(move->packed_positions.packed_data);
         if (t_midGame) {
+            mcts_tree.updateTree(); // ensure that this move exists in the tree
             const auto node = findPlayerMove(mcts_tree.root.get(), board, move->packed_positions);
             assert(node != nullptr);
             mcts_tree.updateRoot(node);

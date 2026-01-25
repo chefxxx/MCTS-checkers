@@ -50,9 +50,15 @@ __global__ void rollout_kernel(curandState *t_stateBuff, const Colour t_starting
     auto turn           = t_startingTurn;
 
     // perform a random game
-    while (true) {
+    int moves = 0;
+    while (moves < 100) {
+        moves++;
         const auto move = generate_random_move(&local, tmp_board, turn);
-        apply_move_gpu(tmp_board, move, turn);
+        if (move.from_mask == GPU_Move::None) {
+            turn = static_cast<Colour>(1 - turn);
+            break;
+        }
+        tmp_board = apply_move_gpu(tmp_board, move, turn);
         state = check_end_of_game_conditions(tmp_board, turn);
         if (state != CONTINUES)
             break;
@@ -60,7 +66,7 @@ __global__ void rollout_kernel(curandState *t_stateBuff, const Colour t_starting
     }
 
     double score = -1.0;
-    if (state == DRAW)
+    if (state == DRAW || moves == 200)
         score = 0.5;
     else
         score = turn == parent_colour ? 1.0 : 0.0;

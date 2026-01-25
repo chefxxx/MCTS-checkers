@@ -36,7 +36,7 @@ std::optional<Board> applyMove(const Board &t_board, const Move &t_move, const C
     }
 
     // update kings quiet moves
-    board_copy.kings_quiet_moves = (t_move.from_mask & t_board.kings[t_colour]) > 0 && t_move.captures_mask > 0
+    board_copy.kings_quiet_moves = (t_move.from_mask & t_board.kings[t_colour]) > 0 && t_move.captures_mask == 0ULL
                                      ? board_copy.kings_quiet_moves + 1
                                      : 0;
 

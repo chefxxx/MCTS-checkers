@@ -93,7 +93,6 @@ struct MctsNode
         return current_score / number_of_visits + C * std::sqrt(std::log(parent_visits()) / number_of_visits);
     }
     [[nodiscard]] bool is_fully_expanded() const { return possible_moves.empty(); }
-    //[[nodiscard]] size_t possible_count() const { return possible_moves.size(); }
     [[nodiscard]] bool is_solved() const { return status != NodeStatus::SEARCHING; }
     void               checkNodeStatus();
 };
@@ -107,7 +106,6 @@ struct MctsTree
     // ---------------------------------
     MctsTree() = default;
     explicit MctsTree(const Board &t_board, const Colour t_colour)
-        : colour_of_ai(t_colour)
     {
         // Note:
         // I assume that the root node is always the node
@@ -119,16 +117,15 @@ struct MctsTree
     }
 
     std::unique_ptr<MctsNode> root         = nullptr;
-    Colour                    colour_of_ai = none;
 
     ~MctsTree() = default;
 
     void initTree(const Board &t_board, const Colour t_colour)
     {
         root         = std::make_unique<MctsNode>(nullptr, t_board, t_colour);
-        colour_of_ai = t_colour;
     }
     void updateRoot(const MctsNode *t_new_root);
+    void updateTree() const;
 };
 
 [[nodiscard]] MctsNode *findPlayerMove(const MctsNode *t_root, const Board &t_board, LightMovePath t_move);

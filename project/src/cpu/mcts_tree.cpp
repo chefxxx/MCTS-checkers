@@ -28,6 +28,26 @@ void MctsTree::updateRoot(const MctsNode *t_new_root)
     root->parent = nullptr;
 }
 
+void MctsTree::updateTree() const
+{
+    while (!root->is_fully_expanded()) {
+        const auto selectedNode = expandNode(root.get());
+        double score;
+        if (selectedNode->is_solved()) {
+            if (selectedNode->status == NodeStatus::WIN)
+                score = 0.0;
+            else if (selectedNode->status == NodeStatus::LOSS)
+                score = 1.0;
+            else
+                score = 0.5;
+        }
+        else {
+            score = rollout(selectedNode);
+        }
+        backpropagate(selectedNode, score);
+    }
+}
+
 MctsNode *findPlayerMove(const MctsNode *t_root, const Board &t_board, const LightMovePath t_move)
 {
     assert(t_root != nullptr);

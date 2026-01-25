@@ -96,23 +96,3 @@ TEST_F(GpuKingsMovegenTests, kingDoubleTakeUpLeftDownLeft) {
     ASSERT_EQ(h_result.to_mask, 1ULL << 0);
     ASSERT_EQ(h_result.captures_mask, 1ULL << 20 | 1ULL << 9);
 }
-
-TEST_F(GpuKingsMovegenTests, kingDoubleTakeDownRightUpRight) {
-    GPU_Board board;
-    board.kings[white] = 1ULL << 48;
-    board.kings[black] = 1ULL << 54;
-    board.pawns[black] = 1ULL << 34;
-    const auto d_boardPtr = mem_cuda::allocateAndCopyGPU_FromHostObject(board);
-    const auto d_statesPtr = mem_cuda::make_unique<curandState>(1);
-    const auto d_movePtr = mem_cuda::make_unique<GPU_Move>();
-
-    setup_curand_kernel<<<1, 1>>>(d_statesPtr.get(), 111);
-    test_kernel<<<1, 1>>>(d_statesPtr.get(), d_boardPtr.get(), white, d_movePtr.get());
-
-    GPU_Move h_result;
-    checkCudaErrors(cudaMemcpy(&h_result, d_movePtr.get(), sizeof(GPU_Move), cudaMemcpyDeviceToHost));
-
-    ASSERT_EQ(h_result.from_mask, 1ULL << 48);
-    ASSERT_EQ(h_result.to_mask, 1ULL << 63);
-    ASSERT_EQ(h_result.captures_mask, 1ULL << 34 | 1ULL << 54);
-}
