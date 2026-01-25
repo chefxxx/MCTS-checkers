@@ -46,9 +46,8 @@ TEST_F(Gpu_vs_Cpu_Test, cpu_vs_cpu_test)
 
         Colour current_turn = white;
         GameState state = CONTINUES;
-        int j = 0;
         while (state == CONTINUES) {
-            constexpr double time_per_turn = 0.25;
+            constexpr double time_per_turn = 0.5;
             MctsTree& actor_tree = (current_turn == cpu_col) ? cpu_mcts_tree : gpu_mcts_tree;
             MctsTree& observer_tree = (current_turn == cpu_col) ? gpu_mcts_tree : cpu_mcts_tree;
             std::string mode = (current_turn == cpu_col) ? "cpu" : "gpu";
