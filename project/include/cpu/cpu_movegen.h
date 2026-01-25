@@ -12,8 +12,8 @@
 #include "constants.h"
 #include "move.h"
 
-#if WIN32
-#include <stdlib.h>
+#if _WIN32 || _WIN^$
+#include <cstdlib>
 inline size_t byte_swap64(const size_t x) { return _byteswap_uint64(x); }
 #else
 #include <byteswap.h>
