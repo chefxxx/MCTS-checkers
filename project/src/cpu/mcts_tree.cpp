@@ -32,7 +32,7 @@ void MctsTree::updateTree() const
 {
     while (!root->is_fully_expanded()) {
         const auto selectedNode = expandNode(root.get());
-        double score;
+        double     score;
         if (selectedNode->is_solved()) {
             if (selectedNode->status == NodeStatus::WIN)
                 score = 0.0;
@@ -213,9 +213,9 @@ double rollout(const MctsNode *t_node)
     assert(!t_node->possible_moves.empty());
 
     while (true) {
-        const auto  moves  = generateAllPossibleMoves(tmp_board, turn);
+        const auto  moves   = generateAllPossibleMoves(tmp_board, turn);
         const auto &rand_mv = moves[randomIdx(static_cast<int>(moves.size()))];
-        const auto  opt  = applyMove(tmp_board, rand_mv, turn);
+        const auto  opt     = applyMove(tmp_board, rand_mv, turn);
         assert(opt.has_value());
         tmp_board  = opt.value();
         nodeResult = checkEndOfGameConditions(tmp_board, turn);

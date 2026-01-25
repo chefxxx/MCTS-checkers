@@ -10,10 +10,7 @@
 // -------------------------------------
 __constant__ size_t d_promotion[2];
 
-void init_promotion_const_mem()
-{
-    checkCudaErrors(cudaMemcpyToSymbol(d_promotion, promotion, 2 * sizeof(size_t)));
-}
+void init_promotion_const_mem() { checkCudaErrors(cudaMemcpyToSymbol(d_promotion, promotion, 2 * sizeof(size_t))); }
 
 __device__ GPU_Board apply_move_gpu(const GPU_Board &t_board, const GPU_Move &t_move, const Colour t_colour)
 {
@@ -44,7 +41,7 @@ __device__ GPU_Board apply_move_gpu(const GPU_Board &t_board, const GPU_Move &t_
     return board_copy;
 }
 
-__device__  GameState check_end_of_game_conditions(const GPU_Board &t_board, const Colour t_playerWhoJustMoved)
+__device__ GameState check_end_of_game_conditions(const GPU_Board &t_board, const Colour t_playerWhoJustMoved)
 {
     if (t_board.kings_quiet_moves == DRAW_LIMIT) {
         return DRAW;

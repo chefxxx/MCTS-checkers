@@ -40,7 +40,8 @@ struct GameManager
     Board                         board;
     std::vector<PrintingMovePath> game_hist;
 
-    void printGameHist(std::ostream& os = std::cout) const {
+    void printGameHist(std::ostream &os = std::cout) const
+    {
         const std::string mess_box = "**** GAME HISTORY ****";
 
         os << mess_box << '\n';
@@ -50,11 +51,9 @@ struct GameManager
 
             // Logic for calculating lengths and padding
             const size_t len = entry.positions.size() * 2 + entry.positions.size() - 1;
-            const int pad = (mess_box.size() - len - 1) / 2;
+            const int    pad = (mess_box.size() - len - 1) / 2;
 
-            os << std::string(pad, ' ')
-               << entry
-               << std::string(mess_box.size() - pad - len - 2, ' ');
+            os << std::string(pad, ' ') << entry << std::string(mess_box.size() - pad - len - 2, ' ');
 
             os << "*\n";
         }
@@ -136,7 +135,7 @@ private:
 
     //
     mem_cuda::unique_ptr<curandState> d_states;
-    mem_cuda::unique_ptr<double> d_globalScore;
+    mem_cuda::unique_ptr<double>      d_globalScore;
 };
 
 Colour              drawStartingColour();

@@ -16,10 +16,10 @@ class Gpu_vs_Cpu_Test : public ::testing::Test
 {
 public:
     mem_cuda::unique_ptr<curandState> d_states;
-    mem_cuda::unique_ptr<double> d_globalScore;
+    mem_cuda::unique_ptr<double>      d_globalScore;
 
-    MctsTree                      cpu_mcts_tree;
-    MctsTree                      gpu_mcts_tree;
+    MctsTree cpu_mcts_tree;
+    MctsTree gpu_mcts_tree;
 
     void SetUp() override
     {

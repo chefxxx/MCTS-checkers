@@ -10,15 +10,12 @@
 #include "gpu_rollout.cuh"
 #include "memory_cuda.cuh"
 
-constexpr int TEST_BLOCKS = 1;
+constexpr int TEST_BLOCKS  = 1;
 constexpr int TEST_THREADS = 1;
 
 class GpuPawnsMovegenTests : public ::testing::Test
 {
-    void SetUp() override
-    {
-        init_gpu_movegen_const_mem();
-    }
+    void SetUp() override { init_gpu_movegen_const_mem(); }
 };
 
 TEST_F(GpuPawnsMovegenTests, whitePawnMoveUpRight)
@@ -30,10 +27,10 @@ TEST_F(GpuPawnsMovegenTests, whitePawnMoveUpRight)
     //
     constexpr auto white_mask = 1ULL << 11;
     constexpr auto black_mask = 1ULL << 18 | 1ULL << 25;
-    GPU_Board board;
-    board.pawns[white] = white_mask;
-    board.pawns[black] = black_mask;
-    const auto d_boardPtr = mem_cuda::allocateAndCopyGPU_FromHostObject(board);
+    GPU_Board      board;
+    board.pawns[white]     = white_mask;
+    board.pawns[black]     = black_mask;
+    const auto d_boardPtr  = mem_cuda::allocateAndCopyGPU_FromHostObject(board);
     const auto d_statesPtr = mem_cuda::make_unique<curandState>(TEST_THREADS * TEST_BLOCKS);
     setup_curand_kernel<<<TEST_BLOCKS, TEST_THREADS>>>(d_statesPtr.get(), time(nullptr));
     CUDA_CHECK_KERNEL();
@@ -47,19 +44,20 @@ TEST_F(GpuPawnsMovegenTests, whitePawnMoveUpRight)
 
     // Only possible move from this position
     constexpr size_t result_from = 1ULL << 11;
-    constexpr size_t result_to = 1ULL << 20;
+    constexpr size_t result_to   = 1ULL << 20;
     ASSERT_EQ(result_from, h_result.from_mask);
     ASSERT_EQ(result_to, h_result.to_mask);
 }
 
 // 1. White Pawn UP_LEFT
-TEST_F(GpuPawnsMovegenTests, whitePawnMoveUpLeft) {
+TEST_F(GpuPawnsMovegenTests, whitePawnMoveUpLeft)
+{
     GPU_Board board;
-    board.pawns[white]  = 1ULL << 18;
+    board.pawns[white] = 1ULL << 18;
     board.pawns[black] |= 1ULL << 27;
     board.pawns[black] |= 1ULL << 36;
 
-    const auto d_boardPtr = mem_cuda::allocateAndCopyGPU_FromHostObject(board);
+    const auto d_boardPtr  = mem_cuda::allocateAndCopyGPU_FromHostObject(board);
     const auto d_statesPtr = mem_cuda::make_unique<curandState>();
     setup_curand_kernel<<<1, 1>>>(d_statesPtr.get(), 1234);
     CUDA_CHECK_KERNEL();
@@ -77,9 +75,10 @@ TEST_F(GpuPawnsMovegenTests, whitePawnMoveUpLeft) {
 }
 
 
-TEST_F(GpuPawnsMovegenTests, blackPawnMoveDownwardsLeft) {
+TEST_F(GpuPawnsMovegenTests, blackPawnMoveDownwardsLeft)
+{
     GPU_Board board;
-    board.pawns[black]  = 1ULL << 45;
+    board.pawns[black] = 1ULL << 45;
     board.pawns[white] |= 1ULL << 38;
     board.pawns[white] |= 1ULL << 31;
 
@@ -100,9 +99,10 @@ TEST_F(GpuPawnsMovegenTests, blackPawnMoveDownwardsLeft) {
     ASSERT_EQ(1ULL << 36, h_result.to_mask);
 }
 
-TEST_F(GpuPawnsMovegenTests, blackPawnMoveDownwardsRight) {
+TEST_F(GpuPawnsMovegenTests, blackPawnMoveDownwardsRight)
+{
     GPU_Board board;
-    board.pawns[black]  = 1ULL << 45;
+    board.pawns[black] = 1ULL << 45;
     board.pawns[white] |= 1ULL << 36;
     board.pawns[white] |= 1ULL << 27;
 
@@ -124,13 +124,14 @@ TEST_F(GpuPawnsMovegenTests, blackPawnMoveDownwardsRight) {
 }
 
 
-TEST_F(GpuPawnsMovegenTests, whitePawnCaptureUpRight) {
+TEST_F(GpuPawnsMovegenTests, whitePawnCaptureUpRight)
+{
     GPU_Board board;
     board.pawns[white] = 1ULL << 18;
     board.pawns[black] = 1ULL << 27;
 
-    const auto d_boardPtr = mem_cuda::allocateAndCopyGPU_FromHostObject(board);
-    const auto d_movePtr = mem_cuda::make_unique<GPU_Move>();
+    const auto d_boardPtr  = mem_cuda::allocateAndCopyGPU_FromHostObject(board);
+    const auto d_movePtr   = mem_cuda::make_unique<GPU_Move>();
     const auto d_statesPtr = mem_cuda::make_unique<curandState>(1);
     setup_curand_kernel<<<1, 1>>>(d_statesPtr.get(), 555);
     CUDA_CHECK_KERNEL();
@@ -148,13 +149,14 @@ TEST_F(GpuPawnsMovegenTests, whitePawnCaptureUpRight) {
     ASSERT_EQ(1ULL << 27, h_result.captures_mask);
 }
 
-TEST_F(GpuPawnsMovegenTests, whitePawnCaptureUpLeft) {
+TEST_F(GpuPawnsMovegenTests, whitePawnCaptureUpLeft)
+{
     GPU_Board board;
     board.pawns[white] = 1ULL << 18;
     board.pawns[black] = 1ULL << 25;
 
-    const auto d_boardPtr = mem_cuda::allocateAndCopyGPU_FromHostObject(board);
-    const auto d_movePtr = mem_cuda::make_unique<GPU_Move>();
+    const auto d_boardPtr  = mem_cuda::allocateAndCopyGPU_FromHostObject(board);
+    const auto d_movePtr   = mem_cuda::make_unique<GPU_Move>();
     const auto d_statesPtr = mem_cuda::make_unique<curandState>(1);
     setup_curand_kernel<<<1, 1>>>(d_statesPtr.get(), 555);
     CUDA_CHECK_KERNEL();
@@ -172,13 +174,14 @@ TEST_F(GpuPawnsMovegenTests, whitePawnCaptureUpLeft) {
     ASSERT_EQ(1ULL << 25, h_result.captures_mask);
 }
 
-TEST_F(GpuPawnsMovegenTests, whitePawnCaptureDownLeft) {
+TEST_F(GpuPawnsMovegenTests, whitePawnCaptureDownLeft)
+{
     GPU_Board board;
     board.pawns[white] = 1ULL << 18;
     board.pawns[black] = 1ULL << 9;
 
-    const auto d_boardPtr = mem_cuda::allocateAndCopyGPU_FromHostObject(board);
-    const auto d_movePtr = mem_cuda::make_unique<GPU_Move>();
+    const auto d_boardPtr  = mem_cuda::allocateAndCopyGPU_FromHostObject(board);
+    const auto d_movePtr   = mem_cuda::make_unique<GPU_Move>();
     const auto d_statesPtr = mem_cuda::make_unique<curandState>(1);
     setup_curand_kernel<<<1, 1>>>(d_statesPtr.get(), 555);
     CUDA_CHECK_KERNEL();
@@ -196,13 +199,14 @@ TEST_F(GpuPawnsMovegenTests, whitePawnCaptureDownLeft) {
     ASSERT_EQ(1ULL << 9, h_result.captures_mask);
 }
 
-TEST_F(GpuPawnsMovegenTests, whitePawnCaptureDownRight) {
+TEST_F(GpuPawnsMovegenTests, whitePawnCaptureDownRight)
+{
     GPU_Board board;
     board.pawns[white] = 1ULL << 18;
     board.pawns[black] = 1ULL << 11;
 
-    const auto d_boardPtr = mem_cuda::allocateAndCopyGPU_FromHostObject(board);
-    const auto d_movePtr = mem_cuda::make_unique<GPU_Move>();
+    const auto d_boardPtr  = mem_cuda::allocateAndCopyGPU_FromHostObject(board);
+    const auto d_movePtr   = mem_cuda::make_unique<GPU_Move>();
     const auto d_statesPtr = mem_cuda::make_unique<curandState>(1);
     setup_curand_kernel<<<1, 1>>>(d_statesPtr.get(), 555);
     CUDA_CHECK_KERNEL();
@@ -221,7 +225,8 @@ TEST_F(GpuPawnsMovegenTests, whitePawnCaptureDownRight) {
 }
 
 
-TEST_F(GpuPawnsMovegenTests, whitePawnDoubleCapture) {
+TEST_F(GpuPawnsMovegenTests, whitePawnDoubleCapture)
+{
     GPU_Board board;
     board.pawns[white] = 1ULL << 9;
     board.pawns[black] = 1ULL << 18 | 1ULL << 34 | 1ULL << 50;
@@ -233,8 +238,8 @@ TEST_F(GpuPawnsMovegenTests, whitePawnDoubleCapture) {
        4. Jump over c5 (41) to d8 (59)
     */
 
-    const auto d_boardPtr = mem_cuda::allocateAndCopyGPU_FromHostObject(board);
-    const auto d_movePtr = mem_cuda::make_unique<GPU_Move>();
+    const auto d_boardPtr  = mem_cuda::allocateAndCopyGPU_FromHostObject(board);
+    const auto d_movePtr   = mem_cuda::make_unique<GPU_Move>();
     const auto d_statesPtr = mem_cuda::make_unique<curandState>(1);
     setup_curand_kernel<<<1, 1>>>(d_statesPtr.get(), 777);
 

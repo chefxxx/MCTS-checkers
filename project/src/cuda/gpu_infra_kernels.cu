@@ -10,7 +10,7 @@ __constant__ GPU_Board d_initBoard;
 
 void init_gpu_const_board(const Board &t_board)
 {
-    const auto  d_board = GPU_Board(t_board);
+    const auto d_board = GPU_Board(t_board);
     checkCudaErrors(cudaMemcpyToSymbol(d_initBoard, &d_board, sizeof(GPU_Board)));
 }
 
@@ -42,12 +42,12 @@ __device__ void summarize_warp(double t_score, double *t_globalScore)
 __global__ void rollout_kernel(curandState *t_stateBuff, const Colour t_startingTurn, double *t_globalScore)
 {
     // Initialize the kernel's variables
-    const size_t    tid       = threadIdx.x + blockIdx.x * blockDim.x;
-    GPU_Board tmp_board       = d_initBoard;
-    curandState     local     = t_stateBuff[tid];
-    GameState state           = CONTINUES;
-    const auto parent_colour  = static_cast<Colour>(1 - t_startingTurn);
-    auto turn           = t_startingTurn;
+    const size_t tid           = threadIdx.x + blockIdx.x * blockDim.x;
+    GPU_Board    tmp_board     = d_initBoard;
+    curandState  local         = t_stateBuff[tid];
+    GameState    state         = CONTINUES;
+    const auto   parent_colour = static_cast<Colour>(1 - t_startingTurn);
+    auto         turn          = t_startingTurn;
 
     // perform a random game
     int moves = 0;
@@ -59,7 +59,7 @@ __global__ void rollout_kernel(curandState *t_stateBuff, const Colour t_starting
             break;
         }
         tmp_board = apply_move_gpu(tmp_board, move, turn);
-        state = check_end_of_game_conditions(tmp_board, turn);
+        state     = check_end_of_game_conditions(tmp_board, turn);
         if (state != CONTINUES)
             break;
         turn = static_cast<Colour>(1 - turn);
@@ -90,15 +90,15 @@ __global__ void setup_curand_kernel(curandState *state, const unsigned long seed
     curand_init(seed, tid, 0, &state[tid]);
 }
 
-__global__ void test_kernel(const curandState *t_stateBuff, const GPU_Board *testBoard, const Colour t_startingTurn, GPU_Move *t_resultMove)
+__global__ void test_kernel(const curandState *t_stateBuff,
+                            const GPU_Board   *testBoard,
+                            const Colour       t_startingTurn,
+                            GPU_Move          *t_resultMove)
 {
-    const size_t tid = threadIdx.x + blockIdx.x * blockDim.x;
-    auto local_state = t_stateBuff[tid];
-    const auto move = generate_random_move(&local_state, *testBoard, t_startingTurn);
-    *t_resultMove = move;
+    const size_t tid         = threadIdx.x + blockIdx.x * blockDim.x;
+    auto         local_state = t_stateBuff[tid];
+    const auto   move        = generate_random_move(&local_state, *testBoard, t_startingTurn);
+    *t_resultMove            = move;
 }
 
-__global__ void reset_score(double *t_globalScore)
-{
-    *t_globalScore = 0.0;
-}
+__global__ void reset_score(double *t_globalScore) { *t_globalScore = 0.0; }

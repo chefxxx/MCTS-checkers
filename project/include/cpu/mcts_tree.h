@@ -116,13 +116,13 @@ struct MctsTree
         root = std::make_unique<MctsNode>(nullptr, t_board, t_colour);
     }
 
-    std::unique_ptr<MctsNode> root         = nullptr;
+    std::unique_ptr<MctsNode> root = nullptr;
 
     ~MctsTree() = default;
 
     void initTree(const Board &t_board, const Colour t_colour)
     {
-        root         = std::make_unique<MctsNode>(nullptr, t_board, t_colour);
+        root = std::make_unique<MctsNode>(nullptr, t_board, t_colour);
     }
     void updateRoot(const MctsNode *t_new_root);
     void updateTree() const;

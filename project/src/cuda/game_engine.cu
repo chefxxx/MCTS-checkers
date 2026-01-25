@@ -6,8 +6,8 @@
 #include <random>
 #include <sys/stat.h>
 
-#include "game_engine.cuh"
 #include "checkers_engine.h"
+#include "game_engine.cuh"
 #include "gpu_rollout.cuh"
 #include "logger.h"
 
@@ -49,13 +49,11 @@ void GameManager::playTheGame()
     }
     std::cout << mess;
 
-    auto now = std::chrono::system_clock::now();
+    auto        now      = std::chrono::system_clock::now();
     std::time_t now_time = std::chrono::system_clock::to_time_t(now);
 
     std::ostringstream filename;
-    filename << "../../games/game_history_"
-             << std::put_time(std::localtime(&now_time), "%Y-%m-%d_%H-%M-%S")
-             << ".txt";
+    filename << "../../games/game_history_" << std::put_time(std::localtime(&now_time), "%Y-%m-%d_%H-%M-%S") << ".txt";
     if (std::ofstream outFile(filename.str()); outFile.is_open()) {
         printGameHist(outFile);
         outFile.close();
@@ -66,7 +64,7 @@ void GameManager::playTheGame()
 void GameManager::aiTurn()
 {
     MctsNode *bestNode = nullptr;
-    bestNode = runMctsSimulation(mcts_tree, m_timePerTurn, m_mode, d_states,  d_globalScore);
+    bestNode           = runMctsSimulation(mcts_tree, m_timePerTurn, m_mode, d_states, d_globalScore);
     assert(bestNode != nullptr);
     board = bestNode->current_board_state;
     mcts_tree.updateRoot(bestNode);
