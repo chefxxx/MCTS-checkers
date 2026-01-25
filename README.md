@@ -1,6 +1,6 @@
 # 🏁 CUDA-Accelerated MCTS Checkers Engine
 
-A high-performance Checkers engine utilizing **Monte Carlo Tree Search (MCTS)** with a hybrid CPU-GPU architecture. This project offloads the computationally intensive simulation phase (rollouts) to the GPU, allowing for tens of thousands of parallel games per second.
+A high-performance Checkers engine utilizing **Monte Carlo Tree Search (MCTS)** with a hybrid CPU-GPU architecture.
 
 ## 🚀 Key Features
 
