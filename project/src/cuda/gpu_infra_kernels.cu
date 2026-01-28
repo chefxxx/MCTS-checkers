@@ -17,10 +17,10 @@ void init_gpu_const_board(const Board &t_board)
 mem_cuda::unique_ptr<curandState> init_random_states()
 {
     // Allocate the buffer on the GPU
-    auto d_states = mem_cuda::make_unique<curandState>(BLOCKS_PER_GRID * THREAD_PER_BLOCK);
+    auto d_states = mem_cuda::make_unique<curandState>(BLOCKS_PER_GRID * THREADS_PER_BLOCK);
 
     // Launch the setup once
-    setup_curand_kernel<<<BLOCKS_PER_GRID, THREAD_PER_BLOCK>>>(d_states.get(), time(nullptr));
+    setup_curand_kernel<<<BLOCKS_PER_GRID, THREADS_PER_BLOCK>>>(d_states.get(), time(nullptr));
     CUDA_CHECK_KERNEL();
     CUDA_SYNC_CHECK();
 

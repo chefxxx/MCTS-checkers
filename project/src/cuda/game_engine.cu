@@ -17,7 +17,7 @@ void GameManager::playTheGame()
     GameState state = CONTINUES;
 
     if (m_player_colour == white) {
-        printBoard();
+        printBoard(board, m_player_colour);
         playerTurn(false);
         turn = black;
     }
@@ -25,8 +25,8 @@ void GameManager::playTheGame()
     mcts_tree.initTree(board, m_ai_colour);
 
     while (state == CONTINUES) {
-        printGameHist();
-        printBoard();
+        printGameHist(game_hist);
+        printBoard(board, m_player_colour);
 
         if (turn == m_player_colour) {
             // player
@@ -40,7 +40,7 @@ void GameManager::playTheGame()
         state = checkEndOfGameConditions(board, turn);
         turn  = static_cast<Colour>(1 - turn);
     }
-    printBoard();
+    printBoard(board, m_player_colour);
     std::string mess = "Maybe next time, you lost!\n";
     if (state == DRAW)
         mess = "Game ended in a draw!\n";
@@ -55,7 +55,7 @@ void GameManager::playTheGame()
     std::ostringstream filename;
     filename << "../../games/game_history_" << std::put_time(std::localtime(&now_time), "%Y-%m-%d_%H-%M-%S") << ".txt";
     if (std::ofstream outFile(filename.str()); outFile.is_open()) {
-        printGameHist(outFile);
+        printGameHist(game_hist, outFile);
         outFile.close();
         std::cout << "History saved to: " << filename.str() << std::endl;
     }
@@ -276,4 +276,155 @@ void mctsIteration(const MctsTree                                           &t_t
 
     // 4. backpropagate
     backpropagate(selectedNode, score);
+}
+
+void printGameHist(const std::vector<PrintingMovePath> &t_hist, std::ostream &os)
+{
+    const std::string mess_box = "**** GAME HISTORY ****";
+
+    os << mess_box << '\n';
+
+    for (const auto &entry : t_hist) {
+        os << '*';
+
+        // Logic for calculating lengths and padding
+        const size_t len = entry.positions.size() * 2 + entry.positions.size() - 1;
+        const int    pad = (mess_box.size() - len - 1) / 2;
+
+        os << std::string(pad, ' ') << entry << std::string(mess_box.size() - pad - len - 2, ' ');
+
+        os << "*\n";
+    }
+
+    os << mess_box << '\n';
+}
+
+
+void printBoard(const Board &t_board, const Colour t_perspective)
+{
+    // perspective and printing utils
+    std::array<char, 8> rowsNames{};
+    std::string         columnsNamesRow;
+
+    if (t_perspective == black) {
+        columnsNamesRow = "    h   g   f   e   d   c   b   a \n";
+        rowsNames       = {'1', '2', '3', '4', '5', '6', '7', '8'};
+    }
+    else {
+        columnsNamesRow = "    a   b   c   d   e   f   g   h \n";
+        rowsNames       = {'8', '7', '6', '5', '4', '3', '2', '1'};
+    }
+
+    const std::string middleRow = " +---+---+---+---+---+---+---+---+\n";
+
+    // Remember that rocks may overlap each other, this func just prints
+    std::cout << columnsNamesRow;
+    for (int visualRow = 0; visualRow < 8; ++visualRow) {
+        std::cout << middleRow;
+        std::cout << rowsNames[visualRow];
+        for (int visualCol = 0; visualCol < 8; ++visualCol) {
+            int actualRow, actualCol;
+            if (t_perspective == black) {
+                actualRow = visualRow;
+                actualCol = 7 - visualCol;
+            }
+            else {
+                actualRow = 7 - visualRow;
+                actualCol = visualCol;
+            }
+            if (const int bitIdx = actualRow * 8 + actualCol; checkBitAtIdx(t_board.pawns[white], bitIdx)) {
+                std::cout << "| w ";
+            }
+            else if (checkBitAtIdx(t_board.pawns[black], bitIdx)) {
+                std::cout << "| b ";
+            }
+            else if (checkBitAtIdx(t_board.kings[white], bitIdx)) {
+                std::cout << "| W ";
+            }
+            else if (checkBitAtIdx(t_board.kings[black], bitIdx)) {
+                std::cout << "| B ";
+            }
+            else {
+                std::cout << "|   ";
+            }
+        }
+        std::cout << '|' << rowsNames[visualRow] << '\n';
+    }
+
+    std::cout << middleRow;
+    std::cout << columnsNamesRow;
+}
+
+void printRuleset()
+{
+    std::cout << "******************************************* RULESET *******************************************\n";
+    std::cout << "* 0. Welcome to checkers.mcts!                                                                *\n";
+    std::cout << "* 1. Quiet moves are marked as (from)-(to).                                                   *\n";
+    std::cout << "* 2. Attack moves are marked as (from):(mid):(to).                                            *\n";
+    std::cout << "* 3. Pawns move in one direction, diagonally, one square. Pawns can attack in any direction.  *\n";
+    std::cout << "* 4. If pawn ends its move on the opposite last rank, it becomes a king.                      *\n";
+    std::cout << "* 5. Kings move ina any direction, diagonally, any number of squares.                         *\n";
+    std::cout << "* 6. There is no limit of taking opponents pieces in one attack move.                         *\n";
+    std::cout << "* 7. At any point of the game you can resign, by writing 'resign'.                            *\n";
+    std::cout << "* 8. Have fun!                                                                                *\n";
+    std::cout << "******************************************* RULESET *******************************************\n";
+}
+
+double setTime(const std::string &t_mess)
+{
+    std::string resTimeStr;
+    const std::string mess_box = "************************* TIME SETTINGS *************************";
+    const std::string mid_box  = "*                                                               *\n";
+    const std::string full_prompt = "Please enter the time for the " + t_mess + " in seconds.";
+
+    const int total_width = mess_box.size();
+    const int inner_width = total_width - 2;
+    const int pad_left = (inner_width - full_prompt.size()) / 2;
+    const int pad_right = inner_width - full_prompt.size() - pad_left;
+
+    std::cout << mess_box << '\n';
+    std::cout << mid_box;
+    std::cout << '*'
+       << std::string(pad_left, ' ')
+       << full_prompt
+       << std::string(pad_right, ' ')
+       << "*\n";
+    std::cout << mid_box;
+    std::cout << mess_box << "\n";
+    std::cout << "ENTER THE TIME: ";
+    std::getline(std::cin, resTimeStr);
+    const auto resTime = std::stoi(resTimeStr);
+    return resTime;
+}
+
+std::string selectArchitecture(const std::string &t_mess)
+{
+    std::string arch;
+
+    const std::string mess_box = "****************************** ENGINE SETTINGS ******************************";
+    const std::string mid_box  = "*                                                                           *\n";
+    const std::string full_prompt = "Please enter the engine for the " + t_mess + " - write 'gpu' or 'cpu'.";
+
+    const int total_width = mess_box.size();
+    const int inner_width = total_width - 2;
+    const int pad_left = (inner_width - full_prompt.size()) / 2;
+    const int pad_right = inner_width - full_prompt.size() - pad_left;
+
+    std::cout << mess_box << '\n';
+    std::cout << mid_box;
+    std::cout << '*'
+       << std::string(pad_left, ' ')
+       << full_prompt
+       << std::string(pad_right, ' ')
+       << "*\n";
+    std::cout << mid_box;
+    std::cout << mess_box << "\n";
+
+    std::cout << "ENTER THE ENGINE: ";
+    std::getline(std::cin, arch);
+    if (arch != "cpu" && arch != "gpu") {
+        logger::err("Wrong engine type entered, try again!\n");
+        exit(EXIT_FAILURE);
+    }
+    return arch;
 }
