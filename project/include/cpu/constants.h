@@ -11,8 +11,13 @@
 // CUDA parts
 // ----------
 
-constexpr int BLOCKS_PER_GRID  = 8;
-constexpr int THREAD_PER_BLOCK = 32;
+// Interestingly in the GPU vs CPU comparison, the GPU's best results
+// are achieved when only one (one-warped) block is run.
+//
+// In such configuration the CPU and GPU play almost equally,
+// with the shift towards the CPU.
+constexpr int BLOCKS_PER_GRID   = 1;
+constexpr int THREADS_PER_BLOCK = 32;
 
 #define CUDA_CHECK_KERNEL() getLastCudaError("Kernel failed...")
 #define CUDA_SYNC_CHECK()   checkCudaErrors(cudaDeviceSynchronize())

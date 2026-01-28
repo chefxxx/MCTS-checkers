@@ -8,10 +8,10 @@
 #include <optional>
 #include <string>
 
-#include "../cpu/board_infra.h"
-#include "../cpu/constants.h"
-#include "../cpu/mcts_tree.h"
-#include "../cpu/move.h"
+#include "board_infra.h"
+#include "constants.h"
+#include "mcts_tree.h"
+#include "move.h"
 #include "bit_operations.cuh"
 #include "gpu_checkers_engine.cuh"
 #include "gpu_infa_kernels.cuh"
@@ -26,7 +26,6 @@ struct GameManager
         , m_mode(t_mode)
         , m_timePerTurn(t_ai_time)
     {
-        initPerspective();
         board.initStartingBoard();
         if (m_mode == "gpu") {
             init_promotion_const_mem();
@@ -40,91 +39,11 @@ struct GameManager
     Board                         board;
     std::vector<PrintingMovePath> game_hist;
 
-    void printGameHist(std::ostream &os = std::cout) const
-    {
-        const std::string mess_box = "**** GAME HISTORY ****";
-
-        os << mess_box << '\n';
-
-        for (const auto &entry : game_hist) {
-            os << '*';
-
-            // Logic for calculating lengths and padding
-            const size_t len = entry.positions.size() * 2 + entry.positions.size() - 1;
-            const int    pad = (mess_box.size() - len - 1) / 2;
-
-            os << std::string(pad, ' ') << entry << std::string(mess_box.size() - pad - len - 2, ' ');
-
-            os << "*\n";
-        }
-
-        os << mess_box << '\n';
-    }
-
-    void printBoard() const
-    {
-        const std::string middleRow = " +---+---+---+---+---+---+---+---+\n";
-
-        // Remember that rocks may overlap each other, this func just prints
-        std::cout << columnsNamesRow;
-        for (int visualRow = 0; visualRow < 8; ++visualRow) {
-            std::cout << middleRow;
-            std::cout << rowsNames[visualRow];
-            for (int visualCol = 0; visualCol < 8; ++visualCol) {
-                int actualRow, actualCol;
-                if (m_player_colour == black) {
-                    actualRow = visualRow;
-                    actualCol = 7 - visualCol;
-                }
-                else {
-                    actualRow = 7 - visualRow;
-                    actualCol = visualCol;
-                }
-                if (const int bitIdx = actualRow * 8 + actualCol; checkBitAtIdx(board.pawns[white], bitIdx)) {
-                    std::cout << "| w ";
-                }
-                else if (checkBitAtIdx(board.pawns[black], bitIdx)) {
-                    std::cout << "| b ";
-                }
-                else if (checkBitAtIdx(board.kings[white], bitIdx)) {
-                    std::cout << "| W ";
-                }
-                else if (checkBitAtIdx(board.kings[black], bitIdx)) {
-                    std::cout << "| B ";
-                }
-                else {
-                    std::cout << "|   ";
-                }
-            }
-            std::cout << '|' << rowsNames[visualRow] << '\n';
-        }
-
-        std::cout << middleRow;
-        std::cout << columnsNamesRow;
-    }
-
     void playTheGame();
     void aiTurn();
     void playerTurn(bool t_midGame = true);
 
 private:
-    void initPerspective()
-    {
-        // perspective only affects printing
-        if (m_player_colour == black) {
-            columnsNamesRow = "    h   g   f   e   d   c   b   a \n";
-            rowsNames       = {'1', '2', '3', '4', '5', '6', '7', '8'};
-        }
-        else {
-            columnsNamesRow = "    a   b   c   d   e   f   g   h \n";
-            rowsNames       = {'8', '7', '6', '5', '4', '3', '2', '1'};
-        }
-    }
-
-    // perspective and printing utils
-    std::array<char, 8> rowsNames{};
-    std::string         columnsNamesRow;
-
     // -------------
     // game settings
     // -------------
@@ -136,6 +55,47 @@ private:
     //
     mem_cuda::unique_ptr<curandState> d_states;
     mem_cuda::unique_ptr<double>      d_globalScore;
+};
+
+struct AI_Player
+{
+    AI_Player(const double t_time, const std::string &t_engine, const Colour t_player_colour) :
+    time_per_round(t_time)
+        , colour(t_player_colour)
+        , engine(t_engine) {}
+
+
+    double time_per_round;
+    Colour colour;
+    std::string engine;
+};
+
+struct ComputerGame
+{
+    ComputerGame(const AI_Player &t_p1, const AI_Player &t_p2) : ai_player1(t_p1), ai_player2(t_p2)
+    {
+        if (t_p1.engine == "gpu" || t_p2.engine == "gpu") {
+            init_promotion_const_mem();
+            init_gpu_movegen_const_mem();
+            d_globalScore = mem_cuda::make_unique<double>();
+            d_states      = init_random_states();
+        }
+        board.initStartingBoard();
+        P1_mcts_tree.initTree(board, white);
+        P2_mcts_tree.initTree(board, white);
+    }
+
+    Board board;
+    AI_Player ai_player1;
+    AI_Player ai_player2;
+
+    MctsTree P1_mcts_tree;
+    MctsTree P2_mcts_tree;
+    std::vector<PrintingMovePath>     game_hist;
+    mem_cuda::unique_ptr<curandState> d_states;
+    mem_cuda::unique_ptr<double>      d_globalScore;
+
+    void playTheGame();
 };
 
 Colour              drawStartingColour();
@@ -151,5 +111,12 @@ void      mctsIteration(const MctsTree                          &t_tree,
                         const std::string                       &t_mode,
                         const mem_cuda::unique_ptr<curandState> &t_states,
                         const mem_cuda::unique_ptr<double>      &t_globalScore);
+
+void printGameHist(const std::vector<PrintingMovePath> &t_hist, std::ostream &os = std::cout);
+void printBoard(const Board &t_board, Colour t_perspective);
+void printRuleset();
+double setTime(const std::string &t_mess);
+std::string selectArchitecture(const std::string &t_mess);
+Colour      selectColour(const std::string &t_mess);
 
 #endif // MCTS_CHECKERS_GAME_ENGINE_H
