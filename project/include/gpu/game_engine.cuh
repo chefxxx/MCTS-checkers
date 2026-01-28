@@ -57,6 +57,47 @@ private:
     mem_cuda::unique_ptr<double>      d_globalScore;
 };
 
+struct AI_Player
+{
+    AI_Player(const double t_time, const std::string &t_engine, const Colour t_player_colour) :
+    time_per_round(t_time)
+        , colour(t_player_colour)
+        , engine(t_engine) {}
+
+
+    double time_per_round;
+    Colour colour;
+    std::string engine;
+};
+
+struct ComputerGame
+{
+    ComputerGame(const AI_Player &t_p1, const AI_Player &t_p2) : ai_player1(t_p1), ai_player2(t_p2)
+    {
+        if (t_p1.engine == "gpu" || t_p2.engine == "gpu") {
+            init_promotion_const_mem();
+            init_gpu_movegen_const_mem();
+            d_globalScore = mem_cuda::make_unique<double>();
+            d_states      = init_random_states();
+        }
+        board.initStartingBoard();
+        P1_mcts_tree.initTree(board, white);
+        P2_mcts_tree.initTree(board, white);
+    }
+
+    Board board;
+    AI_Player ai_player1;
+    AI_Player ai_player2;
+
+    MctsTree P1_mcts_tree;
+    MctsTree P2_mcts_tree;
+    std::vector<PrintingMovePath>     game_hist;
+    mem_cuda::unique_ptr<curandState> d_states;
+    mem_cuda::unique_ptr<double>      d_globalScore;
+
+    void playTheGame();
+};
+
 Colour              drawStartingColour();
 std::optional<Move> parsePlayerMove(const Board &t_board, Colour t_colour);
 std::optional<Move> processMoveString(const std::string &t_moveStr, const Board &t_currBoard, Colour t_colour);
@@ -76,5 +117,6 @@ void printBoard(const Board &t_board, Colour t_perspective);
 void printRuleset();
 double setTime(const std::string &t_mess);
 std::string selectArchitecture(const std::string &t_mess);
+Colour      selectColour(const std::string &t_mess);
 
 #endif // MCTS_CHECKERS_GAME_ENGINE_H

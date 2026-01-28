@@ -51,13 +51,12 @@ void GameManager::playTheGame()
 
     auto        now      = std::chrono::system_clock::now();
     std::time_t now_time = std::chrono::system_clock::to_time_t(now);
-
     std::ostringstream filename;
     filename << "../../games/game_history_" << std::put_time(std::localtime(&now_time), "%Y-%m-%d_%H-%M-%S") << ".txt";
     if (std::ofstream outFile(filename.str()); outFile.is_open()) {
         printGameHist(game_hist, outFile);
         outFile.close();
-        std::cout << "History saved to: " << filename.str() << std::endl;
+        std::cout << "Game history saved to: " << filename.str() << std::endl;
     }
 }
 
@@ -110,6 +109,56 @@ void GameManager::playerTurn(const bool t_midGame)
         }
         return;
     }
+}
+
+void   ComputerGame::playTheGame()
+{
+    Colour turn = white;
+    GameState state = CONTINUES;
+
+    while (state == CONTINUES) {
+        // print always from the white player perspective
+        printGameHist(game_hist);
+        if (!game_hist.empty()) {
+            auto just_played = static_cast<Colour>(1 - turn);
+            std::cout << "The " << just_played << " player played the move " << game_hist.back() << '\n';
+        }
+        printBoard(board, white);
+
+        MctsTree& actor_tree = (turn == ai_player1.colour) ? P1_mcts_tree : P2_mcts_tree;
+        MctsTree& observer_tree = (turn == ai_player1.colour) ? P2_mcts_tree : P1_mcts_tree;
+        AI_Player& actor = (turn == ai_player1.colour) ? ai_player1 : ai_player2;
+
+        const MctsNode* bestActorNode = runMctsSimulation(actor_tree, actor.time_per_round, actor.engine, d_states, d_globalScore);
+
+        board = bestActorNode->current_board_state;
+        const LightMovePath move = bestActorNode->packed_positions_transition;
+        actor_tree.updateRoot(bestActorNode);
+        observer_tree.updateTree();
+        const auto syncNode = findPlayerMove(observer_tree.root.get(), board, move);
+        assert(syncNode != nullptr);
+        observer_tree.updateRoot(syncNode);
+
+        game_hist.emplace_back(move.packed_data);
+
+        state = checkEndOfGameConditions(board, turn);
+        if (state != CONTINUES) break;
+
+        turn = static_cast<Colour>(1 - turn);
+    }
+    printBoard(board, white);
+    std::cout << "The " << turn << " won the game!\n";
+
+    auto        now      = std::chrono::system_clock::now();
+    std::time_t now_time = std::chrono::system_clock::to_time_t(now);
+    std::ostringstream filename;
+    filename << "../../games/game_history_" << std::put_time(std::localtime(&now_time), "%Y-%m-%d_%H-%M-%S") << ".txt";
+    if (std::ofstream outFile(filename.str()); outFile.is_open()) {
+        printGameHist(game_hist, outFile);
+        outFile.close();
+        std::cout << "Game history saved to: " << filename.str() << std::endl;
+    }
+
 }
 
 Colour drawStartingColour()
@@ -393,7 +442,7 @@ double setTime(const std::string &t_mess)
     std::cout << mess_box << "\n";
     std::cout << "ENTER THE TIME: ";
     std::getline(std::cin, resTimeStr);
-    const auto resTime = std::stoi(resTimeStr);
+    const auto resTime = std::stod(resTimeStr);
     return resTime;
 }
 
@@ -427,4 +476,37 @@ std::string selectArchitecture(const std::string &t_mess)
         exit(EXIT_FAILURE);
     }
     return arch;
+}
+
+Colour selectColour(const std::string &t_mess)
+{
+    std::string colour;
+    const std::string mess_box = "****************************** COLOUR SETTINGS ******************************";
+    const std::string mid_box  = "*                                                                           *\n";
+    const std::string full_prompt = "Please enter the colour for the " + t_mess + " - write 'b' or 'w'.";
+
+    const int total_width = mess_box.size();
+    const int inner_width = total_width - 2;
+    const int pad_left = (inner_width - full_prompt.size()) / 2;
+    const int pad_right = inner_width - full_prompt.size() - pad_left;
+
+    std::cout << mess_box << '\n';
+    std::cout << mid_box;
+    std::cout << '*'
+       << std::string(pad_left, ' ')
+       << full_prompt
+       << std::string(pad_right, ' ')
+       << "*\n";
+    std::cout << mid_box;
+    std::cout << mess_box << "\n";
+    std::cout << "ENTER THE COLOUR: ";
+    std::getline(std::cin, colour);
+    if (colour != "w" && colour != "b" ) {
+        logger::err("Wrong colour entered, try again!\n");
+        exit(EXIT_FAILURE);
+    }
+    if (colour == "w") {
+        return white;
+    }
+    return black;
 }

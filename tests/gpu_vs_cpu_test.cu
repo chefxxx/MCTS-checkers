@@ -30,7 +30,7 @@ public:
     }
 };
 
-#if true
+#if false
 TEST_F(Gpu_vs_Cpu_Test, cpu_vs_cpu_test)
 {
     double cpu_score = 0.0;

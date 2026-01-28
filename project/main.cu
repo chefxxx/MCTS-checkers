@@ -30,11 +30,20 @@ int main(const int argc, const char **argv)
         manager.playTheGame();
     }
     else if (mode == "2") {
-
+        const double timeP1 = setTime("player 1");
+        const double timeP2 = setTime("player 2");
+        const auto engineP1 = selectArchitecture("player 1");
+        const auto engineP2 = selectArchitecture("player 2");
+        const auto colP1 = selectColour("player 1");
+        const auto colP2 = static_cast<Colour>(1 - colP1);
+        AI_Player p1{timeP1, engineP1, colP1};
+        AI_Player p2{timeP2, engineP2, colP2};
+        ComputerGame game_manager{p1, p2};
+        game_manager.playTheGame();
     }
     else {
         logger::err("Unknown game mode, try again!\n");
     }
 
-    return 0;
+    return EXIT_SUCCESS;
 }
